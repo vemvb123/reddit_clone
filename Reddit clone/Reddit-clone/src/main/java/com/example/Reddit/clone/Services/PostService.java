@@ -11,6 +11,7 @@ import com.example.Reddit.clone.Repository.CommentRepository;
 import com.example.Reddit.clone.Repository.CommunityRepository;
 import com.example.Reddit.clone.Repository.PostRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
+import com.example.Reddit.clone.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -59,19 +60,13 @@ public class PostService {
 
     @Transactional
     public PostDTO savePost(PostDTO postDTO, String communityName) {
-
-        System.out.println("1");
         Community community = communityRepository.findByTitle(communityName).orElseThrow(() -> new RuntimeException("Community not found"));
-        System.out.println("2");
-
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
-        System.out.println("4");
 
         //save post
         //etabler forholdet mellom post og community
         //etabler forholdet mellom user og post
-
         Post post = new Post();
         if (postDTO.getId() != null) {
             post.setId(postDTO.getId());
@@ -87,13 +82,7 @@ public class PostService {
 
         post.setCommunity(community);
         post.setUser(user);
-        System.out.println("5");
-
         Post savedPost = postRepository.save(post);
-        System.out.println("6");
-
-
-
 
         return new PostDTO().mapObjectToDTO(savedPost);
 
@@ -119,26 +108,20 @@ public class PostService {
     }
 
 
-    public List<PostDTO> get20PostsFromCommunitiesMemberOf(String authorization, Integer page) {
-        String username = jwtService.extractUsername(authorization);
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Community not found"));
-
-        Set<Community> communities = userRepository.findCommunitiesByUsername(username);
-
+    public List<PostDTO> get20PostsFromCommunitiesMemberOf(Integer page) {
+        User user = userRepository.findByUsername(SecurityUtils.getUsername()).orElseThrow(() -> new RuntimeException("Community not found"));
+        Set<Community> communities = userRepository.findCommunitiesByUsername( SecurityUtils.getUsername() );
         List<Post> posts = communityRepository.getPostsOfCommunities(communities, PageRequest.of(page, 20));
-
         List<PostDTO> postDTOs = new ArrayList<>();
         for (Post post : posts)
             postDTOs.add( new PostDTO().mapObjectToDTO(post) );
-
 
         return postDTOs;
 
     }
 
+
     public void setImage(MultipartFile file, Long postId) {
-
-
         Post post = postRepository.getById(postId);
         if (post.getPathToPostImage() != null)
             post.setLastUpdated(LocalDateTime.now());
@@ -180,8 +163,8 @@ public class PostService {
         postRepository.deleteById(postId);
     }
 
-    public List<PostDTO> get20LatestPostsOfUser(String username, Integer page, String authorization) {
-        User userLooking = userRepository.findByUsername(jwtService.extractUsername(authorization)).orElseThrow(() -> ExceptionUtils.noUserWithThatName(jwtService.extractUsername(authorization)));
+    public List<PostDTO> get20LatestPostsOfUserLoggedIn(String username, Integer page) {
+        User userLooking = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow(() -> ExceptionUtils.noUserWithThatName( SecurityUtils.getUsername() ));
         User userProfile = userRepository.findByUsername(username ) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(username ));
 
         List<Post> posts = postRepository.getPostsOfUserOrderByCreatedAt(userProfile.getUsername(), PageRequest.of(page, 20));
@@ -200,7 +183,7 @@ public class PostService {
 
     }
 
-    public List<PostDTO> get20LatestPostsOfUser(String username, Integer page) {
+    public List<PostDTO> get20LatestPostsOfUserNotLoggedIn(String username, Integer page) {
         User userProfile = userRepository.findByUsername(username ) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(username ));
 
         List<Post> posts = postRepository.getPostsOfUserOrderByCreatedAt(userProfile.getUsername(), PageRequest.of(page, 20));
@@ -218,15 +201,11 @@ public class PostService {
 
     }
     public List<PostDTO> getLatestPostsOfCommunitiesPublic(Integer page) {
-        System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         List<Post> posts = postRepository.getLatestsPostsOfPublicCommunities(PageRequest.of(page, 20));
-
-
         List<PostDTO> postDTOs = new ArrayList<>();
         for (Post post : posts) {
             postDTOs.add( new PostDTO().mapObjectToDTO(post) );
         }
-
         return postDTOs;
     }
 }

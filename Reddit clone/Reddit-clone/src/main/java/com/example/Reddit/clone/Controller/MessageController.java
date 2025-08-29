@@ -38,77 +38,57 @@ public class MessageController {
     @CrossOrigin(origins = origin)
     @GetMapping("/get10MessageToUser/{page}")
     public ResponseEntity<List<MessageDTO>> get10MessageToUser(
-            @RequestHeader("Authorization") String authorization,
             @PathVariable Integer page
     ) {
-
-        List<MessageDTO> messages = messageService.get10MessagesToUser(authorization, page);
-        System.out.println("Storrelsepalista: " + messages.size());
-
-
-
+        List<MessageDTO> messages = messageService.get10MessagesToUser(page);
         return ResponseEntity.ok().body(messages);
-
-
     }
 
 
 
 
     @CrossOrigin(origins = origin)
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministratorOrModerator(#authorization, #communityName)"))
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministratorOrModerator(#communityName)"))
     @GetMapping("/getRequestsToJoinCommunity/{page}/{communityName}")
     public ResponseEntity<List<MessageDTO>> get10RequestsToJoinCommunity(
-            @RequestHeader("Authorization") String authorization,
             @PathVariable Integer page,
             @PathVariable String communityName
     ) {
-        System.out.println("herjasann");
         List<MessageDTO> messages = messageService.getRequestsToJoinCommunity(page, communityName);
-        System.out.println(messages.size() + " herstor");
-
         return ResponseEntity.ok().body(messages);
     }
 
 
     @CrossOrigin(origins = origin)
-    @PreAuthorize(("@ownerCheck.userCanRequestToJoinCommunity(#authorization, #communityName)"))
+    @PreAuthorize(("@ownerCheck.userCanRequestToJoinCommunity(#communityName)"))
     @PostMapping("/requestToJoinCommunity/{communityName}")
     public ResponseEntity<String> requestToJoinCommunity(
-            @RequestHeader("Authorization") String authorization,
             @PathVariable String communityName
     ) {
-
-         messageService.requestToJoinCommunity(authorization, communityName);
-
+         messageService.requestToJoinCommunity(communityName);
         return ResponseEntity.status(HttpStatus.OK).body("Successfully requested to join community");
     }
 
+
     @CrossOrigin(origins = origin)
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministratorOrModerator(#authorization, #communityName)"))
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministratorOrModerator(#communityName)"))
     @PostMapping("/acceptRequestToJoinCommunity/{communityName}/{usernameRequestingToJoin}")
     public ResponseEntity<String> requestToJoinCommunity(
-            @RequestHeader("Authorization") String authorization,
             @PathVariable String communityName,
             @PathVariable String usernameRequestingToJoin
     ) {
-        System.out.println("uh0");
-
         messageService.acceptRequestToJoinCommunity(communityName, usernameRequestingToJoin);
-
         return ResponseEntity.status(HttpStatus.OK).body("Successfully accepted request to join community");
     }
 
 
 
     @CrossOrigin(origins = origin)
-    @PreAuthorize(("@ownerCheck.userOwnsMessage(#authorization, #messageId)"))
+    @PreAuthorize(("@ownerCheck.userOwnsMessage(#messageId)"))
     @DeleteMapping("/deleteMessage/{messageId}")
     public ResponseEntity<String> get10MessageToUser(
-            @RequestHeader("Authorization") String authorization,
             @PathVariable Long messageId
     ) {
-
         messageService.deleteMessage(messageId);
         return ResponseEntity.status(HttpStatus.OK).body("Successfully deleted message");
     }

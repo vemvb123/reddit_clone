@@ -7,6 +7,7 @@ import com.example.Reddit.clone.Entity.*;
 import com.example.Reddit.clone.Repository.CommentRepository;
 import com.example.Reddit.clone.Repository.MessageRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
+import com.example.Reddit.clone.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -76,10 +77,8 @@ public class UserService {
     }
 
 
-    public UserDTO getUserByToken(String authorization) {
-        String username = jwtService.extractUsername(authorization);
-        User user = userRepository.findByUsername(username).orElseThrow();
-
+    public UserDTO getUserByToken() {
+        User user = userRepository.findByUsername(SecurityUtils.getUsername()).orElseThrow();
         return new UserDTO().mapObjectToDTO(user);
 
     }
@@ -111,8 +110,8 @@ public class UserService {
     @Autowired
     CommentRepository commentRepository;
 
-    public void sendFriendRequestFromUser(String toUsername, String authorization) {
-        String fromUsername = jwtService.extractUsername(authorization);
+    public void sendFriendRequestFromUser(String toUsername) {
+        String fromUsername = SecurityUtils.getUsername();
         User fromUser = userRepository.findByUsername(fromUsername).orElseThrow();
         System.out.println("der1");
 
@@ -154,10 +153,10 @@ public class UserService {
         userRepository.deleteFriendRequestsFromUserToUser(user2.getId(), user1.getId());
     }
     @Transactional
-    public void acceptFriendRequest(String fromUsername, String authorization) {
+    public void acceptFriendRequest(String fromUsername) {
         User fromUser = userRepository.findByUsername(fromUsername).orElseThrow();
 
-        String toUsername = jwtService.extractUsername(authorization);
+        String toUsername = SecurityUtils.getUsername();
         User toUser = userRepository.findByUsername(toUsername).orElseThrow();
 
         if (messageRepository.findFriendRequestFromUserToUser(fromUsername, toUsername) == null)
@@ -169,9 +168,8 @@ public class UserService {
 
 
 
-    public void changeOthersCanSeePostsAndComments(Integer allowedToSeePosts, Integer allowedToSeeComments, String authorization) {
-        String username = jwtService.extractUsername(authorization);
-        User user = userRepository.findByUsername(username) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(username));
+    public void changeOthersCanSeePostsAndComments(Integer allowedToSeePosts, Integer allowedToSeeComments) {
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() ) .orElseThrow(() -> ExceptionUtils.noUserWithThatName( SecurityUtils.getUsername() ));
 
         if (allowedToSeePosts == 1)
             user.setOtherUsersCanSeePosts(true);

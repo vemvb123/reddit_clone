@@ -8,14 +8,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 public class RedditCloneApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(RedditCloneApplication.class, args);
 	}
-
-
-
-
 }
 
 

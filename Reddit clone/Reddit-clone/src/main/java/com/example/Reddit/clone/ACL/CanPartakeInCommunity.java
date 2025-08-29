@@ -10,6 +10,7 @@ import com.example.Reddit.clone.Repository.CommunityRepository;
 import com.example.Reddit.clone.Repository.PostRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import com.example.Reddit.clone.Services.ExceptionUtils;
+import com.example.Reddit.clone.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -37,10 +38,6 @@ public class CanPartakeInCommunity {
 
 
     public boolean userCanCreate(String authorization, String communityName) {
-        String username = jwtService.extractUsername(authorization);
-        User user = userRepository.findByUsername(username).orElseThrow();
-
-
         Community community = communityRepository.findByTitle(communityName).orElseThrow();
 
         //check if community type is public
@@ -48,7 +45,7 @@ public class CanPartakeInCommunity {
             return true;
 
         //check if user is part of community, if so, return true
-        Set<Community> communities = userRepository.findCommunitiesByUsername(username);
+        Set<Community> communities = userRepository.findCommunitiesByUsername(SecurityUtils.getUsername());
         for (Community communityInList : communities)
             if (communityInList == community)
                 return true;
@@ -59,21 +56,15 @@ public class CanPartakeInCommunity {
 
 
 
-    public boolean userCanView(String authorization, String communityName) {
-        String username = jwtService.extractUsername(authorization);
-        User user = userRepository.findByUsername(username).orElseThrow();
-
+    public boolean userCanViewLoggedIn(String communityName) {
         Community community = communityRepository.findByTitle(communityName).orElseThrow();
-
         if (community.getCommunityType() == CommunityType.PUBLIC || community.getCommunityType() == CommunityType.RESTRICTED)
             return true;
-
         // communityType is private
-        return userRepository.findCommunitiesUserIsMemberOf(username) .contains(community);
+        return userRepository.findCommunitiesUserIsMemberOf( SecurityUtils.getUsername() ) .contains(community);
     }
 
-    public boolean userCanView(String communityName) {
-        System.out.println("halloda");
+    public boolean userCanViewNotLoggedIn(String communityName) {
         Community community = communityRepository.findByTitle(communityName).orElseThrow();
 
         if (community.getCommunityType() == CommunityType.PUBLIC || community.getCommunityType() == CommunityType.RESTRICTED)
@@ -82,9 +73,6 @@ public class CanPartakeInCommunity {
     }
 
     public boolean userCanView(String authorization, Long postId) {
-        String username = jwtService.extractUsername(authorization);
-        User user = userRepository.findByUsername(username).orElseThrow();
-
         Post post = postRepository.findById(postId) .orElseThrow(() -> ExceptionUtils.noPostWithThatId(postId));
 
         Community community = communityRepository.findByTitle(post.getCommunity().getTitle()).orElseThrow();
@@ -93,12 +81,11 @@ public class CanPartakeInCommunity {
             return true;
 
         // communityType is private
-        return userRepository.findCommunitiesUserIsMemberOf(username) .contains(community);
+        return userRepository.findCommunitiesUserIsMemberOf( SecurityUtils.getUsername() ) .contains(community);
     }
 
 
     public boolean userCanView(Long postId) {
-
         Post post = postRepository.findById(postId) .orElseThrow(() -> ExceptionUtils.noPostWithThatId(postId));
 
         Community community = communityRepository.findByTitle(post.getCommunity().getTitle()).orElseThrow();
@@ -107,11 +94,6 @@ public class CanPartakeInCommunity {
             return true;
         return false;
     }
-
-
-
-
-
 
 
 }

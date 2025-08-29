@@ -8,6 +8,7 @@ import com.example.Reddit.clone.Repository.CommentRepository;
 import com.example.Reddit.clone.Repository.CommunityRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import com.example.Reddit.clone.Services.ExceptionUtils;
+import com.example.Reddit.clone.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -25,43 +26,28 @@ public class CheckAgainstModeratorAndAdminRights {
     @Autowired
     private CommunityRepository communityRepository;
 
-    public boolean userIsModerator(String authorization, String communityName) {
+    public boolean userIsModerator(String communityName) {
         Community community = communityRepository.findByTitle(communityName).orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(communityName));
-        User user = userRepository.findByUsername( jwtService.extractUsername(authorization) ).orElseThrow(() -> ExceptionUtils.noUserWithThatName(jwtService.extractUsername(authorization)));
-
-        return (userRepository.findCommunitiesUserIsModeratorOf(user.getUsername()) .contains(community));
+        return (userRepository.findCommunitiesUserIsModeratorOf(SecurityUtils.getUsername()) .contains(community));
     }
 
 
-    public boolean userIsAdministrator(String authorization, String communityName) {
-        System.out.println("derfraherfra");
+    public boolean userIsAdministrator(String communityName) {
         Community community = communityRepository.findByTitle(communityName).orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(communityName));
-        User user = userRepository.findByUsername( jwtService.extractUsername(authorization) ).orElseThrow(() -> ExceptionUtils.noUserWithThatName(jwtService.extractUsername(authorization)));
-        boolean userIsAdministratorIfCommunity = userRepository.findCommunitiesUserIsAdministratorOf(user.getUsername()) .contains(community);
-        System.out.println(userIsAdministratorIfCommunity);
+        boolean userIsAdministratorIfCommunity = userRepository.findCommunitiesUserIsAdministratorOf( SecurityUtils.getUsername() ) .contains(community);
         return userIsAdministratorIfCommunity;
     }
 
-    public boolean userIsAdministratorOrModerator(String authorization, String communityName) {
+    public boolean userIsAdministratorOrModerator(String communityName) {
         Community community = communityRepository.findByTitle(communityName).orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(communityName));
-        User user = userRepository.findByUsername( jwtService.extractUsername(authorization) ).orElseThrow(() -> ExceptionUtils.noUserWithThatName(jwtService.extractUsername(authorization)));
-
-        return (userRepository.findCommunitiesUserIsAdministratorOf(user.getUsername()).contains(community)
-                || userRepository.findCommunitiesUserIsModeratorOf(user.getUsername()).contains(community));
+        return (userRepository.findCommunitiesUserIsAdministratorOf( SecurityUtils.getUsername() ).contains(community)
+                || userRepository.findCommunitiesUserIsModeratorOf( SecurityUtils.getUsername() ).contains(community));
 
     }
 
-
-
-
-
-
-
-
-
-    public boolean canChangeCommunityImage(String authorization, String communityName) {
+    public boolean canChangeCommunityImage(String communityName) {
         Community community = communityRepository.findByTitle(communityName).orElseThrow();
-        User user = userRepository.findByUsername( jwtService.extractUsername(authorization) ).orElseThrow();
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
 
         if (user.getAdministratorOnCommunities().contains(community))
             return true;
@@ -71,9 +57,9 @@ public class CheckAgainstModeratorAndAdminRights {
     }
 
 
-    public boolean canChangeWallpaper(String authorization, String communityName) {
+    public boolean canChangeWallpaper(String communityName) {
         Community community = communityRepository.findByTitle(communityName).orElseThrow();
-        User user = userRepository.findByUsername( jwtService.extractUsername(authorization) ).orElseThrow();
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
 
         if (user.getAdministratorOnCommunities().contains(community))
             return true;
@@ -82,22 +68,17 @@ public class CheckAgainstModeratorAndAdminRights {
         return false;
     }
 
-    public boolean canBanUsers(String authorization, String communityName, String usernameToBan) {
+    public boolean canBanUsers(String communityName, String usernameToBan) {
         Community community = communityRepository.findByTitle(communityName).orElseThrow();
-        User user = userRepository.findByUsername( jwtService.extractUsername(authorization) ).orElseThrow();
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
         User userToBan = userRepository.findByUsername(usernameToBan).orElseThrow(() -> ExceptionUtils.noUserWithThatName(usernameToBan));
 
         if (user == userToBan)
             return false;
-
-        if (userToBan.getAdministratorOnCommunities().contains(community)) {
+        if (userToBan.getAdministratorOnCommunities().contains(community))
             return false;
-
-        }
-        else if (user.getModeratorOnCommunities().contains(community) && userToBan.getModeratorOnCommunities().contains(community)) {
+        else if (user.getModeratorOnCommunities().contains(community) && userToBan.getModeratorOnCommunities().contains(community))
             return false;
-
-        }
 
         if (user.getAdministratorOnCommunities().contains(community))
             return true;
@@ -108,10 +89,9 @@ public class CheckAgainstModeratorAndAdminRights {
 
 
 
-    public boolean userCanSubscribe(String authorization, String communityName) {
-        User user = userRepository.findByUsername( jwtService.extractUsername(authorization) ).orElseThrow();
+    public boolean userCanSubscribe(String communityName) {
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
         Community community = communityRepository.findByTitle(communityName).orElseThrow();
-
 
         //user is not banned
         if (userRepository.getCommunitiesBannedFrom(user.getUsername()).contains(community))
@@ -123,9 +103,9 @@ public class CheckAgainstModeratorAndAdminRights {
 
 
 
-    public boolean canDeleteCommunity(String authorization, String communityName) {
+    public boolean canDeleteCommunity(String communityName) {
         Community community = communityRepository.findByTitle(communityName).orElseThrow();
-        User user = userRepository.findByUsername( jwtService.extractUsername(authorization) ).orElseThrow();
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
 
         if (user.getAdministratorOnCommunities().contains(community))
             return true;
@@ -134,11 +114,9 @@ public class CheckAgainstModeratorAndAdminRights {
         return false;
     }
 
-    public boolean canDeleteOthersComments(String authorization, String communityName) {
-        System.out.println("forja");
+    public boolean canDeleteOthersComments(String communityName) {
         Community community = communityRepository.findByTitle(communityName).orElseThrow();
-        System.out.println("etterja");
-        User user = userRepository.findByUsername( jwtService.extractUsername(authorization) ).orElseThrow();
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
 
         if (communityRepository.findAdminsOfCommunity(communityName).contains(user))
             return true;
@@ -148,9 +126,9 @@ public class CheckAgainstModeratorAndAdminRights {
     }
 
 
-    public boolean canDeleteOthersPosts(String authorization, String communityName) {
+    public boolean canDeleteOthersPosts(String communityName) {
         Community community = communityRepository.findByTitle(communityName).orElseThrow();
-        User user = userRepository.findByUsername( jwtService.extractUsername(authorization) ).orElseThrow();
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
 
         if (communityRepository.findAdminsOfCommunity( communityName ) .contains( user ))
             return true;
@@ -159,9 +137,9 @@ public class CheckAgainstModeratorAndAdminRights {
         return false;
     }
 
-    public boolean canMakeAnnouncments(String authorization, String communityName) {
+    public boolean canMakeAnnouncments(String communityName) {
         Community community = communityRepository.findByTitle(communityName).orElseThrow();
-        User user = userRepository.findByUsername( jwtService.extractUsername(authorization) ).orElseThrow();
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
 
         if (user.getAdministratorOnCommunities().contains(community))
             return true;
@@ -170,9 +148,9 @@ public class CheckAgainstModeratorAndAdminRights {
         return false;
     }
 
-    public boolean canChangeCommunityDescription(String authorization, String communityName) {
+    public boolean canChangeCommunityDescription(String communityName) {
         Community community = communityRepository.findByTitle(communityName).orElseThrow();
-        User user = userRepository.findByUsername( jwtService.extractUsername(authorization) ).orElseThrow();
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
 
         if (user.getAdministratorOnCommunities().contains(community))
             return true;

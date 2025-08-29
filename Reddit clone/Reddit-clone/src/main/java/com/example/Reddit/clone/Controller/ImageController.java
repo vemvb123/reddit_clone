@@ -42,12 +42,7 @@ public class ImageController {
     public ResponseEntity<byte[]> downloadFile(
             @PathVariable String fileName
     ) throws IOException {
-        System.out.println("herigetfilename");
-        System.out.println(fileName);
-
-
         byte[] fileContent = fileService.downloadFile(fileName);
-
 
         HttpHeaders headers = new HttpHeaders();
         if (fileName.contains(".jpg"))
@@ -62,14 +57,8 @@ public class ImageController {
 
         headers.setContentLength(fileContent.length);
 
-
-
         return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
     }
-
-
-
-
 
 
 

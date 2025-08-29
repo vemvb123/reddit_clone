@@ -41,9 +41,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public List<ChatMessage> getChatMessages(Long chatId) {
         List<ChatMessage> messages = chatMessageRepository.findByChatId(chatId);
-        System.out.println("huuuuuuu " + messages);
         if (messages.size() == 0) {
-            System.out.println("size is 0");
             return new ArrayList<ChatMessage>();
 
         }

@@ -15,7 +15,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     @CrossOrigin(origins = origin)
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        System.out.println("neeeeeeeeeeeeeeeeeeeeeeeeeeeei");
         config.enableSimpleBroker("/topic");  // Enables a simple in-memory message broker
         config.setApplicationDestinationPrefixes("/app");  // Defines the prefix for messages that are sent to the message broker
     }
@@ -23,7 +22,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     @CrossOrigin(origins = origin)
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        System.out.println("jaaaaaaaaaaaaaaaaaaaaaa");
         registry.addEndpoint("/websocket")  // Defines the endpoint for WebSocket communication
                 .setAllowedOrigins("http://localhost:3000")  // Replace with your actual frontend URL
                 .withSockJS();  // Enables SockJS fallback options for browsers that do not support WebSocket

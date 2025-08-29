@@ -11,7 +11,6 @@ public class AuthenticationController {
 
     final String origin = "http://localhost:3000";
 
-
     private final AuthenticationService service;
 
 
@@ -19,7 +18,6 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> register(
             @RequestBody RegisterRequest request
     ) {
-        System.out.println("inregister");
         return ResponseEntity.ok(service.register(request));
     }
 

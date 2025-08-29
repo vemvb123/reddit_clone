@@ -7,6 +7,7 @@ import com.example.Reddit.clone.Entity.*;
 import com.example.Reddit.clone.Repository.CommunityRepository;
 import com.example.Reddit.clone.Repository.MessageRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
+import com.example.Reddit.clone.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -74,28 +75,16 @@ public class MessageService {
         messageRepository.save(message);
     }
 
-    public List<MessageDTO> get10MessagesToUser(String authorization, int page) {
-
-        User toUser = userRepository.findByUsername(jwtService.extractUsername(authorization) ).orElseThrow();
-
-        System.out.println("user and id: " + toUser.getUsername() + ", " + toUser.getId());
-
+    public List<MessageDTO> get10MessagesToUser(int page) {
+        User toUser = userRepository.findByUsername(SecurityUtils.getUsername()).orElseThrow();
         List<Message> messages = messageRepository.find10MessagesOrderByEventHappendAt(toUser.getId(), PageRequest.of(page, 10));
-        System.out.println("storrelsepaquery: " + messages.size());
-
         List<MessageDTO> messageDTOs = new ArrayList<>();
         for (Message message : messages)
             messageDTOs.add(new MessageDTO(message));
-
-
-
         return messageDTOs;
-
     }
 
     public List<MessageDTO> getRequestsToJoinCommunity(int page, String communityName) {
-        System.out.println("getrequests....");
-
         List<Message> messages = messageRepository.getRequestsToJoinCommunity(communityName, PageRequest.of(page, 10));
 
         List<MessageDTO> messageDTOs = new ArrayList<>();
@@ -116,9 +105,8 @@ public class MessageService {
     @Autowired
     CommunityRepository communityRepository;
 
-    public void requestToJoinCommunity(String authorization, String communityName) {
-        String username = jwtService.extractUsername(authorization);
-        User user = userRepository.findByUsername(username).orElseThrow(() -> ExceptionUtils.noUserWithThatName(username));
+    public void requestToJoinCommunity(String communityName) {
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow(() -> ExceptionUtils.noUserWithThatName( SecurityUtils.getUsername() ));
 
         Community community = communityRepository.findByTitle(communityName).orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(communityName));
 

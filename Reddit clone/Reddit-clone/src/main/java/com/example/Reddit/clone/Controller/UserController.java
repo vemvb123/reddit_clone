@@ -47,16 +47,12 @@ public class UserController {
 
 
     //Todo: Bare administrator kan gjøre dette
-    @PreAuthorize(("@ownerCheck.usernameIsSameAsToken(#username, #authorization)"))
+    @PreAuthorize(("@ownerCheck.usernameIsSameAsToken(#username)"))
     @PostMapping("/setWallpaper/{username}")
     public ResponseEntity<String> setWallpaper(@RequestParam("file") MultipartFile file,
-                                               @PathVariable String username,
-                                               @RequestHeader("Authorization") String authorization
+                                               @PathVariable String username
     ) {
-
-        System.out.println("her " + authorization);
         userService.setWallpaper(file, username);
-
         return ResponseEntity.status(HttpStatus.OK).body("File saved successfully");
     }
 
@@ -73,24 +69,17 @@ public class UserController {
     // hvis toUser godtar request, slettes forespørselen, og vennskapet blit opprettet
     @CrossOrigin(origins = origin)
     @PostMapping("/send_friend_request/{toUsername}") //toUsername - Brukernavn til bruker som får request
-    public ResponseEntity<String> sendFriendRequest(
-            @PathVariable String toUsername,
-            @RequestHeader("Authorization") String authorization)
+    public ResponseEntity<String> sendFriendRequest(@PathVariable String toUsername)
     {
-
-        System.out.println("herjaderja");
-        userService.sendFriendRequestFromUser(toUsername, authorization);
-
+        userService.sendFriendRequestFromUser(toUsername);
         return ResponseEntity.status(HttpStatus.OK).body("Sent request successfully");
     }
 
     @CrossOrigin(origins = origin)
     @PostMapping("/accept_friend_request/{fromUsername}") //fromUsername - Brukernavn til bruker som request er fra
-    public ResponseEntity<String> acceptFriendRequest(@PathVariable String fromUsername, @RequestHeader("Authorization") String authorization)
+    public ResponseEntity<String> acceptFriendRequest(@PathVariable String fromUsername)
     {
-
-        userService.acceptFriendRequest(fromUsername, authorization);
-
+        userService.acceptFriendRequest(fromUsername);
         return ResponseEntity.status(HttpStatus.OK).body("Request accepted successfully");
     }
 
@@ -100,25 +89,24 @@ public class UserController {
     @PostMapping("/change_others_allowed_to_see_users_posts_and_comments/{allowedToSeePosts}/{allowedToSeeComments}") //fromUsername - Brukernavn til bruker som request er fra
     public ResponseEntity<String> changeOthersCanSeePostsAndComments(
             @PathVariable Integer allowedToSeePosts,
-            @PathVariable Integer allowedToSeeComments,
-            @RequestHeader("Authorization") String authorization)
+            @PathVariable Integer allowedToSeeComments
+    )
     {
-        userService.changeOthersCanSeePostsAndComments(allowedToSeePosts, allowedToSeeComments, authorization);
-
+        userService.changeOthersCanSeePostsAndComments(allowedToSeePosts, allowedToSeeComments);
         return ResponseEntity.status(HttpStatus.OK).body("Changed who can see posts and comments of user");
     }
-
 
 
     //Todo: post - save file path
     @CrossOrigin(origins = origin)
     //@PreAuthorize(("@ownerCheck.userOwnsImage(#authorization, #username)"))
     @PostMapping("/set_profile_image_for_user/{username}")
-    public ResponseEntity<String> setProfileImage(@RequestParam("file") MultipartFile file, @PathVariable String username, @RequestHeader("Authorization") String authorization)
+    public ResponseEntity<String> setProfileImage(
+            @RequestParam("file") MultipartFile file,
+            @PathVariable String username
+    )
     {
-
         userService.setImage(file, username);
-
         return ResponseEntity.status(HttpStatus.OK).body("File saved successfully");
     }
 
@@ -127,7 +115,6 @@ public class UserController {
     public ResponseEntity<UserDTO> getUserByUsername(
             @PathVariable String username
     ) {
-
         UserDTO userDTO = userService.getUserByUsername(username);
         return ResponseEntity.ok().body(userDTO);
 
@@ -136,49 +123,21 @@ public class UserController {
 
 
 
-
     @CrossOrigin(origins = origin)
     @GetMapping("/get_user_by_token")
-    public ResponseEntity<UserDTO> getUserByToken(
-            @RequestHeader("Authorization") String authorization
-    ) {
-
-        UserDTO userDTO = userService.getUserByToken(authorization);
-
-
-
+    public ResponseEntity<UserDTO> getUserByToken() {
+        UserDTO userDTO = userService.getUserByToken();
         return ResponseEntity.ok().body(userDTO);
-
-
     }
 
 
-
-
-
-    @CrossOrigin(origins = origin)
     @GetMapping("/get_communities_of_user/{username}")
     public ResponseEntity<List<CommunityDTO>> getCommunitiesUserIsMemberOf(
             @PathVariable String username
     ) {
-        System.out.println("In func");
         List<CommunityDTO> communities = userService.getCommunitiesUserIsMemberOf(username);
-
-
-
         return ResponseEntity.ok().body(communities);
-
-
     }
-
-
-
-    //sett profilbilde
-    //få bruker
-
-
-
-
 
 
 }

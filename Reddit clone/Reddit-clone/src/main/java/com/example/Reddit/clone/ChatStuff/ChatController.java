@@ -9,6 +9,7 @@ import com.example.Reddit.clone.Repository.ChatMessageRepository;
 import com.example.Reddit.clone.Repository.ChatRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import com.example.Reddit.clone.Services.ExceptionUtils;
+import com.example.Reddit.clone.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -53,7 +54,6 @@ public class ChatController {
     @CrossOrigin(origins = origin)
     @GetMapping("/{chatId}/messages")
     public ResponseEntity<List<ChatMessageDTO>> getChatMessages(@PathVariable Long chatId) {
-        System.out.println("kanskje");
         List<ChatMessage> messages = chatService.getChatMessages(chatId);
 
         List<ChatMessageDTO> messageDTOs = new ArrayList<>();
@@ -70,8 +70,6 @@ public class ChatController {
             @Payload ChatMessageDTO chatMessageDTO
 
     ) {
-        System.out.println("handling message");
-
         Chat chat = chatRepository.findById(chatId) .orElseThrow();
         User sender = userRepository.findByUsername(chatMessageDTO.getSender() ).orElseThrow();
 
@@ -100,13 +98,9 @@ public class ChatController {
     @CrossOrigin(origins = origin)
     @PostMapping("/getChatOrCreateIfAlreadyExists/{usernameChatWith}")
     public ResponseEntity<Long> getChatMessages(
-            @RequestHeader("Authorization") String authorization,
             @PathVariable String usernameChatWith
             ) {
-        System.out.println("HJJSAHJSAJHD");
-        String usernameFromToken = jwtService.extractUsername(authorization);
-        User userFromToken = userRepository.findByUsername(usernameFromToken) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(usernameFromToken));
-
+        User userFromToken = userRepository.findByUsername(SecurityUtils.getUsername()) .orElseThrow(() -> ExceptionUtils.noUserWithThatName( SecurityUtils.getUsername() ));
         User userChatWith = userRepository.findByUsername(usernameChatWith) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(usernameChatWith));
 
         if (Objects.equals(userFromToken.getUsername(), userChatWith.getUsername())) {
@@ -115,25 +109,16 @@ public class ChatController {
             throw new RuntimeException("no lol");
         }
 
-
         List<User> usersSorted = chatService.sortUsersAlphabetically(userFromToken, userChatWith);
 
         //ser om chat allerede finnes, hvis det, bare returner id ac den eksiterende chatten
         Chat chatThatMightExist = chatService.getChatByUsers(usersSorted.get(0), usersSorted.get(1));
         if (chatThatMightExist != null) {
-            System.out.println("chatexists");
-            System.out.println(chatThatMightExist.getId());
             return ResponseEntity.ok().body(chatThatMightExist.getId());
         }
 
-
-
         chatService.createChat(usersSorted.get(0), usersSorted.get(1));
-        System.out.println("HERERDET");
-        System.out.println(chatService.getIdOfChatBetweenUsers(usersSorted.get(0), usersSorted.get(1)));
         return ResponseEntity.ok().body(chatService.getIdOfChatBetweenUsers(usersSorted.get(0), usersSorted.get(1)));
-
-
-
     }
+
 }

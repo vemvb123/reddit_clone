@@ -23,9 +23,6 @@ import java.util.Set;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class CommunityController {
 
-
-
-
     final String origin = "http://localhost:3000";
 
     @Autowired
@@ -34,49 +31,33 @@ public class CommunityController {
     @Autowired
     private CheckAgainstModeratorAndAdminRights checkAgainstModeratorAndAdminRights;
 
-    //@Autowired
-    //private OwnerCheck ownerCheck;
-
-    //@Autowired
-    //private CanPartakeInCommunity canPartakeInCommunity;
-
 
     @CrossOrigin(origins = origin)
     @GetMapping("/user_has_role_in_community/{communityName}")
-    public ResponseEntity<UserHasRoleInCommunityResponse> userHasRoleInCommunity(
-            @PathVariable String communityName,
-            @RequestHeader("Authorization") String authorization)
+    public ResponseEntity<UserHasRoleInCommunityResponse> userHasRoleInCommunity(@PathVariable String communityName)
     {
-
-        System.out.println("herfrada");
-        UserHasRoleInCommunityResponse response = communityService.userHasRoleInCommunity(authorization, communityName);
-
+        UserHasRoleInCommunityResponse response = communityService.userHasRoleInCommunity(communityName);
         return ResponseEntity.ok().body(response);
     }
 
     @CrossOrigin(origins = origin)
     @PostMapping("/save_community")
     public ResponseEntity<CommunityDTO> saveCommunity(
-            @RequestBody CommunityDTO communityDTO,
-            @RequestHeader("Authorization") String authorization)
+            @RequestBody CommunityDTO communityDTO
+    )
     {
-
-
-        CommunityDTO DTOfromSavedComunity = communityService.saveCommunity(communityDTO, authorization);
-
+        CommunityDTO DTOfromSavedComunity = communityService.saveCommunity(communityDTO);
         return ResponseEntity.ok().body(DTOfromSavedComunity);
     }
 
+
     @CrossOrigin(origins = origin)
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.canDeleteCommunity(#authorization, #communityName)"))
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.canDeleteCommunity(#communityName)"))
     @DeleteMapping("/delete_community/{communityName}")
     public ResponseEntity<String> deleteCommunity(
-            @PathVariable String communityName,
-            @RequestHeader("Authorization") String authorization
+            @PathVariable String communityName
     ) {
-        System.out.println("Infuncy");
         communityService.deleteCommunity(communityName);
-
         return ResponseEntity.status(HttpStatus.OK).body("Deleted community");
     }
 
@@ -84,31 +65,26 @@ public class CommunityController {
 
 
     @CrossOrigin(origins = origin)
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#authorization, #communityName)"))
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#communityName)"))
     @PostMapping("/change_moderator_rights/{communityName}")
     public ResponseEntity<String> changeModeratorRights(
             @PathVariable String communityName,
-            @RequestHeader("Authorization") String authorization,
             @RequestBody ModeratorRightsDTO changeModeratorRightsRequest
     ) {
-        System.out.println("hallofracontroller");
         communityService.changeModeratorRights(communityName, changeModeratorRightsRequest);
-
         return ResponseEntity.status(HttpStatus.OK).body("Changed moderator rights");
 
     }
 
 
     @CrossOrigin(origins = origin)
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#authorization, #communityName)"))
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#communityName)"))
     @PostMapping("/remove_moderator_rights/{communityName}/{userToHaveModeratorRightsRemoved}")
     public ResponseEntity<String> removeModeratorRightsFromUser(
             @PathVariable String communityName,
-            @RequestHeader("Authorization") String authorization,
             @PathVariable String userToHaveModeratorRightsRemoved
     ) {
         communityService.removeModeratorRightsFromUser(communityName, userToHaveModeratorRightsRemoved);
-
         return ResponseEntity.status(HttpStatus.OK).body("Removed moderator rights");
 
     }
@@ -118,64 +94,42 @@ public class CommunityController {
 
     @CrossOrigin(origins = origin)
     @GetMapping("/get_members/{communityName}")
-    public ResponseEntity<Set<MemberDTO>> getMembers(
-            @PathVariable String communityName,
-            @RequestHeader("Authorization") String authorization
-            ) {
-        Set<MemberDTO> members = communityService.getMembers(communityName, authorization);
-
+    public ResponseEntity<Set<MemberDTO>> getMembers(@PathVariable String communityName) {
+        Set<MemberDTO> members = communityService.getMembers(communityName);
         return ResponseEntity.ok().body(members);
     }
 
 
     @CrossOrigin(origins = origin)
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministratorOrModerator(#authorization, #communityName)"))
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministratorOrModerator(#communityName)"))
     @GetMapping("/get_moderator_rights/{communityName}")
-    public ResponseEntity<ModeratorRightsDTO> getModeratorRights(
-            @PathVariable String communityName,
-            @RequestHeader("Authorization") String authorization
-    ) {
-        System.out.println("herfra1");
+    public ResponseEntity<ModeratorRightsDTO> getModeratorRights(@PathVariable String communityName) {
         ModeratorRightsDTO moderatorRightsDTO = communityService.getModeratorRights(communityName);
-
         return ResponseEntity.ok().body(moderatorRightsDTO);
     }
 
 
-
-
-
     //Todo: Kan bare bli invitert til private, brukeren selv må klikke for å bli bruker
     @CrossOrigin(origins = origin)
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userCanSubscribe(#authorization, #communityName)"))
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userCanSubscribe(#communityName)"))
     @PostMapping("/makeUserBecomeMember/{communityName}")
-    public ResponseEntity<String> makeUserBecomeMember(
-            @PathVariable String communityName,
-            @RequestHeader("Authorization") String authorization
-    )
+    public ResponseEntity<String> makeUserBecomeMember(@PathVariable String communityName)
     {
-        System.out.println("herja?");
-        communityService.makeUserBecomeMember(authorization, communityName);
-
-
+        communityService.makeUserBecomeMember(communityName);
         return ResponseEntity.status(HttpStatus.OK).body("User became member successfully");
     }
 
     //authorization - The user making the other user become admin
     //userToBecomeAdmin - The user reciving admin rights in community
     @CrossOrigin(origins = origin)
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#authorization, #communityName)"))
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#communityName)"))
     @PostMapping("/makeUserAdmin/{communityName}/{usernameToBecomeAdmin}")
     public ResponseEntity<String> makeUserAdmin(
             @PathVariable String communityName,
-            @PathVariable String usernameToBecomeAdmin,
-            @RequestHeader("Authorization") String authorization
+            @PathVariable String usernameToBecomeAdmin
     )
     {
-        System.out.println("OKEY");
         communityService.makeUserBecomeAdmin(usernameToBecomeAdmin, communityName);
-
-
         return ResponseEntity.status(HttpStatus.OK).body("User became admin successfully");
     }
 
@@ -183,82 +137,64 @@ public class CommunityController {
     //authorization - The user making the other user become mod
     //userToBecomeAdmin - The user reciving mod rights in community
     @CrossOrigin(origins = origin)
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#authorization, #communityName)"))
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#communityName)"))
     @PostMapping("/makeUserBecomeMod/{communityName}/{usernameToBecomeMod}")
     public ResponseEntity<String> makeUserBecomeMod(
             @PathVariable String communityName,
-            @PathVariable String usernameToBecomeMod,
-            @RequestHeader("Authorization") String authorization
+            @PathVariable String usernameToBecomeMod
     )
     {
-        System.out.println("Fader");
         communityService.makeUserBecomeMod(usernameToBecomeMod, communityName);
-
-
         return ResponseEntity.status(HttpStatus.OK).body("User became admin successfully");
     }
 
 
     @CrossOrigin(origins = origin)
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.canBanUsers(#authorization, #communityName, #usernameToBan)"))
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.canBanUsers(#communityName, #usernameToBan)"))
     @PostMapping("/banUserFromCommunity/{communityName}/{usernameToBan}")
     public ResponseEntity<String> banUserFromCommunity(
             @PathVariable String communityName,
-            @PathVariable String usernameToBan,
-            @RequestHeader("Authorization") String authorization
+            @PathVariable String usernameToBan
     ) {
-        System.out.println("huh");
         communityService.banUserFromCommunity(communityName, usernameToBan);
-
-
         return ResponseEntity.status(HttpStatus.OK).body("Banned users successfully");
-
     }
-
 
 
 
     @CrossOrigin(origins = origin)
     @PostMapping("/unsubscribeFromCommunity/{communityName}")
     public ResponseEntity<String> unsubscribeFromCommunity(
-            @PathVariable String communityName,
-            @RequestHeader("Authorization") String authorization
+            @PathVariable String communityName
     ) {
-
-        communityService.unsubscribeUserFromCommunity(authorization, communityName);
-
+        communityService.unsubscribeUserFromCommunity(communityName);
         return ResponseEntity.status(HttpStatus.OK).body("Successfully unsubscribed from community");
 
     }
 
 
-
-
-
-
-
     //Todo: Bare administrator kan gjøre dette
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.canChangeWallpaper(#authorization, #communityName)"))
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.canChangeWallpaper(#communityName)"))
     @PostMapping("/setWallpaperForCommunity/{communityName}")
-    public ResponseEntity<String> setWallpaper(@RequestParam("file") MultipartFile file, @PathVariable String communityName, @RequestHeader("Authorization") String authorization)
+    public ResponseEntity<String> setWallpaper(
+            @RequestParam("file") MultipartFile file,
+            @PathVariable String communityName
+    )
     {
-
-
         communityService.setWallpaper(file, communityName);
-
         return ResponseEntity.status(HttpStatus.OK).body("File saved successfully");
     }
 
-
     //Todo: Bare administrator kan gjøre dette
     @CrossOrigin(origins = origin)
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.canChangeCommunityImage(#authorization, #communityName)"))
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.canChangeCommunityImage(#communityName)"))
     @PostMapping("/setLogoForCommunity/{communityName}")
-    public ResponseEntity<String> setLogo(@RequestParam("file") MultipartFile file, @PathVariable String communityName, @RequestHeader("Authorization") String authorization)
+    public ResponseEntity<String> setLogo(
+            @RequestParam("file") MultipartFile file,
+            @PathVariable String communityName
+    )
     {
-        System.out.println("herfrada");
         communityService.setLogo(file, communityName);
-
         return ResponseEntity.status(HttpStatus.OK).body("File saved successfully");
     }
 
@@ -266,53 +202,30 @@ public class CommunityController {
     @CrossOrigin(origins = origin)
     @GetMapping("/get_community_by_name/{communityName}")
     public ResponseEntity<CommunityDTO> getCommunityByName(
-            @PathVariable String communityName,
-            @RequestHeader("Authorization") String authorization
-    ) {
-
-        CommunityDTO communityDTO = communityService.getCommunityByName(communityName);
-        return ResponseEntity.ok().body(communityDTO);
-
-
-    }
-
-    @CrossOrigin(origins = origin)
-    @GetMapping("/get_community_by_name_without_token/{communityName}")
-    public ResponseEntity<CommunityDTO> getCommunityByName(
             @PathVariable String communityName
     ) {
-
         CommunityDTO communityDTO = communityService.getCommunityByName(communityName);
         return ResponseEntity.ok().body(communityDTO);
-
-
     }
+
 
     @CrossOrigin(origins = origin)
     @GetMapping("/getUsers/{communityName}")
     public ResponseEntity<Set<UserDTO>> getUsers(
             @PathVariable String communityName
     ) {
-        System.out.println("hallodameg");
         Set<UserDTO> userDTOs = communityService.getUsers(communityName);
         return ResponseEntity.ok().body(userDTOs);
-
-
     }
 
 
 
-
     @CrossOrigin(origins = origin)
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#authorization, #communityName)"))
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#communityName)"))
     @PostMapping("/removeMod/{communityName}/{usernameToRemove}")
     public ResponseEntity<String> removeMod(
             @PathVariable String communityName
     ) {
-
-
-
-
         return ResponseEntity.status(HttpStatus.OK).body("Mod removed successfully");
 
 
@@ -321,17 +234,9 @@ public class CommunityController {
     @CrossOrigin(origins = origin)
     @PostMapping("/removeAdmin/{communityName}")
     public ResponseEntity<String> removeAdmin(
-            @PathVariable String communityName,
-            @RequestHeader("Authorization") String authorization
+            @PathVariable String communityName
     ) {
-
-
-
-
-
         return ResponseEntity.status(HttpStatus.OK).body("Admin removed successfully");
-
-
     }
 
 

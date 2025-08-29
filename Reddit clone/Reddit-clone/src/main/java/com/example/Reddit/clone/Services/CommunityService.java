@@ -8,6 +8,7 @@ import com.example.Reddit.clone.Entity.User;
 import com.example.Reddit.clone.Repository.CommunityRepository;
 import com.example.Reddit.clone.Repository.PostRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
+import com.example.Reddit.clone.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -38,11 +39,10 @@ public class CommunityService {
 
 
     @Transactional
-    public CommunityDTO saveCommunity(CommunityDTO communityDTO, String token) {
+    public CommunityDTO saveCommunity(CommunityDTO communityDTO) {
 
         // finding username of user who made community
-        String username = jwtService.extractUsername(token);
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow(() -> new RuntimeException("User not found"));
 
         Community community = new Community();
         community.setTitle(communityDTO.getTitle());
@@ -148,9 +148,8 @@ public class CommunityService {
     }
 
     @Transactional
-    public void makeUserBecomeMember(String authorization, String communityName) {
-        String username = jwtService.extractUsername(authorization);
-        User user = userRepository.findByUsername(username).orElseThrow();
+    public void makeUserBecomeMember(String communityName) {
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
 
         Community community = communityRepository.findByTitle(communityName).orElseThrow(() -> new RuntimeException("Community not found"));
 
@@ -284,9 +283,9 @@ public class CommunityService {
     }
 
     @Transactional
-    public void unsubscribeUserFromCommunity(String authorization, String communityName) {
+    public void unsubscribeUserFromCommunity(String communityName) {
         System.out.println("hertestesdet");
-        User user = userRepository.findByUsername(jwtService.extractUsername(authorization) ).orElseThrow(() -> ExceptionUtils.noUserWithThatName(jwtService.extractUsername(authorization)));
+        User user = userRepository.findByUsername(jwtService.extractUsername( SecurityUtils.getUsername() ) ).orElseThrow(() -> ExceptionUtils.noUserWithThatName( SecurityUtils.getUsername() ));
         Community community = communityRepository.findByTitle(communityName).orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(communityName));
 
         //check if user is member of community
@@ -300,10 +299,8 @@ public class CommunityService {
 
     @Transactional
     public void banUserFromCommunity(String communityName, String usernameToBan) {
-        System.out.println("herdakoman");
         Community community = communityRepository.findByTitle(communityName).orElseThrow();
         User user = userRepository.findByUsername(usernameToBan).orElseThrow();
-
 
         communityRepository.banUserFromCommunity(user.getId(), community.getId());
 
@@ -330,13 +327,11 @@ public class CommunityService {
 
     }
 
-    public UserHasRoleInCommunityResponse userHasRoleInCommunity(String authorization, String communityName) {
-        String username = jwtService.extractUsername(authorization);
-
+    public UserHasRoleInCommunityResponse userHasRoleInCommunity(String communityName) {
         UserHasRoleInCommunityResponse responseToReturn = new UserHasRoleInCommunityResponse();
 
         // check if user is member
-        Set<Community> communitiesMemberOf = userRepository.findCommunitiesUserIsMemberOf(username);
+        Set<Community> communitiesMemberOf = userRepository.findCommunitiesUserIsMemberOf(SecurityUtils.getUsername());
         boolean userIsMember = false;
         for (Community community : communitiesMemberOf) {
             if (Objects.equals(community.getTitle(), communityName)) {
@@ -351,7 +346,7 @@ public class CommunityService {
         }
 
         // check if user is admin
-        Set<Community> communitiesAdminOf = userRepository.findCommunitiesUserIsAdministratorOf(username);
+        Set<Community> communitiesAdminOf = userRepository.findCommunitiesUserIsAdministratorOf( SecurityUtils.getUsername() );
         for (Community community : communitiesAdminOf) {
             if (Objects.equals(community.getTitle(), communityName)) {
                 responseToReturn.setRole(UserHasRoleInCommunityResponseRoles.ADMIN);
@@ -360,7 +355,7 @@ public class CommunityService {
         }
 
         // check if user is mod
-        Set<Community> communitiesModOf = userRepository.findCommunitiesUserIsModeratorOf(username);
+        Set<Community> communitiesModOf = userRepository.findCommunitiesUserIsModeratorOf( SecurityUtils.getUsername() );
         for (Community community : communitiesModOf)
             if (Objects.equals(community.getTitle(), communityName)) {
                 responseToReturn.setRole(UserHasRoleInCommunityResponseRoles.MOD);
@@ -377,10 +372,9 @@ public class CommunityService {
     }
 
 
-    public Set<MemberDTO> getMembers(String communityName, String authorization) {
+    public Set<MemberDTO> getMembers(String communityName) {
 
-        String username = jwtService.extractUsername(authorization);
-        User user = userRepository.findByUsername(username) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(username));
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() ) .orElseThrow(() -> ExceptionUtils.noUserWithThatName( SecurityUtils.getUsername() ));
 
 
         Set<MemberDTO> members = new HashSet<>();

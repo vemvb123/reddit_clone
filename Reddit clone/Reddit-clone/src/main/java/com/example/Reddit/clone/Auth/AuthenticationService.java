@@ -19,7 +19,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-
     private final UserRepository userRepository;
 
     private final RoleRepository rolerRepository;
@@ -84,12 +83,6 @@ public class AuthenticationService {
                 .token(jwtToken)
                 .build();
     }
-
-
-
-
-
-
 
 
 }

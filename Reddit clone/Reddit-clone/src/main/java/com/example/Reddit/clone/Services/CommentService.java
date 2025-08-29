@@ -8,6 +8,7 @@ import com.example.Reddit.clone.Entity.*;
 import com.example.Reddit.clone.Repository.CommentRepository;
 import com.example.Reddit.clone.Repository.PostRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
+import com.example.Reddit.clone.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -44,15 +45,6 @@ public class CommentService {
 
     @Autowired
     private CommentRepository commentRepository;
-
-
-
-
-
-
-
-
-
 
 
     public List<CommentDTO> getReplyIntervall(Long parentCommentId, int page) {
@@ -100,9 +92,8 @@ public class CommentService {
 
 
 
-    public Comment saveComment(CommentDTO commentDTO, String authorization) {
-        String username = jwtService.extractUsername(authorization);
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+    public Comment saveComment(CommentDTO commentDTO) {
+        User user = userRepository.findByUsername(SecurityUtils.getUsername()).orElseThrow(() -> new RuntimeException("User not found"));
 
         Comment parentComment = null;
         if (commentDTO.getParentCommentId() != null)
@@ -135,21 +126,13 @@ public class CommentService {
         User fetchedUser = userRepository.getById(user.getId());
         comment.setUser(fetchedUser);
 
-
-
-
         Comment savedComment = commentRepository.save(comment);
 
         //making message to user the comment is meant for
-        System.out.println(parentComment + " herjakomigjen");
         if (parentComment != null)
             messageService.saveMessageNewReplyToComment(savedComment);
         else
             messageService.saveMessageNewReplyToPost(savedComment);
-
-
-
-
 
         return savedComment;
     }
@@ -226,8 +209,8 @@ public class CommentService {
 
 
 
-    public List<CommentDTO> get20LatestCommentsOfUser(String username, Integer page, String authorization) {
-        String usernameLooking = jwtService.extractUsername(authorization);
+    public List<CommentDTO> get20LatestCommentsOfUserLoggedIn(String username, Integer page) {
+        String usernameLooking = SecurityUtils.getUsername();
         User userLooking = userRepository.findByUsername(usernameLooking) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(usernameLooking));
 
 
@@ -252,8 +235,7 @@ public class CommentService {
 
 
 
-    public List<CommentDTO> get20LatestCommentsOfUser(String username, Integer page) {
-
+    public List<CommentDTO> get20LatestCommentsOfUserNotLoggedIn(String username, Integer page) {
 
         User user = userRepository.findByUsername(username ) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(username ));
 
