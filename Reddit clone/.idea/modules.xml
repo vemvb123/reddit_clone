@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Reddit clone.iml" filepath="$PROJECT_DIR$/.idea/Reddit clone.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Reddit-clone/Reddit-clone.iml" filepath="$PROJECT_DIR$/Reddit-clone/Reddit-clone.iml" />
     </modules>
   </component>
 </project>

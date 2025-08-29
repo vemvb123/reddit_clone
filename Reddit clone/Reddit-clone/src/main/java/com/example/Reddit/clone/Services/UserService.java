@@ -8,6 +8,7 @@ import com.example.Reddit.clone.Repository.CommentRepository;
 import com.example.Reddit.clone.Repository.MessageRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,9 @@ import java.util.Set;
 @Service
 public class UserService {
 
+
+    @Value("${images.path}")
+    public String pathToSaveImages;
 
     @Autowired
     private UserRepository userRepository;
@@ -45,12 +49,12 @@ public class UserService {
 
         if (!file.isEmpty()) {
             try {
-                if (!new File(FileService.pathToSaveImages).exists()) {
-                    new File(FileService.pathToSaveImages).mkdir();
+                if (!new File(pathToSaveImages).exists()) {
+                    new File(pathToSaveImages).mkdir();
                 }
 
                 String orgName = file.getOriginalFilename();
-                String filePath = FileService.pathToSaveImages + orgName;
+                String filePath = pathToSaveImages + orgName;
                 filePath = FileService.makeOriginalFileName(filePath);
                 File dest = new File(filePath);
                 file.transferTo(dest);
@@ -187,14 +191,16 @@ public class UserService {
 
         User user = userRepository.findByUsername(username) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(username));
 
+        System.out.println("Filstia");
+
         if (!file.isEmpty()) {
             try {
-                if (!new File(FileService.pathToSaveImages).exists()) {
-                    new File(FileService.pathToSaveImages).mkdir();
+                if (!new File(pathToSaveImages).exists()) {
+                    new File(pathToSaveImages).mkdir();
                 }
 
                 String orgName = file.getOriginalFilename();
-                String filePath = FileService.pathToSaveImages + orgName;
+                String filePath = pathToSaveImages + orgName;
                 filePath = FileService.makeOriginalFileName(filePath);
                 File dest = new File(filePath);
                 file.transferTo(dest);

@@ -8,9 +8,11 @@ import com.example.Reddit.clone.Entity.*;
 import com.example.Reddit.clone.Repository.*;
 import com.example.Reddit.clone.Services.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.Objects;
 
 @Component
@@ -42,9 +44,8 @@ public class OwnerCheck {
     // first determines if the post is being edited, or made for the first time
     // if its made for the first time, it determines wether the user has access to the community
     // if the post is being edited, it determines if the user is the owner of the post
-    public boolean userCanMakeThisPost(String authorization, PostDTO postDTO, String communityName) {
-        System.out.println("herkanskjeda");
-        String username = jwtService.extractUsername(authorization);
+    public boolean userCanMakeThisPost(PostDTO postDTO, String communityName) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username).orElseThrow();
         Community community = communityRepository.findByTitle(communityName).orElseThrow();
         System.out.println("herdaherkanskjeda");

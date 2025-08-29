@@ -9,6 +9,7 @@ import com.example.Reddit.clone.Repository.CommunityRepository;
 import com.example.Reddit.clone.Repository.PostRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +21,8 @@ import java.util.*;
 @Service
 public class CommunityService {
 
-
+    @Value("${images.path}")
+    public String pathToSaveImages;
 
     @Autowired
     private CommunityRepository communityRepository;
@@ -79,12 +81,12 @@ public class CommunityService {
 
         if (!file.isEmpty()) {
             try {
-                if (!new File(FileService.pathToSaveImages).exists()) {
-                    new File(FileService.pathToSaveImages).mkdir();
+                if (!new File(pathToSaveImages).exists()) {
+                    new File(pathToSaveImages).mkdir();
                 }
 
                 String orgName = file.getOriginalFilename();
-                String filePath = FileService.pathToSaveImages + orgName;
+                String filePath = pathToSaveImages + orgName;
                 filePath = FileService.makeOriginalFileName(filePath);
                 File dest = new File(filePath);
                 file.transferTo(dest);
@@ -121,12 +123,12 @@ public class CommunityService {
 
         if (!file.isEmpty()) {
             try {
-                if (!new File(FileService.pathToSaveImages).exists()) {
-                    new File(FileService.pathToSaveImages).mkdir();
+                if (!new File(pathToSaveImages).exists()) {
+                    new File(pathToSaveImages).mkdir();
                 }
 
                 String orgName = file.getOriginalFilename();
-                String filePath = FileService.pathToSaveImages + orgName;
+                String filePath = pathToSaveImages + orgName;
                 filePath = FileService.makeOriginalFileName(filePath);
                 File dest = new File(filePath);
                 file.transferTo(dest);

@@ -15,8 +15,39 @@ These communities can have moderators and administrators.
 
 The administrators can set different rights for the moderators (ex moderators can ban other users, moderators can delete other’s posts)
 
-## How to run
 
+
+# Setup
+
+1. Go into the application.properties file in the springboot project, and set the path where you want images to be saved:
+
+The the value to the path you want.
+```python
+images.path=/home/vemund/Pictures/reddit
+```
+
+
+
+Make an SQL docker database:
+
+```python
+docker run --name mysql-reddit \
+  -e MYSQL_ROOT_PASSWORD=password \
+  -e MYSQL_DATABASE=reddit_clone \
+  -p 3305:3306 \
+  -d mysql:8.0
+```
+
+Go to the react project under Reactjs/
+
+Run:
+
+```python
+npm install
+```
+
+
+## How to run
 In the springboot project, change the [application.properties](http://application.properties) to appropriate values for the mysql database.
 
 ```python

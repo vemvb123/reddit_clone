@@ -1,17 +1,20 @@
 import axios from 'axios';
 
+
+
 export async function savePost(token, postData, communityName)
 {
     var link = "http://localhost:8080/post/save_post_to_community/" + communityName
     let responseStatus;
 
-    const config = {
+    await axios.post(link, postData,
+      {
         headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // Include your JW
         }
-    }
-
-    await axios.post(link, postData, config)
+      } 
+    )
     .then(response => {
         responseStatus = response.status
     })

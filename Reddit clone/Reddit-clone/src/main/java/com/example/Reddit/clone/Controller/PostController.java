@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.Reddit.clone.ACL.CanPartakeInCommunity;
 import com.example.Reddit.clone.ACL.OwnerCheck;
 import java.nio.file.Path;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -104,15 +105,15 @@ public class PostController {
 
 
     @CrossOrigin(origins = origin)
-    @PreAuthorize(("@ownerCheck.userCanMakeThisPost(#authorization, #postDTO, #communityName)"))
+    @PreAuthorize(("@ownerCheck.userCanMakeThisPost(#postDTO, #communityName)"))
     @PostMapping("/save_post_to_community/{communityName}")
     public ResponseEntity<PostDTO> saveCommunity(
             @PathVariable String communityName,
-            @RequestBody PostDTO postDTO,
-            @RequestHeader("Authorization") String authorization)
+            @RequestBody PostDTO postDTO
+    )
     {
-        System.out.println("hallo");
-        PostDTO DTOfromSavedPost = postService.savePost(postDTO, authorization, communityName);
+        System.out.println("hallofracontroller");
+        PostDTO DTOfromSavedPost = postService.savePost(postDTO, communityName);
 
         return ResponseEntity.ok().body(DTOfromSavedPost);
     }

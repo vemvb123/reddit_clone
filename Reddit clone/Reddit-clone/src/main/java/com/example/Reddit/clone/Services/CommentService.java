@@ -9,6 +9,7 @@ import com.example.Reddit.clone.Repository.CommentRepository;
 import com.example.Reddit.clone.Repository.PostRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,8 @@ import java.util.*;
 public class CommentService {
 
 
+    @Value("${images.path}")
+    public String pathToSaveImages;
 
     @Autowired
     private JwtService jwtService;
@@ -167,12 +170,12 @@ public class CommentService {
 
         if (!file.isEmpty()) {
             try {
-                if (!new File(FileService.pathToSaveImages).exists()) {
-                    new File(FileService.pathToSaveImages).mkdir();
+                if (!new File(pathToSaveImages).exists()) {
+                    new File(pathToSaveImages).mkdir();
                 }
 
                 String orgName = file.getOriginalFilename();
-                String filePath = FileService.pathToSaveImages + orgName;
+                String filePath = pathToSaveImages + orgName;
                 filePath = FileService.makeOriginalFileName(filePath);
                 File dest = new File(filePath);
                 file.transferTo(dest);

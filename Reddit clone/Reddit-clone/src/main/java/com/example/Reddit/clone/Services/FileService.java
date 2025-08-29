@@ -1,6 +1,7 @@
 package com.example.Reddit.clone.Services;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -10,11 +11,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Random;
 
+
 @Service
 public class FileService {
 
 
-    public static final String pathToSaveImages = "C:\\Users\\Greencom\\Pictures\\wg\\reddit_clone\\";
+    @Value("${images.path}")
+    public String pathToSaveImages;
+
 
     public byte[] downloadFile(String fileName) throws IOException {
         String filepath = pathToSaveImages + fileName;

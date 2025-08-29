@@ -12,20 +12,27 @@ import com.example.Reddit.clone.Repository.CommunityRepository;
 import com.example.Reddit.clone.Repository.PostRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 public class PostService {
+
+    @Value("${images.path}")
+    public String pathToSaveImages;
 
     @Autowired
     private CommunityRepository communityRepository;
@@ -51,14 +58,13 @@ public class PostService {
 
 
     @Transactional
-    public PostDTO savePost(PostDTO postDTO, String authorization, String communityName) {
+    public PostDTO savePost(PostDTO postDTO, String communityName) {
 
         System.out.println("1");
         Community community = communityRepository.findByTitle(communityName).orElseThrow(() -> new RuntimeException("Community not found"));
         System.out.println("2");
 
-        String username = jwtService.extractUsername(authorization);
-        System.out.println("3");
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
         System.out.println("4");
 
@@ -139,12 +145,12 @@ public class PostService {
 
         if (!file.isEmpty()) {
             try {
-                if (!new File(FileService.pathToSaveImages).exists()) {
-                    new File(FileService.pathToSaveImages).mkdir();
+                if (!new File(pathToSaveImages).exists()) {
+                    new File(pathToSaveImages).mkdir();
                 }
 
                 String orgName = file.getOriginalFilename();
-                String filePath = FileService.pathToSaveImages + orgName;
+                String filePath = pathToSaveImages + orgName;
                 filePath = FileService.makeOriginalFileName(filePath);
                 File dest = new File(filePath);
                 file.transferTo(dest);
