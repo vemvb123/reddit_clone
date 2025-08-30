@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { createAxiosInstance, request, isNotTokenNon } from './utils';
 
 
@@ -21,7 +20,7 @@ export async function getPostIntervall(communityName, date) {
 
 
 export async function getPostsOfUser(page, username) {  
-  const api = createAxiosInstance();
+  const api = createAxiosInstance();  
   var link;
 
   if (isNotTokenNon()) {

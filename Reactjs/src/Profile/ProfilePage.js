@@ -21,6 +21,10 @@ export default function ProfilePage() {
   const [User, setUser] = useState('');
   const [chatId, setChatId] = useState('second'); // Add chatId state
 
+
+
+  let token = localStorage.getItem("token");
+
   useEffect(() => {
     const fetchData = async () => {
       try {
