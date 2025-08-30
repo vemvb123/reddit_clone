@@ -1,39 +1,30 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import * as userService from "../Services/UserService"
-import Card from 'react-bootstrap/Card';
 import RoundImage from '../Community/RoundImage';
 
-import { useParams, Link } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap styles
 import Messages from './Messages';
-import { useSelector } from 'react-redux';
-import Wallpaper from '../Community/Wallpaper';
 import logo from "../Assets/Reddit-Logo.wine.png"
 
-export default function NavbarLoggedIn() {
 
+
+export default function NavbarLoggedIn() {
     
     const [User, setUser] = useState("")
 
     useEffect(() => {
-
-      console.log()
-
         const fetchData = async () => {
             try {
-
               let token = localStorage.getItem('token');
               const response = await userService.getUseByToken(token)
-
               setUser(response)
             } catch (error) {
               console.error('Error fetching posts:', error);
             }
-
           };
           fetchData();
 

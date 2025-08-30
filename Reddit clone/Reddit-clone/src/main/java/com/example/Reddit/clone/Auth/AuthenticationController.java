@@ -1,6 +1,7 @@
 package com.example.Reddit.clone.Auth;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,7 +12,8 @@ public class AuthenticationController {
 
     final String origin = "http://localhost:3000";
 
-    private final AuthenticationService service;
+    @Autowired
+    private AuthenticationService service;
 
 
     @PostMapping("/register")
