@@ -13,14 +13,12 @@ export default function RequestsToJoinCommunity() {
     let params = useParams()
     let communityName = params.community_name
 
-    let token = localStorage.getItem("token")
-
 
     const [RequestsToJoin, setRequestsToJoin] = useState([])
 
 
     const getRequestsToJoin = async () => {
-        const response = await communityService.getRequestsToJoin(token, page, communityName)
+        const response = await communityService.getRequestsToJoin(page, communityName)
         console.log(response + "herda")
         setRequestsToJoin(response)
     }
@@ -35,7 +33,7 @@ export default function RequestsToJoinCommunity() {
     
   
     const acceptJoinRequest = (fromUser) => {
-        communityService.acceptJoinRequest(token, communityName, fromUser)
+        communityService.acceptJoinRequest(communityName, fromUser)
     }
   
   

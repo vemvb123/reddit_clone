@@ -11,8 +11,7 @@ export default function ViewCommunityPostsMemberOf() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const response = await postService.getPostsMemberOf(token, page);
+        const response = await postService.getPostsMemberOf(page);
         setPosts((prevPosts) => [...prevPosts, ...response]);
         console.log(response);
       } catch (error) {

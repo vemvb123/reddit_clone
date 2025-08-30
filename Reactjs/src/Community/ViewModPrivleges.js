@@ -14,7 +14,7 @@ export default function ViewModPrivleges() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await communityService.getCommunity(token, communityName)
+        const response = await communityService.getCommunity(communityName)
         setCommunity(response)
       } catch (error) {
         console.error('Error fetching posts:', error);

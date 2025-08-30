@@ -27,7 +27,7 @@ export default function CreateCommunity() {
       console.log('Creating community:', communityData);
   
       let token = localStorage.getItem("token");
-      let response = communityService.saveCommunity(token, communityData);
+      let response = communityService.saveCommunity(communityData);
       console.log(communityData)
       console.log(response)
       console.log(token)

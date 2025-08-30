@@ -51,10 +51,8 @@ const [showReplies, setShowReplies] = useState(true)
  async function getIntervallOfComments() {
     if (replies.length === 0 || !showRepliesOrShowMore) 
     {
-        let token = localStorage.getItem('token');
-
       //får resultatet
-      let result = await commentService.getIntervallOfComments(token, props.postId, highestId, props.id)
+      let result = await commentService.getIntervallOfComments(props.postId, highestId, props.id)
       result = result.filter(reply => !replies.includes(reply))
       setReplies([...replies, ...result])
       console.log("her er unga")

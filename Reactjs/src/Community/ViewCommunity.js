@@ -22,18 +22,15 @@ export default function ViewCommunity() {
   const [posts, setPosts] = useState([])
   const [page, setPage] = useState(0);
 
-  let token = localStorage.getItem('token');
-
-  
 
   useEffect(() => {
     const fetchData = async () => {
       console.log("wtf")
       try {
-        const isMember = await communityService.getUserIsHasRoleInCommunityOrIsNotAMember(token, communityName)
-        const response = await communityService.getCommunity(token, communityName)
+        const isMember = await communityService.getUserIsHasRoleInCommunityOrIsNotAMember(communityName)
+        const response = await communityService.getCommunity(communityName)
         
-        const postsResponse = await postService.getLatestPosts(token, communityName, page)
+        const postsResponse = await postService.getLatestPosts(communityName, page)
 
         setPosts( postsResponse )
         setCommunity( response )
@@ -60,7 +57,7 @@ export default function ViewCommunity() {
   const becomeMember = () => {
     
         
-    communityService.makeUserBecomeMemberOfCommunity(token, communityName)
+    communityService.makeUserBecomeMemberOfCommunity(communityName)
 
 
   };
@@ -68,7 +65,7 @@ export default function ViewCommunity() {
   const requestToJoinCommunity = () => {
     
         
-    communityService.requestToJoinCommunity(token, communityName)
+    communityService.requestToJoinCommunity(communityName)
 
 
   };
@@ -83,13 +80,13 @@ export default function ViewCommunity() {
   const deleteCommunity = () => {
     
         
-    communityService.deleteCommunity(token, communityName)
+    communityService.deleteCommunity(communityName)
 
 
   };
 
   const unsubscribeFromCommunity = () => {
-    communityService.unsubscribeFromCommunity(token, communityName)
+    communityService.unsubscribeFromCommunity(communityName)
   
   }
 

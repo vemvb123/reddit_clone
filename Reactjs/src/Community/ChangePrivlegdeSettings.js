@@ -23,7 +23,7 @@ export default function ChangePrivlegdeSettings() {
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await communityService.getModeratorRights(token, communityName);
+          const response = await communityService.getModeratorRights(communityName);
           setModeratorRights(response); // Assuming response is already in the expected shape
           console.log("her " + response)
         } catch (error) {
@@ -36,7 +36,6 @@ export default function ChangePrivlegdeSettings() {
     }, [])
     
 
-  let token = localStorage.getItem('token');
 
   const [moderatorRights, setModeratorRights] = useState({
     banUsers: false,
@@ -53,7 +52,7 @@ export default function ChangePrivlegdeSettings() {
   const handleUpdateRights = () => {
     // Implement your logic to update moderator rights here
     console.log('Updated Moderator Rights:', moderatorRights);
-    communityService.updateModeratorRights(token, communityName, moderatorRights)
+    communityService.updateModeratorRights(communityName, moderatorRights)
   };
 
 
@@ -69,7 +68,7 @@ export default function ChangePrivlegdeSettings() {
   };
 
   const makeUserBecomeMod = () => {
-    communityService.makeUserBecomeMod(token, usernameMod, communityName)
+    communityService.makeUserBecomeMod(usernameMod, communityName)
   };
 
 
@@ -85,7 +84,7 @@ export default function ChangePrivlegdeSettings() {
 
 
   const makeUserBecomeAdmin = () => {
-    communityService.makeUserBecomeAdmin(token, usernameAdmin, communityName)
+    communityService.makeUserBecomeAdmin(usernameAdmin, communityName)
   };
 
 
@@ -96,7 +95,7 @@ export default function ChangePrivlegdeSettings() {
   };
 
 const removeModeratorRights = (e) => {
-  communityService.removeModRights(token, communityName, usernameToRemoveMod)
+  communityService.removeModRights(communityName, usernameToRemoveMod)
 };
 
 

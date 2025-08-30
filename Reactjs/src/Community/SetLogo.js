@@ -46,12 +46,7 @@ export default function SetLogo() {
   
 
     const handleUpload = () => {
-
-        
-        const token = localStorage.getItem('token');
-        communityService.setLogo(token, selectedFile, communityName)
-
-
+        communityService.setLogo(selectedFile, communityName)
       };
 
 

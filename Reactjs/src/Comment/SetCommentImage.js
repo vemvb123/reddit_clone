@@ -44,12 +44,7 @@ export default function SetCommentImage() {
   
 
     const handleUpload = () => {
-
-        
-        const token = localStorage.getItem('token');
-        commentService.setImage(token, selectedFile, commentId)
-
-
+        commentService.setImage(selectedFile, commentId)
       };
 
 

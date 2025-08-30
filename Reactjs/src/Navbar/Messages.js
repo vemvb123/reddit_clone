@@ -12,18 +12,13 @@ export default function Messages(User) {
 
 
 
-    let token = localStorage.getItem('token');
 
     const [Messages, setMessages] = useState([])
     
 
     async function getIntervallOfMessages() {
-
-    
-      let result = await messageService.get10LatestMessages(token, 0)
+      let result = await messageService.get10LatestMessages(0)
       setMessages((prevMessages) => [...prevMessages, ...result]);
-      console.log("hallo")
-      console.log(Messages)
 
     }
 
@@ -31,28 +26,15 @@ export default function Messages(User) {
 
     useEffect(() => {
         getIntervallOfMessages();
-        console.log(Messages)
       }, []);
 
+    const handleAcceptRequest = (fromUsername) => {
+      userSerivce.acceptFriendRequest(fromUsername)
+    };
 
-
-
-
-
-    
-
-
-      const printMessages = () => {
-        console.log(Messages)
-      }
-
-      const handleAcceptRequest = (fromUsername) => {
-        userSerivce.acceptFriendRequest(token, fromUsername)
-      };
-
-      const deleteMessage = (messageId) => {
-        messageService.deleteMessage(token, messageId)
-      };
+    const deleteMessage = (messageId) => {
+      messageService.deleteMessage(messageId)
+    };
 
 
   return (

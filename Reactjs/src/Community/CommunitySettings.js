@@ -9,7 +9,6 @@ export default function CommunitySettings() {
 
     let params = useParams()
     let communityName = params.community_name
-    let token = localStorage.getItem('token');
 
 
   const [banFormData, setBanFormData] = useState({
@@ -25,7 +24,7 @@ export default function CommunitySettings() {
   const handleBanSubmit = (e) => {
     e.preventDefault();
     // Add logic to handle ban user form submission
-    communityService.banUser(token, communityName, banFormData.username) //videre å gjøre: så man også kan slette alle posts og comments
+    communityService.banUser(communityName, banFormData.username) //videre å gjøre: så man også kan slette alle posts og comments
     
   };
 

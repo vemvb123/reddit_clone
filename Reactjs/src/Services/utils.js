@@ -17,10 +17,13 @@ export function createAxiosInstance() {
   export async function request(apiCall) {
     try {
       const response = await apiCall();
+      console.log("ingen feil")
       return { status: response.status, data: response.data };
     } catch (error) {
+      console.log("feil")
       if (error.response) {
-        return { status: error.response.status };
+        return []
+        // return { status: error.response.status };
       }
       throw error;
     }

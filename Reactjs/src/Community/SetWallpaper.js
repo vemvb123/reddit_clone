@@ -49,12 +49,7 @@ export default function SetWallpaper() {
   
 
     const handleUpload = () => {
-
-        
-        const token = localStorage.getItem('token');
-        communityService.setWallpaper(token, selectedFile, communityName)
-
-
+        communityService.setWallpaper(selectedFile, communityName)
       };
 
 

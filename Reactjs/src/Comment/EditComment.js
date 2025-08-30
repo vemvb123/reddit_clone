@@ -11,10 +11,9 @@ export default function EditComment() {
     const [Comment, setComment] = useState("")
 
 
-    let token = localStorage.getItem('token');
 
     async function getComment() {
-        let result = await commentService.getComment(token, commentId)
+        let result = await commentService.getComment(commentId)
         setComment(result)
       }
 
@@ -28,7 +27,7 @@ export default function EditComment() {
       const handleSubmit = (e) => {
         e.preventDefault();
 
-        let response = commentService.saveComment(token, Comment)
+        let response = commentService.saveComment(Comment)
         console.log(response)
         
     
@@ -38,7 +37,7 @@ export default function EditComment() {
   
       const handleDeleteComment = () => {
         
-            commentService.deleteComment(token, commentId)
+            commentService.deleteComment(commentId)
       };
 
 

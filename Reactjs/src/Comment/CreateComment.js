@@ -17,14 +17,13 @@ export const CreateComment = (props) => {
     setCommentData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  let token = localStorage.getItem("token");
 
 
   
 
   const sendData = (e) => {
     e.preventDefault();
-    commentService.saveComment(token, commentData);
+    commentService.saveComment(commentData);
   };
 
   return (
