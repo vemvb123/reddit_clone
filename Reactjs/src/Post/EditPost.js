@@ -15,7 +15,6 @@ export default function EditPost() {
     
 
 
-    let token = localStorage.getItem('token');
 
   
     useEffect(() => {
@@ -30,7 +29,7 @@ export default function EditPost() {
     const [post, setPost] = useState('');
   
     async function getPost() {
-      let response = await postService.getPost(token, postId);
+      let response = await postService.getPost(postId);
       setPost(response);
 
     }
@@ -55,7 +54,7 @@ export default function EditPost() {
   
     const handleDeletePost = () => {
       // Perform the delete operation here
-      postService.deletePost(token, postId)
+      postService.deletePost(postId)
   
       // Close the modal after deletion
       setShowDeleteModal(false);
@@ -66,8 +65,7 @@ export default function EditPost() {
         e.preventDefault();
     
     
-        let token = localStorage.getItem("token");
-        let response = postService.savePost(token, post, communityName);
+        let response = postService.savePost(post, communityName);
     
     
     

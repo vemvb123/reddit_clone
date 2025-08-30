@@ -1,346 +1,122 @@
 import axios from 'axios';
+import { isNotTokenNon } from './utils';
 
-export async function saveCommunity(token, communityData)
+export async function saveCommunity(communityData)
 {
-    console.log("i save comm")
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/community/save_community"
-    let responseStatus;
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
-    await axios.post(link, communityData, config)
-    .then(response => {
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return responseStatus;
+    return (await request(() => api.post(link, communityData))).status;
 }
 
 
-export async function deleteCommunity(token, communityName)
+
+export async function deleteCommunity(communityName)
 {
-    console.log("in delete comm")
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/community/delete_community/" + communityName
-    let responseStatus;
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
-    await axios.delete(link, config)
-    .then(response => {
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return responseStatus;
+    return (await request(() => api.delete(link))).status;
 }
 
 
 
-export async function makeUserBecomeMemberOfCommunity(token, communityName)
+export async function makeUserBecomeMemberOfCommunity(communityName)
 {
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/community/makeUserBecomeMember/" + communityName
-    let responseStatus;
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
-    await axios.post(link, null, config)
-    .then(response => {
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return responseStatus;
+    return (await request(() => api.post(link, null))).status;
 }
 
 
 
-
-export async function unsubscribeFromCommunity(token, communityName)
+export async function unsubscribeFromCommunity(communityName)
 {
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/community/unsubscribeFromCommunity/" + communityName 
-    let responseStatus;
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
-    await axios.post(link, null, config)
-    .then(response => {
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return responseStatus;
+    return (await request(() => api.post(link, null))).status;
 }
 
 
-export async function banUser(token, communityName, username)
+export async function banUser(communityName, username)
 {
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/community/banUserFromCommunity/" + communityName + "/" + username
-    let responseStatus;
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
-    await axios.post(link, null, config)
-    .then(response => {
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return responseStatus;
+    return (await request(() => api.post(link, null))).status;
 }
 
 
 
 
-export async function acceptJoinRequest(token, communityName, fromUser)
+export async function acceptJoinRequest(communityName, fromUser)
 {
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/message/acceptRequestToJoinCommunity/" + communityName + "/" +fromUser
-    let responseStatus;
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
-    await axios.post(link, null, config)
-    .then(response => {
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return responseStatus;
+    return (await request(() => api.post(link, null))).status;
 }
 
 
-export async function removeModRights(token, communityName, usernameToRemoveMod)
+
+export async function removeModRights(communityName, usernameToRemoveMod)
 {
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/community/remove_moderator_rights/" + communityName + "/" + usernameToRemoveMod
-    let responseStatus;
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
-    await axios.post(link, null, config)
-    .then(response => {
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return responseStatus;
+    return (await request(() => api.post(link, null))).status;
 }
 
-export async function getRequestsToJoin(token, page, communityName)
+
+
+export async function getRequestsToJoin(page, communityName)
 {
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/message/getRequestsToJoinCommunity/" + page + "/" + communityName
-    let responseStatus;
-    let data;
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
-    await axios.get(link, config)
-    .then(response => {
-        data = response.data
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return data;
+    return (await request(() => api.get(link))).data;
 }
 
 
 
 
 
-export async function requestToJoinCommunity(token, communityName)
+export async function requestToJoinCommunity(communityName)
 {
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/message/requestToJoinCommunity/" + communityName 
-    let responseStatus;
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
-    await axios.post(link, null, config)
-    .then(response => {
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return responseStatus;
+    return (await request(() => api.get(link, null))).status;
 }
 
 
 
-
-
-export async function makeUserBecomeMod(token, usernameMod, communityName)
+export async function makeUserBecomeMod(usernameMod, communityName)
 {
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/community/makeUserBecomeMod/" + communityName + "/" + usernameMod
-    let responseStatus;
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
-    await axios.post(link, null, config)
-    .then(response => {
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return responseStatus;
+    return (await request(() => api.post(link, null))).status;
 }
 
 
 
-export async function makeUserBecomeAdmin(token, usernameAdmin, communityName)
+export async function makeUserBecomeAdmin(usernameAdmin, communityName)
 {
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/community/makeUserAdmin/" + communityName + "/" + usernameAdmin
-    let responseStatus;
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
-    await axios.post(link, null, config)
-    .then(response => {
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return responseStatus;
+    return (await request(() => api.post(link, null))).status;
 }
 
 
 
 
-export async function updateModeratorRights(token, communityName, moderatorRights)
+export async function updateModeratorRights(communityName, moderatorRights)
 {
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/community/change_moderator_rights/" + communityName
-    let responseStatus;
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
-    await axios.post(link, moderatorRights, config)
-    .then(response => {
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return responseStatus;
+    return (await request(() => api.post(link, moderatorRights))).status;
 }
 
 
-export async function getModeratorRights(token, communityName)
+
+export async function getModeratorRights(communityName)
 {
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/community/get_moderator_rights/" + communityName
-    let responseStatus;
-    let data;
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
-    await axios.get(link, config)
-    .then(response => {
-        data = response.data
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return data;
+    return (await request(() => api.get(link))).status;
 }
 
 
@@ -348,171 +124,56 @@ export async function getModeratorRights(token, communityName)
 
 export async function getUsers(communityName)
 {
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/community/getUsers/" + communityName
-    let responseStatus;
-    let data;
-
-
-
-    await axios.get(link)
-    .then(response => {
-        data = response.data
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return data;
+    return (await request(() => api.get(link))).status;
 }
 
 
 
 
-export async function getCommunity(token, communityName)
+export async function getCommunity(communityName)
 {
-    let responseStatus;
-    let data;
-
-
-    if (token !== "non") {
+    const api = createAxiosInstance();
+    if (isNotTokenNon()) {
         var link = "http://localhost:8080/community/get_community_by_name/" + communityName
 
-        const config = {
-            headers: {
-              Authorization: `Bearer ${token}` // Replace with your authorization token
-            }
-        }
-    
-        await axios.get(link, config)
-        .then(response => {
-            data = response.data
-            responseStatus = response.status
-        })
-        .catch(error => {
-            if (error.response) {
-                responseStatus = error.response.status
-            }
-        });
-    
     } else {
         var link = "http://localhost:8080/community/get_community_by_name_without_token/" + communityName
 
-    
-        await axios.get(link)
-        .then(response => {
-            data = response.data
-            responseStatus = response.status
-        })
-        .catch(error => {
-            if (error.response) {
-                responseStatus = error.response.status
-            }
-        });
     }
-
-
-
-
-
-
-
-    return data;
+    return (await request(() => api.get(link))).data;
 }
 
 
 
-export async function setLogo(token, file, communityName)
+export async function setLogo(file, communityName)
 {
-    var link = "http://localhost:8080/community/setLogoForCommunity/" + communityName
-    let responseStatus;
-
-
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
     const formData = new FormData();
     formData.append('file', file);
 
-
-
-    await axios.post(link, formData, config)
-    .then(response => {
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return responseStatus;
+    const api = createAxiosInstance();
+    var link = "http://localhost:8080/community/setLogoForCommunity/" + communityName
+    return (await request(() => api.post(link, formData))).status;
 }
 
 
-export async function getMembersOfCommunity(communityName, token)
+export async function getMembersOfCommunity(communityName)
 {
-    
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/community/get_members/" + communityName
-
-    let responseStatus;
-    let data;
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
-    await axios.get(link, config)
-    .then(response => {
-        data = response.data
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return data;
+    return (await request(() => api.get(link))).data;
 }
 
 
-export async function getUserIsHasRoleInCommunityOrIsNotAMember(token, communityName)
+export async function getUserIsHasRoleInCommunityOrIsNotAMember(communityName)
 {
-    if (token === "non") {
+    if (isNotTokenNon) {
         return {role: "NON_MEMBER"}
     }
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/community/user_has_role_in_community/" + communityName
-
-    let responseStatus;
-    let data;
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
-    await axios.get(link, config)
-    .then(response => {
-        data = response.data
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return data;
+    return (await request(() => api.get(link))).data;
 }
 
 
@@ -520,35 +181,14 @@ export async function getUserIsHasRoleInCommunityOrIsNotAMember(token, community
 
 
 
-export async function setWallpaper(token, file, communityName)
+export async function setWallpaper(file, communityName)
 {
-    var link = "http://localhost:8080/community/setWallpaperForCommunity/" + communityName
-    let responseStatus;
-
-
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
     const formData = new FormData();
     formData.append('file', file);
 
-
-
-    await axios.post(link, formData, config)
-    .then(response => {
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return responseStatus;
+    const api = createAxiosInstance();
+    var link = "http://localhost:8080/community/setWallpaperForCommunity/" + communityName
+    return (await request(() => api.post(link, formData))).status;
 }
 
 

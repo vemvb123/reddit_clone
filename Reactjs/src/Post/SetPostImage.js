@@ -44,8 +44,7 @@ export default function SetPostImage() {
     const handleUpload = () => {
 
         
-        const token = localStorage.getItem('token');
-        postService.setImage(token, selectedFile, postId)
+        postService.setImage(selectedFile, postId)
 
 
       };

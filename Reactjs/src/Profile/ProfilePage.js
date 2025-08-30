@@ -15,8 +15,6 @@ export default function ProfilePage() {
   let username = params.username;
 
 
-  const token = localStorage.getItem('token');
-
   const [friendRequestSent, setFriendRequestSent] = useState(false);
   const [profile, setProfile] = useState('');
   const [activeTab, setActiveTab] = useState('posts');

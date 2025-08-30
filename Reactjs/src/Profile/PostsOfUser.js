@@ -21,8 +21,7 @@ export default function PostsOfUser(props) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const response = await postService.getPostsOfUser(token, page, username);
+        const response = await postService.getPostsOfUser(page, username);
         setPosts((prevPosts) => [...prevPosts, ...response]);
         console.log(response);
       } catch (error) {

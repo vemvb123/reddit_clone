@@ -16,11 +16,9 @@ export default function ViewPosts(data) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token');
-
         // HERE
         // METHOD AND VARIABLES CAN CHANGE
-        let response = await postService.getLatestPosts(token, data.communityName, page);
+        let response = await postService.getLatestPosts(data.communityName, page);
         setPosts((prevPosts) => [...prevPosts, ...response]);
       } catch (error) {
         console.error('Error fetching posts:', error);

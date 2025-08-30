@@ -9,8 +9,6 @@ import * as postService from '../Services/PostService';
 import RoundImage from '../Community/RoundImage';
 
 export default function ViewPost() {
-  let token = localStorage.getItem('token');
-
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
@@ -24,7 +22,7 @@ export default function ViewPost() {
   const [post, setPost] = useState('');
 
   async function getPost() {
-    let response = await postService.getPost(token, postId);
+    let response = await postService.getPost(postId);
     setPost(response);
     console.log("post:")
     console.log(response);
@@ -43,7 +41,7 @@ export default function ViewPost() {
     let fromPostId = highestId;
     let parentCommentId = 0;
 
-    let result = await commentService.getIntervallOfComments(token, postId, fromPostId, parentCommentId);
+    let result = await commentService.getIntervallOfComments(postId, fromPostId, parentCommentId);
     result = result.filter((comment) => !comments.includes(comment));
     setComments([...comments, ...result]);
 

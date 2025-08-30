@@ -26,13 +26,7 @@ export default function CreatePost() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-
-    let token = localStorage.getItem("token");
-    let response = postService.savePost(token, postData, communityName);
-
-
-
+    postService.savePost(postData, communityName);
   };
 
 

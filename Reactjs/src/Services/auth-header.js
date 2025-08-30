@@ -28,12 +28,8 @@ export async function authenticate(username, password) {
     password: password
   })
   .then((response) => {
-
     setToken(response.data.token) //setting token
-    
     responseStatus = response.status
-
-
   })
   .catch(error => {
     if (error.response) {

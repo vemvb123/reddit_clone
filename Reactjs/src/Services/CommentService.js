@@ -1,31 +1,13 @@
 import axios from 'axios';
+import { isNotTokenNon } from './utils';
 
 
 
-export async function getComment(token, commentId)
+export async function getComment(commentId)
 {
-  var link = "http://localhost:8080/comment/get_comment/" + commentId
-  let data = [];
-  let responseStatus;
-
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}` // Replace with your authorization token
-    }
-  }
-
-  await axios.get(link, config)
-  .then(response => {
-      data = response.data;
-  })
-  .catch(error => {
-    if (error.response) {
-        responseStatus = error.response.status
-    }
-  });
-
-  return data
-
+    const api = createAxiosInstance();
+    var link = "http://localhost:8080/comment/get_comment/" + commentId
+    return (await request(() => api.get(link))).data;
 }
 
 
@@ -33,237 +15,65 @@ export async function getComment(token, commentId)
 
 
 
-export async function getCommentsOfUser(token, page, username)
+export async function getCommentsOfUser(page, username)
 {
-  let data = [];
-  let responseStatus;
-
-
-    console.log(token)
-    if (token === "non") {
-
-    var link = "http://localhost:8080/comment/get_20_latets_comments_of_user_not_logged_in/" + page + "/" + username
-
-
-
-    await axios.get(link)
-    .then(response => {
-        data = response.data;
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-
-}
-else {
-    var link = "http://localhost:8080/comment/get_20_latets_comments_of_user/" + page + "/" + username
-
-    const config = {
-        headers: {
-        Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
+    const api = createAxiosInstance();
+    if (isNotTokenNon()) {
+        var link = "http://localhost:8080/comment/get_20_latets_comments_of_user_not_logged_in/" + page + "/" + username
+    } else {
+        var link = "http://localhost:8080/comment/get_20_latets_comments_of_user/" + page + "/" + username
     }
-
-    await axios.get(link, config)
-    .then(response => {
-        data = response.data;
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-
-
+    return (await request(() => api.get(link))).data;
 }
 
 
 
-
-
-  return data
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-export async function saveComment(token, commentData)
+export async function saveComment(commentData)
 {
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/comment/saveComment"
-    let responseStatus;
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
-    await axios.post(link, commentData, config)
-    .then(response => {
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return responseStatus;
+    return (await request(() => api.post(link, commentData))).status;
 }
 
 
 
-export async function deleteComment(token, commentId)
+export async function deleteComment(commentId)
 {
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/comment/delete_comment/" + commentId
-    let responseStatus;
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
-    await axios.post(link, null, config)
-    .then(response => {
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return responseStatus;
+    return (await request(() => api.post(link, null))).status;
 }
 
 
 export async function getAllCommentsOfPost(postId)
 {
-    console.log("i th")
-    console.log(postId)
+    const api = createAxiosInstance();
     var link = "http://localhost:8080/comment/getCommentsOfPost/" + postId;
-    let data = [];
-
-    await axios.get(link)
-    .then(response => {
-        data = response.data;
-    })
-  
-    return data
+    return (await request(() => api.get(link))).data;
 }
 
 
 
-export async function getIntervallOfComments(token, postId, fromPostId, parentCommentId)
+export async function getIntervallOfComments(postId, fromPostId, parentCommentId)
 {
-    let data = []
-
-
-    if (token !== "non") {
+    const api = createAxiosInstance();
+    if (isNotTokenNon) {
         var link = "http://localhost:8080/comment/getIntervallOfComments/" + postId + "/" + fromPostId + "/" + parentCommentId;
-
-        const config = {
-            headers: {
-              Authorization: `Bearer ${token}` // Replace with your authorization token
-            }
-        }
-    
-    
-        await axios.get(link, config)
-        .then(response => {
-            data = response.data
-        })
-        .catch(error => {
-            if (error.response) {
-                console.log(error.response)
-            }
-        });
-    }
-    else {
+    } else {
         var link = "http://localhost:8080/comment/getIntervallOfCommentsWithoutToken/" + postId + "/" + fromPostId + "/" + parentCommentId;
-
-    
-    
-        await axios.get(link)
-        .then(response => {
-            data = response.data
-        })
-        .catch(error => {
-            if (error.response) {
-                console.log(error.response)
-            }
-        });
     }
-
-
-    return data
+    return (await request(() => api.get(link))).data;
 }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-export async function setImage(token, file, commentId)
+export async function setImage(file, commentId)
 {
-    var link = "http://localhost:8080/comment/setCommentImage/" + commentId
-    let responseStatus;
-
-
-
-    const config = {
-        headers: {
-          Authorization: `Bearer ${token}` // Replace with your authorization token
-        }
-    }
-
     const formData = new FormData();
     formData.append('file', file);
 
-
-
-    await axios.post(link, formData, config)
-    .then(response => {
-        responseStatus = response.status
-    })
-    .catch(error => {
-        if (error.response) {
-            responseStatus = error.response.status
-        }
-    });
-
-    return responseStatus;
+    const api = createAxiosInstance();
+    var link = "http://localhost:8080/comment/setCommentImage/" + commentId
+    return (await request(() => api.post(link, formData))).status;
 }
+
