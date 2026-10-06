@@ -3,12 +3,18 @@ package com.example.Reddit.clone.Services;
 import com.example.Reddit.clone.Config.JwtService;
 import com.example.Reddit.clone.DTO.CommunityDTO;
 import com.example.Reddit.clone.DTO.UserDTO;
-import com.example.Reddit.clone.Entity.*;
-import com.example.Reddit.clone.Repository.CommentRepository;
+import com.example.Reddit.clone.Entity.Community;
+import com.example.Reddit.clone.Entity.Message;
+import com.example.Reddit.clone.Entity.MessageTopic;
+import com.example.Reddit.clone.Entity.User;
+import com.example.Reddit.clone.Exception.NotFound;
+import com.example.Reddit.clone.Exception.NotFoundException;
+import com.example.Reddit.clone.Mapper.CommunityMapper;
+import com.example.Reddit.clone.Mapper.UserMapper;
 import com.example.Reddit.clone.Repository.MessageRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import com.example.Reddit.clone.utils.SecurityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,42 +23,42 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 @Service
+@AllArgsConstructor
 public class UserService {
 
 
     @Value("${images.path}")
     public String pathToSaveImages;
 
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
     private MessageRepository messageRepository;
 
-    @Autowired
     private JwtService jwtService;
 
+    private UserMapper userMapper;
+    private CommunityMapper communityMapper;
+
+
+
     public UserDTO getUserByUsername(String username) {
-        User user = userRepository.findByUsername(username) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(username));
-        return new UserDTO().mapObjectToDTO(user);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+        return userMapper.entityToDto(user);
     }
 
 
     public void setImage(MultipartFile file, String username) {
-
-
-        User user = userRepository.findByUsername(username) .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
         if (!file.isEmpty()) {
             try {
-                if (!new File(pathToSaveImages).exists()) {
+                if (!new File(pathToSaveImages).exists())
                     new File(pathToSaveImages).mkdir();
-                }
 
                 String orgName = file.getOriginalFilename();
                 String filePath = pathToSaveImages + orgName;
@@ -60,68 +66,45 @@ public class UserService {
                 File dest = new File(filePath);
                 file.transferTo(dest);
 
-
-
                 if (new File(filePath).exists()) {
                     user.setPathToProfileImage(file.getOriginalFilename());
                     userRepository.save(user);
                 }
-
 
             } catch (IOException | IllegalStateException e) {
                 e.printStackTrace();
             }
         }
 
-
     }
 
 
     public UserDTO getUserByToken() {
-        User user = userRepository.findByUsername(SecurityUtils.getUsername()).orElseThrow();
-        return new UserDTO().mapObjectToDTO(user);
-
+        User user = userRepository.findByUsername(SecurityUtils.getUsername())
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+        return userMapper.entityToDto(user);
     }
-
-
-
-
 
 
     @Transactional
     public List<CommunityDTO> getCommunitiesUserIsMemberOf(String username) {
-
-        System.out.println("1");
         Set<Community> communities = userRepository.findCommunitiesUserIsMemberOf(username);
-        System.out.println(communities);
-        System.out.println("2");
-
-        List<CommunityDTO> communityDTOs = new ArrayList<>();
-        for (Community community : communities)
-            communityDTOs.add( new CommunityDTO().mapObjectToDTO(community) );
-        System.out.println("3");
-
-
-
-        return communityDTOs;
+        return communities.stream()
+                .map(community -> communityMapper.entityToDto(community))
+                .toList();
     }
 
 
-    @Autowired
-    CommentRepository commentRepository;
-
     public void sendFriendRequestFromUser(String toUsername) {
         String fromUsername = SecurityUtils.getUsername();
-        User fromUser = userRepository.findByUsername(fromUsername).orElseThrow();
-        System.out.println("der1");
-
-        User toUser = userRepository.findByUsername(toUsername).orElseThrow();
-        System.out.println("der2");
+        User fromUser = userRepository.findByUsername(fromUsername)
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+        User toUser = userRepository.findByUsername(toUsername)
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
         //se om ikke person allerede har sendt/fått request
         if (messageRepository.findFriendRequestFromUserToUser(fromUsername, toUsername) != null)
             ExceptionUtils.friendRequestHasAlreadyBeenSent(toUsername, fromUsername);
-        System.out.println("der3");
 
         Message message = new Message();
         message.setMessageTopic(MessageTopic.NewFriendRequest);
@@ -129,38 +112,32 @@ public class UserService {
         message.setToUser(toUser);
         message.setFromUser(fromUser);
         message.setEventHappendAt(LocalDateTime.now());
-        // message.setComment(commentRepository.findById(155L).orElseThrow());
-
-        // VIKTIG: Hvis det mases om et constraint, så har det med at messagetopic er ute av sync med hvor mange beskjeder som finnes
-        // da må du muligens slette kolonnen for messagetopic, så la springboot gjenlage kolonnen
-
-        System.out.println("der4");
-
-        System.out.println(message.toString());
         messageRepository.save(message);
-        System.out.println("der5");
     }
 
 
-    @Transactional
     private void makeUsersBecomeFriends(User user1, User user2) {
         userRepository.addUserAsFriendToThisUser(user1.getId(), user2.getId());
         userRepository.addUserAsFriendToThisUser(user2.getId(), user1.getId());
     }
-    @Transactional
+
+
     private void deleteFriendRequestsBetweenUsers(User user1, User user2) {
         userRepository.deleteFriendRequestsFromUserToUser(user1.getId(), user2.getId());
         userRepository.deleteFriendRequestsFromUserToUser(user2.getId(), user1.getId());
     }
-    @Transactional
+
+
     public void acceptFriendRequest(String fromUsername) {
-        User fromUser = userRepository.findByUsername(fromUsername).orElseThrow();
+        User fromUser = userRepository.findByUsername(fromUsername)
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
         String toUsername = SecurityUtils.getUsername();
-        User toUser = userRepository.findByUsername(toUsername).orElseThrow();
+        User toUser = userRepository.findByUsername(toUsername)
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
         if (messageRepository.findFriendRequestFromUserToUser(fromUsername, toUsername) == null)
-            ExceptionUtils.noExistingFriendRequestFromUserToUser(fromUsername, toUsername);
+            throw new NotFoundException(NotFound.FRIEND_REQUEST);
 
         makeUsersBecomeFriends(toUser, fromUser);
         deleteFriendRequestsBetweenUsers(toUser, fromUser);
@@ -169,7 +146,8 @@ public class UserService {
 
 
     public void changeOthersCanSeePostsAndComments(Integer allowedToSeePosts, Integer allowedToSeeComments) {
-        User user = userRepository.findByUsername( SecurityUtils.getUsername() ) .orElseThrow(() -> ExceptionUtils.noUserWithThatName( SecurityUtils.getUsername() ));
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() )
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
         if (allowedToSeePosts == 1)
             user.setOtherUsersCanSeePosts(true);
@@ -186,16 +164,13 @@ public class UserService {
     }
 
     public void setWallpaper(MultipartFile file, String username) {
-
-        User user = userRepository.findByUsername(username) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(username));
-
-        System.out.println("Filstia");
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
         if (!file.isEmpty()) {
             try {
-                if (!new File(pathToSaveImages).exists()) {
+                if (!new File(pathToSaveImages).exists())
                     new File(pathToSaveImages).mkdir();
-                }
 
                 String orgName = file.getOriginalFilename();
                 String filePath = pathToSaveImages + orgName;
@@ -203,22 +178,15 @@ public class UserService {
                 File dest = new File(filePath);
                 file.transferTo(dest);
 
-
-
                 if (new File(filePath).exists()) {
                     user.setPathToWallpaperImage(file.getOriginalFilename());
                     userRepository.save(user);
                 }
 
-
             } catch (IOException | IllegalStateException e) {
                 e.printStackTrace();
             }
         }
-
-
-
-
-
     }
+
 }

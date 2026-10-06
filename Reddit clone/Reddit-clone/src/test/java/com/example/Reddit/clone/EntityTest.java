@@ -682,8 +682,6 @@ public class EntityTest {
         messages = messageRepository.findMessagesOrderByEventHappendAt(user.getId());
         assertTrue(messages.size() > 0);
         Message message = messages.get(0);
-        System.out.println("hersjadusja");
-        System.out.println(message);
         assertEquals(message.getToUser(), user);
         assertEquals(message.getFromUser(), otherUser);
         assertEquals(message.getMessageTopic(), MessageTopic.NewReplyToPost);

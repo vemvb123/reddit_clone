@@ -229,23 +229,18 @@ public class RightsTest {
                 .andReturn();
 
         String json = result.getResponse().getContentAsString();
-        System.out.println("hererjson");
-        System.out.println(json);
         CommunityDTO response = objectMapper.readValue(json, CommunityDTO.class);
 
         return communityRepository.findByTitle(response.getTitle()) .orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(response.getTitle()));
     }
 
     public void makeUserBecomeMod(String authorization, String communityName, String usernameToBecomeMod) throws Exception {
-        System.out.println("kaifa");
         mockMvc.perform(MockMvcRequestBuilders.post("/community/makeUserBecomeMod/" + communityName + "/" + usernameToBecomeMod)
                         .header("Authorization", authorization)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(null)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print());
-
-
     }
 
     public void makeUserBecomeMember(String authorization, String communityName) throws Exception {

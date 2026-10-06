@@ -17,10 +17,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> getAllCommentsOfPostWithId(@Param("parentCommentId") Long parentCommentId);
 
     @Query(value = "SELECT c FROM Comment c WHERE c.parent.id = :parentCommentId ORDER BY c.createdAt DESC")
-    public List<Comment> getReplyIntervall(@Param("parentCommentId") Long parentCommentId, PageRequest pageRequest);
-
-
-    // SELECT * FROM reddit_clone.comment WHERE post_id = 14;
+    List<Comment> getReplyInterval(@Param("parentCommentId") Long parentCommentId, PageRequest pageRequest);
 
     @Query(value = "SELECT c FROM Comment c WHERE c.post.id = :postId AND c.parent IS NULL ORDER BY c.createdAt DESC")
     List<Comment> getCommentIntervall(@Param("postId") Long postId, PageRequest pageRequest);

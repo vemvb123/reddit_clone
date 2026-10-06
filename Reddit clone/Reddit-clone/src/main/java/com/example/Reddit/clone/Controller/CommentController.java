@@ -1,12 +1,9 @@
 package com.example.Reddit.clone.Controller;
 
 
-import com.example.Reddit.clone.ACL.CanPartakeInCommunity;
 import com.example.Reddit.clone.ACL.OwnerCheck;
 import com.example.Reddit.clone.DTO.CommentDTO;
-import com.example.Reddit.clone.DTO.PostDTO;
 import com.example.Reddit.clone.Entity.Comment;
-import com.example.Reddit.clone.Repository.CommentRepository;
 import com.example.Reddit.clone.Services.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +15,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -65,7 +61,6 @@ public class CommentController {
             @PathVariable Integer page
     )
     {
-        System.out.println("hallo");
         List<CommentDTO> latestComments = commentService.get20LatestCommentsOfUserLoggedIn(username, page);
         return ResponseEntity.ok().body(latestComments);
     }
@@ -130,8 +125,8 @@ public class CommentController {
             )
     {
         if (parentCommentId != 0)
-            return ResponseEntity.ok().body(commentService.getReplyIntervall(parentCommentId, page));
-        return ResponseEntity.ok().body(commentService.getCommentIntervall(postId, page));
+            return ResponseEntity.ok().body(commentService.getReplyInterval(parentCommentId, page));
+        return ResponseEntity.ok().body(commentService.getCommentInterval(postId, page));
     }
 
 
@@ -145,8 +140,8 @@ public class CommentController {
     )
     {
         if (parentCommentId != 0)
-            return ResponseEntity.ok().body(commentService.getReplyIntervall(parentCommentId, page));
-        return ResponseEntity.ok().body(commentService.getCommentIntervall(postId, page));
+            return ResponseEntity.ok().body(commentService.getReplyInterval(parentCommentId, page));
+        return ResponseEntity.ok().body(commentService.getCommentInterval(postId, page));
     }
 
 }

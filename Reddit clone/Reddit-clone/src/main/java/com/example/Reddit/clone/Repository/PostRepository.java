@@ -1,17 +1,13 @@
 package com.example.Reddit.clone.Repository;
 
-import com.example.Reddit.clone.Entity.Community;
 import com.example.Reddit.clone.Entity.Post;
-import com.example.Reddit.clone.Entity.User;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +16,6 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     Optional<Post> findById(Long postId);
-
-
 
     @Query("SELECT p FROM Post p ORDER BY p.createdAt DESC")
     List<Post> findAllByOrderByCreatedAtAsc();
@@ -32,19 +26,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("startDate") LocalDateTime startDate,
             @Param("idOfLastPost") Long idOfLastPost,
             Pageable pageable);
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     //må ha med noe limit type 10 ting, kan finne ut hvordan implementere dette senere
     @Query("SELECT p FROM Post p WHERE " +

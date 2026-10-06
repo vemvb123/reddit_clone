@@ -30,7 +30,6 @@ public class FileService {
     }
 
 
-    //Todo: ensure saved file has an original name
     public static String makeOriginalFileName(String filepath) {
         while (true)
         {

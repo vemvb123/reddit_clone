@@ -7,17 +7,16 @@ import com.example.Reddit.clone.Entity.Community;
 import com.example.Reddit.clone.Entity.CommunityType;
 import com.example.Reddit.clone.Entity.Post;
 import com.example.Reddit.clone.Entity.User;
-import com.example.Reddit.clone.Repository.CommentRepository;
+import com.example.Reddit.clone.Exception.NotFound;
+import com.example.Reddit.clone.Exception.NotFoundException;
+import com.example.Reddit.clone.Mapper.PostMapper;
 import com.example.Reddit.clone.Repository.CommunityRepository;
 import com.example.Reddit.clone.Repository.PostRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import com.example.Reddit.clone.utils.SecurityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,104 +24,87 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 @Service
+@AllArgsConstructor
 public class PostService {
 
     @Value("${images.path}")
     public String pathToSaveImages;
 
-    @Autowired
     private CommunityRepository communityRepository;
-
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private JwtService jwtService;
-
-    @Autowired
     private PostRepository postRepository;
 
-    @Autowired
-    private CommentRepository commentRepository;
+    private JwtService jwtService;
+
+    private PostMapper postMapper;
 
 
     public PostDTO getPost(Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow();
-        return new PostDTO().mapObjectToDTO(post);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException(NotFound.POST));
+        return postMapper.entityToDto(post);
     }
-
 
 
     @Transactional
     public PostDTO savePost(PostDTO postDTO, String communityName) {
-        Community community = communityRepository.findByTitle(communityName).orElseThrow(() -> new RuntimeException("Community not found"));
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        Community community = communityRepository.findByTitle(communityName)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
-        //save post
-        //etabler forholdet mellom post og community
-        //etabler forholdet mellom user og post
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+
         Post post = new Post();
-        if (postDTO.getId() != null) {
-            post.setId(postDTO.getId());
-            post.setPathToPostImage(postDTO.getPathToPostImage());
+        if (postDTO.id() != null) {
+            post.setId(postDTO.id());
+            post.setPathToPostImage(postDTO.pathToPostImage());
             post.setLastUpdated(LocalDateTime.now());
-            post.setCreatedAt(postDTO.getCreatedAt());
+            post.setCreatedAt(postDTO.createdAt());
         }
         else
             post.setCreatedAt(LocalDateTime.now());
 
-        post.setTitle(postDTO.getTitle());
-        post.setContent(postDTO.getContent());
+        post.setTitle(postDTO.title());
+        post.setContent(postDTO.content());
 
         post.setCommunity(community);
         post.setUser(user);
         Post savedPost = postRepository.save(post);
 
-        return new PostDTO().mapObjectToDTO(savedPost);
-
-
-
-
-
-
-
+        return postMapper.entityToDto(savedPost);
     }
 
 
     public List<PostDTO> get20LatestPosts(String communityName, int page) {
-        Community community = communityRepository.findByTitle(communityName).orElseThrow(() -> new RuntimeException("Community not found"));
+        Community community = communityRepository.findByTitle(communityName)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         List<Post> posts = postRepository.find20LaterPostAfterPost(community.getTitle(), PageRequest.of(page, 10));
-
-        List<PostDTO> postDTOs = new ArrayList<>();
-        for (Post post : posts)
-            postDTOs.add( new PostDTO().mapObjectToDTO(post) );
-
-        return postDTOs;
+        return posts.stream()
+                .map(post -> postMapper.entityToDto(post))
+                .toList();
     }
 
 
     public List<PostDTO> get20PostsFromCommunitiesMemberOf(Integer page) {
-        User user = userRepository.findByUsername(SecurityUtils.getUsername()).orElseThrow(() -> new RuntimeException("Community not found"));
         Set<Community> communities = userRepository.findCommunitiesByUsername( SecurityUtils.getUsername() );
         List<Post> posts = communityRepository.getPostsOfCommunities(communities, PageRequest.of(page, 20));
-        List<PostDTO> postDTOs = new ArrayList<>();
-        for (Post post : posts)
-            postDTOs.add( new PostDTO().mapObjectToDTO(post) );
-
-        return postDTOs;
-
+        return posts.stream()
+                .map(post -> postMapper.entityToDto(post))
+                .toList();
     }
 
 
     public void setImage(MultipartFile file, Long postId) {
-        Post post = postRepository.getById(postId);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException(NotFound.POST));
+
         if (post.getPathToPostImage() != null)
             post.setLastUpdated(LocalDateTime.now());
 
@@ -154,58 +136,49 @@ public class PostService {
 
 
     public void deletePost(Long postId) {
-        if (!postRepository.existsById(postId)) {
-            throw new NoSuchElementException("Entity not found with id: " + postId);
-        }
-
-
+        if (!postRepository.existsById(postId))
+            throw new NotFoundException(NotFound.POST);
 
         postRepository.deleteById(postId);
     }
 
+
     public List<PostDTO> get20LatestPostsOfUserLoggedIn(String username, Integer page) {
-        User userLooking = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow(() -> ExceptionUtils.noUserWithThatName( SecurityUtils.getUsername() ));
-        User userProfile = userRepository.findByUsername(username ) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(username ));
+        User userLooking = userRepository.findByUsername( SecurityUtils.getUsername() )
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+        User userProfile = userRepository.findByUsername( username )
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
+        Set<Community> userCommunities = userRepository.findCommunitiesUserIsMemberOf(userLooking.getUsername());
         List<Post> posts = postRepository.getPostsOfUserOrderByCreatedAt(userProfile.getUsername(), PageRequest.of(page, 20));
-
-
-        List<PostDTO> postDTOs = new ArrayList<>();
-        for (Post post : posts) {
-            if (!(post.getCommunity().getCommunityType() == CommunityType.PUBLIC))
-                if (!userRepository.findCommunitiesUserIsMemberOf(userLooking.getUsername()).contains(post.getCommunity()))
-                    continue;
-
-            postDTOs.add( new PostDTO().mapObjectToDTO(post) );
-        }
-
-        return postDTOs;
-
+        return posts.stream()
+            .filter(post ->
+                post.getCommunity().getCommunityType() == CommunityType.PUBLIC
+                || userCommunities.contains(post.getCommunity())
+            )
+            .map(postMapper::entityToDto)
+            .toList();
     }
+
 
     public List<PostDTO> get20LatestPostsOfUserNotLoggedIn(String username, Integer page) {
-        User userProfile = userRepository.findByUsername(username ) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(username ));
+        User userProfile = userRepository.findByUsername( username )
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
         List<Post> posts = postRepository.getPostsOfUserOrderByCreatedAt(userProfile.getUsername(), PageRequest.of(page, 20));
 
-
-        List<PostDTO> postDTOs = new ArrayList<>();
-        for (Post post : posts) {
-            if (!(post.getCommunity().getCommunityType() == CommunityType.PUBLIC))
-                continue;
-
-            postDTOs.add( new PostDTO().mapObjectToDTO(post) );
-        }
-
-        return postDTOs;
-
+        return posts.stream()
+                .filter(post -> post.getCommunity().getCommunityType() == CommunityType.PUBLIC)
+                .map(post -> postMapper.entityToDto(post))
+                .toList();
     }
+
+
     public List<PostDTO> getLatestPostsOfCommunitiesPublic(Integer page) {
         List<Post> posts = postRepository.getLatestsPostsOfPublicCommunities(PageRequest.of(page, 20));
-        List<PostDTO> postDTOs = new ArrayList<>();
-        for (Post post : posts) {
-            postDTOs.add( new PostDTO().mapObjectToDTO(post) );
-        }
-        return postDTOs;
+        return posts.stream()
+                .map(post -> postMapper.entityToDto(post))
+                .toList();
     }
+
 }

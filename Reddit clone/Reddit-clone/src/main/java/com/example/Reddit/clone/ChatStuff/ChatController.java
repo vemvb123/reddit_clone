@@ -104,9 +104,7 @@ public class ChatController {
         User userChatWith = userRepository.findByUsername(usernameChatWith) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(usernameChatWith));
 
         if (Objects.equals(userFromToken.getUsername(), userChatWith.getUsername())) {
-            System.out.println(userFromToken.getUsername());
-            System.out.println(userChatWith.getUsername());
-            throw new RuntimeException("no lol");
+            throw new RuntimeException();
         }
 
         List<User> usersSorted = chatService.sortUsersAlphabetically(userFromToken, userChatWith);

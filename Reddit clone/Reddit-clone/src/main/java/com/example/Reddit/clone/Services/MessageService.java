@@ -4,95 +4,67 @@ package com.example.Reddit.clone.Services;
 import com.example.Reddit.clone.Config.JwtService;
 import com.example.Reddit.clone.DTO.MessageDTO;
 import com.example.Reddit.clone.Entity.*;
+import com.example.Reddit.clone.Exception.*;
+import com.example.Reddit.clone.Mapper.MessageMapper;
 import com.example.Reddit.clone.Repository.CommunityRepository;
 import com.example.Reddit.clone.Repository.MessageRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import com.example.Reddit.clone.utils.SecurityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class MessageService {
 
-
-    @Autowired
     private MessageRepository messageRepository;
+    private UserRepository userRepository;
+    private CommunityRepository communityRepository;
 
-    @Autowired
     private JwtService jwtService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private MessageMapper messageMapper;
 
 
 
-    public Message saveMessageNewReplyToPost(Comment comment) {
+    public void saveMessageNewReplyToPost(Comment comment) {
+        if (comment.getUser() == comment.getPost().getUser())
+            throw new MessageException(MessageExceptionMessage.OWN_POST);
 
-
-
-        if (comment.getUser() == comment.getPost().getUser()) {
-            System.out.println("Cant create message for having made a comment on ones own post");
-            return null;
-        }
-
-        Message message = new Message();
-
-        message.setMessageTopic(MessageTopic.NewReplyToPost);
-        message.setSeen(false);
-        message.setEventHappendAt(comment.getCreatedAt());
-        message.setComment(comment);
-        message.setToUser(comment.getPost().getUser());
-        message.setFromUser(comment.getUser());
-
-        return messageRepository.save(message);
-
-
-    }
-    public void saveMessageNewReplyToComment(Comment comment) {
-
-        if (comment.getUser() == comment.getParent().getUser()) {
-            System.out.println("Cant create message for having made a reply to ones own comment");
-            return;
-        }
-
-
-        System.out.println("new comment shit!!");
-        Message message = new Message();
-
-        message.setMessageTopic(MessageTopic.NewReplyToComment);
-        message.setSeen(false);
-        message.setEventHappendAt(comment.getCreatedAt());
-        message.setComment(comment);
-        message.setToUser(comment.getParent().getUser());
-        message.setFromUser(comment.getUser());
-
+        Message message = messageMapper.commentToMessage(comment, MessageTopic.NewReplyToPost, false);
         messageRepository.save(message);
     }
+
+
+    public void saveMessageNewReplyToComment(Comment comment) {
+
+        if (comment.getUser() == comment.getParent().getUser())
+            throw new MessageException(MessageExceptionMessage.OWN_COMMENT);
+
+        Message message = messageMapper.commentToMessage(comment, MessageTopic.NewReplyToComment, false);
+        messageRepository.save(message);
+    }
+
 
     public List<MessageDTO> get10MessagesToUser(int page) {
         User toUser = userRepository.findByUsername(SecurityUtils.getUsername()).orElseThrow();
         List<Message> messages = messageRepository.find10MessagesOrderByEventHappendAt(toUser.getId(), PageRequest.of(page, 10));
-        List<MessageDTO> messageDTOs = new ArrayList<>();
-        for (Message message : messages)
-            messageDTOs.add(new MessageDTO(message));
-        return messageDTOs;
+
+        return messages.stream()
+                .map(message -> messageMapper.entityToDto(message))
+                .toList();
     }
+
 
     public List<MessageDTO> getRequestsToJoinCommunity(int page, String communityName) {
         List<Message> messages = messageRepository.getRequestsToJoinCommunity(communityName, PageRequest.of(page, 10));
-
-        List<MessageDTO> messageDTOs = new ArrayList<>();
-        for (Message message : messages)
-            messageDTOs.add(new MessageDTO(message));
-
-
-        return messageDTOs;
+        return messages.stream()
+                .map(message -> messageMapper.entityToDto(message))
+                .toList();
     }
 
 
@@ -101,15 +73,12 @@ public class MessageService {
     }
 
 
-
-    @Autowired
-    CommunityRepository communityRepository;
-
     public void requestToJoinCommunity(String communityName) {
-        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow(() -> ExceptionUtils.noUserWithThatName( SecurityUtils.getUsername() ));
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() )
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
-        Community community = communityRepository.findByTitle(communityName).orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(communityName));
-
+        Community community = communityRepository.findByTitle(communityName)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         var message = Message.builder()
                         .messageTopic(MessageTopic.NewRequestToJoinCommunity)
@@ -119,26 +88,20 @@ public class MessageService {
                         .communityRequestingToJoin(community)
                         .build();
 
-
-
         messageRepository.save(message);
-
-
-
     }
 
-    @Transactional
+
     public void acceptRequestToJoinCommunity(String communityName, String usernameRequestingToJoin) {
         //check if user exists
-        User user = userRepository.findByUsername(usernameRequestingToJoin) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(usernameRequestingToJoin));
-
+        User user = userRepository.findByUsername(usernameRequestingToJoin)
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
         //check if community exists
-        Community community = communityRepository.findByTitle(communityName) .orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(communityName));
-
+        Community community = communityRepository.findByTitle(communityName)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         //check if user not already a member
         if (communityRepository.findMembersOfCommunity(communityName).contains(user))
-            throw new RuntimeException("User " + user.getUsername() + " is already a member of community " + community.getTitle());
-
+            throw new CommunityException(CommunityError.ALREADY_MEMBER, user.getUsername(), communityName);
         //check if user has sent a request, if so, then delete the request, elsewise throw an error
         boolean hasSentRequestToJoinCommunity = false;
         for (Message message : messageRepository.findMessagesFromUser(user.getId()))
@@ -149,10 +112,9 @@ public class MessageService {
             }
 
         if (!hasSentRequestToJoinCommunity)
-            throw new RuntimeException("User " + user.getUsername() + " has not sent a request to join the community " + community.getTitle());
-
+            throw new CommunityException(CommunityError.NOT_SENT_REQUEST, user.getUsername(), communityName);
 
         communityRepository.addUserToCommunity(user.getId(), community.getId());
-
     }
+
 }

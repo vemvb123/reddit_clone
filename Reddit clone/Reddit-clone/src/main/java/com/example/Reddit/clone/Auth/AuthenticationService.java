@@ -65,14 +65,10 @@ public class AuthenticationService {
                         request.getPassword()
                 )
         );
-        System.out.println("b");
         var user  = userRepository.findByUsername(request.getUsername())
                 .orElseThrow();
 
-        System.out.println("c");
-
         var jwtToken = jwtService.generateToken(user);
-
 
         return AuthenticationResponse.builder()
                 .firstname(user.getFirstName())

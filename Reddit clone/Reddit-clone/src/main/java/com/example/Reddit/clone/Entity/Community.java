@@ -38,13 +38,10 @@ public class Community {
     @ToString.Exclude
     private Set<Post> posts;
 
-
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "communityRequestingToJoin", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private Set<Message> requestsToJoinCommunity;
-
-
 
     @Enumerated(EnumType.STRING)
     @Column(name = "community_type")
@@ -67,25 +64,20 @@ public class Community {
     @ToString.Exclude
     private Set<User> moderators = new HashSet<>();
 
-
     @JsonIgnore
     @ManyToMany(mappedBy = "bannedFromCommunities", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude
     private Set<User> bannedUsers = new HashSet<>();
 
-
-
-
-
     // rights of moderators
-    private Boolean moderatorCanChangeWallpaper;
-    private Boolean moderatorCanChangeCommunityImage;
-    private Boolean moderatorCanDeleteOthersPosts;
-    private Boolean moderatorCanDeleteOthersComments;
-    private Boolean moderatorCanBanUser;
-    private Boolean moderatorCanDeleteCommunity;
-    private Boolean moderatorCanMakeAnnouncement;
-    private Boolean moderatorCanChangeCommunityDescription;
+    private Boolean moderatorCanChangeWallpaper = false;
+    private Boolean moderatorCanChangeCommunityImage = false;
+    private Boolean moderatorCanDeleteOthersPosts = false;
+    private Boolean moderatorCanDeleteOthersComments = false;
+    private Boolean moderatorCanBanUser = false;
+    private Boolean moderatorCanDeleteCommunity = false;
+    private Boolean moderatorCanMakeAnnouncement = false;
+    private Boolean moderatorCanChangeCommunityDescription = false;
 
 
 
