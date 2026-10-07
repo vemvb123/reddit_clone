@@ -9,22 +9,29 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ExceptionResponse> handleException(Exception e) {
-        log.warn(e.getMessage());
-
-        HttpStatus statusCode = HttpStatus.NOT_FOUND;
+    private ResponseEntity<ExceptionResponse> buildExceptionResponse(HttpStatus status, Exception e) {
+         log.warn(e.getMessage());
 
         ExceptionResponse response = new ExceptionResponse(
-                statusCode.value(),
+                status.value(),
                 e.getMessage()
         );
 
         return ResponseEntity
-                .status(statusCode)
+                .status(status)
                 .body(response);
     }
 
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ExceptionResponse> handleException(Exception e) {
+        return buildExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR, e);
+    }
+
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleNotFoundException(NotFoundException e) {
+        return buildExceptionResponse(HttpStatus.NOT_FOUND, e);
+   }
 
 }
