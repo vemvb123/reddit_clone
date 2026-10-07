@@ -34,7 +34,7 @@ public class UserController {
     private UserService userService;
 
 
-    //Todo: Bare administrator kan gjøre dette
+    //Todo: Bare administrator kan gjøre dette ..
     @PreAuthorize(("@ownerCheck.usernameIsSameAsToken(#username)"))
     @PostMapping("/wallpaper/{username}")
     public ResponseText setWallpaper(
