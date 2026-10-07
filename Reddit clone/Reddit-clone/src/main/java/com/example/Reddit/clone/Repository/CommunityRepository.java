@@ -3,7 +3,6 @@ package com.example.Reddit.clone.Repository;
 import com.example.Reddit.clone.Entity.Community;
 import com.example.Reddit.clone.Entity.Post;
 import com.example.Reddit.clone.Entity.User;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -12,7 +11,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -76,10 +74,16 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     public void unsubscribeUserFromCommunity(@Param("userId") Long userId, @Param("communityId") Long communityId);
 
     @Query("SELECT c.administrators FROM Community c WHERE c.title LIKE :communityName")
-    Set<User> findAdminsOfCommunity(String communityName);
+    Set<User> findAdminsOfCommunityByTitle(String communityName);
+
+    @Query("SELECT c.administrators FROM Community c WHERE c.id = :comunityId")
+    Set<User> findAdminsOfCommunityById(long communityId);
 
     @Query("SELECT c.moderators FROM Community c WHERE c.title LIKE :communityName")
-    Set<User> findModsOfCommunity(String communityName);
+    Set<User> findModsOfCommunityByTitle(String communityName);
+
+    @Query("SELECT c.moderators FROM Community c WHERE c.id = :communityName")
+    Set<User> findModsOfCommunityById(long communityId);
 
     @Modifying
     @Query(value = "INSERT INTO user_community_banned (user_id, community_id) VALUES (:userId, :communityId)", nativeQuery = true)

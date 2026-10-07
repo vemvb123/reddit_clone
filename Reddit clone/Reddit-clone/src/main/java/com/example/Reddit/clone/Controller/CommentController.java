@@ -3,13 +3,11 @@ package com.example.Reddit.clone.Controller;
 
 import com.example.Reddit.clone.ACL.OwnerCheck;
 import com.example.Reddit.clone.DTO.CommentDTO;
-import com.example.Reddit.clone.Entity.Comment;
+import com.example.Reddit.clone.DTO.ResponseText;
+import com.example.Reddit.clone.DTO.ResponseTextType;
 import com.example.Reddit.clone.Services.CommentService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.bind.annotation.*;
@@ -20,94 +18,64 @@ import java.util.List;
 @RestController
 @RequestMapping("/comment")
 @EnableAutoConfiguration
-@RequiredArgsConstructor
+@AllArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class CommentController {
 
-    private final String origin = "http://localhost:3000";
-
-    @Autowired
     private CommentService commentService;
-
-    @Autowired
     private OwnerCheck ownerCheck;
 
-
-    @CrossOrigin(origins = origin)
-    @GetMapping("/get_comment/{commentId}")
-    public ResponseEntity<CommentDTO> getComment(
+    @GetMapping("/{commentId}")
+    public CommentDTO getComment(
             @PathVariable Long commentId
     ) {
-        CommentDTO commentDTO = commentService.getComment(commentId);
-        return ResponseEntity.ok().body(commentDTO);
+        return commentService.getComment(commentId);
     }
 
 
-    @CrossOrigin(origins = origin)
     @PreAuthorize(("@ownerCheck.canDeleteComment(#commentId)"))
-    @PostMapping("/delete_comment/{commentId}")
-    public ResponseEntity<String> deleteComment(
+    @DeleteMapping("/{commentId}")
+    public ResponseText deleteComment(
             @PathVariable Long commentId
     ) {
-        commentService.deleteComment(commentId);
-        return ResponseEntity.status(HttpStatus.OK).body("Comment deleted successfully");
+        return commentService.deleteComment(commentId);
     }
 
-    @CrossOrigin(origins = origin)
     @PreAuthorize(("@ownerCheck.userCanViewOtherUsersComments(#username)"))
-    @GetMapping("/get_20_latets_comments_of_user/{page}/{username}")
-    public ResponseEntity<List<CommentDTO>> getLatestCommentsOfUserLoggedIn(
+    @GetMapping("/latests/{page}/{username}")
+    public List<CommentDTO> getLatestCommentsOfUserLoggedIn(
             @PathVariable String username,
             @PathVariable Integer page
-    )
-    {
-        List<CommentDTO> latestComments = commentService.get20LatestCommentsOfUserLoggedIn(username, page);
-        return ResponseEntity.ok().body(latestComments);
+    ) {
+        return commentService.get20LatestCommentsOfUserLoggedIn(username, page);
     }
 
-    @CrossOrigin(origins = origin)
     @PreAuthorize(("@ownerCheck.userCanViewOtherUsersComments(#username)"))
-    @GetMapping("/get_20_latets_comments_of_user_not_logged_in/{page}/{username}")
-    public ResponseEntity<List<CommentDTO>> getLatestCommentsOfUserNotLoggedIn(
+    @GetMapping("/latets_not_logged_in/{page}/{username}")
+    public List<CommentDTO> getLatestCommentsOfUserNotLoggedIn(
             @PathVariable String username,
             @PathVariable Integer page
-    )
-    {
-        List<CommentDTO> latestComments = commentService.get20LatestCommentsOfUserNotLoggedIn(username, page);
-        return ResponseEntity.ok().body(latestComments);
+    ) {
+        return commentService.get20LatestCommentsOfUserNotLoggedIn(username, page);
     }
 
-    @CrossOrigin(origins = origin)
+
     @PreAuthorize(("@ownerCheck.userCanMakeThisComment(#commentDTO)"))
-    @PostMapping("/saveComment")
-    public ResponseEntity<CommentDTO> saveComment(@RequestBody CommentDTO commentDTO)
+    @PostMapping
+    public CommentDTO saveComment(@RequestBody CommentDTO commentDTO)
     {
-
-        Comment comment = commentService.saveComment(commentDTO);
-        CommentDTO responseCommentDTO = new CommentDTO();
-        responseCommentDTO.setId(comment.getId());
-        responseCommentDTO.setPostId(comment.getId());
-        if (comment.getParent() != null)
-            responseCommentDTO.setParentCommentId(comment.getParent().getId());
-        responseCommentDTO.setDescription(comment.getDescription());
-        responseCommentDTO.setTitle(comment.getTitle());
-        responseCommentDTO.setUserId(comment.getUser().getId());
-
-        return ResponseEntity.ok().body(responseCommentDTO);
+        return commentService.saveComment(commentDTO);
     }
 
 
-
-    @CrossOrigin(origins = origin)
     @PreAuthorize(("@ownerCheck.userOwnsComment(#commentId)"))
-    @PostMapping("/setCommentImage/{commentId}")
-    public ResponseEntity<String> setWallpaper(
+    @PostMapping("/image/{commentId}")
+    public ResponseText setWallpaper(
             @RequestParam("file") MultipartFile file,
             @PathVariable Long commentId
-    )
-    {
+    ) {
         commentService.setImage(file, commentId);
-        return ResponseEntity.status(HttpStatus.OK).body("File saved successfully");
+        return new ResponseText(ResponseTextType.FILE_SAVED);
     }
 
 
@@ -115,33 +83,29 @@ public class CommentController {
     //will return 10 comments from a certain point
     //if a post has 10 comments, and the user clicks to see more comments, the user will get to see 10 more comments
     //if the commentId has a value, it will give 10 more replies of a specific comment.
-    @CrossOrigin(origins = origin)
     //@PreAuthorize(("@canPartakeInCommunity.userCanViewPost(#authorization, #postId)"))
-    @GetMapping("/getIntervallOfComments/{postId}/{page}/{parentCommentId}")
-    public ResponseEntity<List<CommentDTO>> getIntervallOfComments(
+    @GetMapping("/{postId}/{page}/{parentCommentId}")
+    public List<CommentDTO> getIntervallOfComments(
             @PathVariable Long postId,
             @PathVariable Integer page,
             @PathVariable Long parentCommentId
-            )
-    {
+    ) {
         if (parentCommentId != 0)
-            return ResponseEntity.ok().body(commentService.getReplyInterval(parentCommentId, page));
-        return ResponseEntity.ok().body(commentService.getCommentInterval(postId, page));
+            return commentService.getReplyInterval(parentCommentId, page);
+        return commentService.getCommentInterval(postId, page);
     }
 
 
-    @CrossOrigin(origins = origin)
     //@PreAuthorize(("@canPartakeInCommunity.userCanViewPost(#authorization, #postId)"))
-    @GetMapping("/getIntervallOfCommentsWithoutToken/{postId}/{page}/{parentCommentId}")
-    public ResponseEntity<List<CommentDTO>> getIntervallOfCommentsWithoutToken(
+    @GetMapping("/not_logged_in/{postId}/{page}/{parentCommentId}")
+    public List<CommentDTO> getIntervallOfCommentsWithoutToken(
             @PathVariable Long postId,
             @PathVariable Integer page,
             @PathVariable Long parentCommentId
-    )
-    {
+    ) {
         if (parentCommentId != 0)
-            return ResponseEntity.ok().body(commentService.getReplyInterval(parentCommentId, page));
-        return ResponseEntity.ok().body(commentService.getCommentInterval(postId, page));
+            return commentService.getReplyInterval(parentCommentId, page);
+        return commentService.getCommentInterval(postId, page);
     }
 
 }

@@ -1,184 +1,131 @@
 package com.example.Reddit.clone.Controller;
 
 
-import com.example.Reddit.clone.DTO.CommunityDTO;
-import com.example.Reddit.clone.DTO.PostDTO;
-import com.example.Reddit.clone.Entity.Post;
-import com.example.Reddit.clone.Services.PostService;
-import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.parser.Authorization;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import com.example.Reddit.clone.ACL.CanPartakeInCommunity;
 import com.example.Reddit.clone.ACL.OwnerCheck;
-import java.nio.file.Path;
-import java.security.Principal;
-import java.time.LocalDateTime;
+import com.example.Reddit.clone.DTO.PostDTO;
+import com.example.Reddit.clone.DTO.ResponseText;
+import com.example.Reddit.clone.Services.PostService;
+import lombok.AllArgsConstructor;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/post")
 @EnableAutoConfiguration
-@RequiredArgsConstructor
+@AllArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class PostController {
 
-    final String origin = "http://localhost:3000";
-
-    @Autowired
     private PostService postService;
-
-    @Autowired
     private CanPartakeInCommunity canPartakeInCommunity;
-
-    @Autowired
     private OwnerCheck ownerCheck;
 
 
-
-    @CrossOrigin(origins = origin)
     @PreAuthorize(("@canPartakeInCommunity.userCanView(#postId)"))
-    @GetMapping("/get_post/{postId}")
-    public ResponseEntity<PostDTO> getPost(
+    @GetMapping("/{postId}")
+    public PostDTO getPost(
             @PathVariable Long postId
     ) {
-        PostDTO postDTO = postService.getPost(postId);
-        return ResponseEntity.ok().body(postDTO);
-    }
-
-    @CrossOrigin(origins = origin)
-    @PreAuthorize(("@canPartakeInCommunity.userCanView(#postId)"))
-    @GetMapping("/get_post_not_logged_in/{postId}")
-    public ResponseEntity<PostDTO> getPostWithoutAuthorization(
-            @PathVariable Long postId
-    ) {
-        PostDTO postDTO = postService.getPost(postId);
-        return ResponseEntity.ok().body(postDTO);
+        return postService.getPost(postId);
     }
 
 
+    @PreAuthorize(("@canPartakeInCommunity.userCanView(#postId)"))
+    @GetMapping("/not_logged_in/{postId}")
+    public PostDTO getPostWithoutAuthorization(
+            @PathVariable Long postId
+    ) {
+        return postService.getPost(postId);
+    }
 
-    @CrossOrigin(origins = origin)
-    @GetMapping("/get_posts_from_communities_member_of/{page}")
-    public ResponseEntity<List<PostDTO>> getPostsFromCommunitiesMemberOf(
+
+    @GetMapping("/communities/{page}")
+    public List<PostDTO> getPostsFromCommunitiesMemberOf(
             @PathVariable Integer page
     ) {
-        List<PostDTO> latestsPosts = postService.get20PostsFromCommunitiesMemberOf(page);
-        return ResponseEntity.ok().body(latestsPosts);
-
-
+        return postService.get20PostsFromCommunitiesMemberOf(page);
     }
 
 
-
-    @CrossOrigin(origins = origin)
-    @PostMapping("/setImage/{postId}")
+    @PostMapping("/image/{postId}")
     @PreAuthorize(("@ownerCheck.userOwnsPost(#postId)"))
-    public ResponseEntity<String> setWallpaper(
+    public ResponseText setWallpaper(
             @RequestParam("file") MultipartFile file,
             @PathVariable Long postId
-    )
-    {
-        postService.setImage(file, postId);
-        return ResponseEntity.status(HttpStatus.OK).body("File saved successfully");
+    ) {
+        return postService.setImage(file, postId);
     }
 
 
-    @CrossOrigin(origins = origin)
     @PreAuthorize(("@ownerCheck.userCanMakeThisPost(#postDTO, #communityName)"))
-    @PostMapping("/save_post_to_community/{communityName}")
-    public ResponseEntity<PostDTO> saveCommunity(
+    @PostMapping("/{communityName}")
+    public PostDTO saveCommunity(
             @PathVariable String communityName,
             @RequestBody PostDTO postDTO
-    )
-    {
-        PostDTO DTOfromSavedPost = postService.savePost(postDTO, communityName);
-        return ResponseEntity.ok().body(DTOfromSavedPost);
+    ) {
+        return postService.savePost(postDTO, communityName);
     }
 
 
-
-    @CrossOrigin(origins = origin)
-    @GetMapping("/get_all_posts_of_public_communities/{page}")
-    public ResponseEntity<List<PostDTO>> getLatestPostsOfCommunitiesPublic(
+    @GetMapping("/public_communities/{page}")
+    public List<PostDTO> getLatestPostsOfCommunitiesPublic(
             @PathVariable Integer page
-    )
-    {
-        List<PostDTO> latestsPosts = postService.getLatestPostsOfCommunitiesPublic(page);
-        return ResponseEntity.ok().body(latestsPosts);
+    ) {
+        return postService.getLatestPostsOfCommunitiesPublic(page);
     }
 
 
-    @CrossOrigin(origins = origin)
     @PreAuthorize(("@canPartakeInCommunity.userCanView(#communityName)"))
-    @GetMapping("/get_20_latets_posts_of_community/{page}/{communityName}")
-    public ResponseEntity<List<PostDTO>> getLatestPostsOfCommunity(
+    @GetMapping("/{page}/{communityName}")
+    public List<PostDTO> getLatestPostsOfCommunity(
             @PathVariable String communityName,
             @PathVariable Integer page
-    )
-    {
-        List<PostDTO> latestsPosts = postService.get20LatestPosts(communityName, page);
-        return ResponseEntity.ok().body(latestsPosts);
+    ) {
+        return postService.get20LatestPosts(communityName, page);
     }
 
 
-    @CrossOrigin(origins = origin)
     @PreAuthorize(("@canPartakeInCommunity.userCanView(#communityName)"))
-    @GetMapping("/get_20_latets_posts_of_community_without_token/{page}/{communityName}")
-    public ResponseEntity<List<PostDTO>> getLatestPostsOfCommunityWithoutToken(
+    @GetMapping("/not_logged_in/{page}/{communityName}")
+    public List<PostDTO> getLatestPostsOfCommunityWithoutToken(
             @PathVariable String communityName,
             @PathVariable Integer page
-    )
-    {
-        List<PostDTO> latestsPosts = postService.get20LatestPosts(communityName, page);
-        return ResponseEntity.ok().body(latestsPosts);
+    ) {
+        return postService.get20LatestPosts(communityName, page);
     }
 
 
-
-    @CrossOrigin(origins = origin)
     @PreAuthorize(("@ownerCheck.userCanViewOtherUsersPosts(#username)"))
-    @GetMapping("/get_20_latets_posts_of_user/{page}/{username}")
-    public ResponseEntity<List<PostDTO>> getLatestPostsOfUserLoggedIn(
+    @GetMapping("/user/{page}/{username}")
+    public List<PostDTO> getLatestPostsOfUserLoggedIn(
             @PathVariable String username,
             @PathVariable Integer page
-    )
-    {
-        List<PostDTO> latestsPosts = postService.get20LatestPostsOfUserLoggedIn(username, page);
-        return ResponseEntity.ok().body(latestsPosts);
+    ) {
+        return postService.get20LatestPostsOfUserLoggedIn(username, page);
     }
 
 
-    @CrossOrigin(origins = origin)
     @PreAuthorize(("@ownerCheck.userCanViewOtherUsersPosts(#username)"))
-    @GetMapping("/get_20_latets_posts_of_user_not_logged_in/{page}/{username}")
-    public ResponseEntity<List<PostDTO>> getLatestPostsOfUserNotLoggedIn(
+    @GetMapping("/user/not_logged_in/{page}/{username}")
+    public List<PostDTO> getLatestPostsOfUserNotLoggedIn(
             @PathVariable String username,
             @PathVariable Integer page
-    )
-    {
-        List<PostDTO> latestsPosts = postService.get20LatestPostsOfUserNotLoggedIn(username, page);
-        return ResponseEntity.ok().body(latestsPosts);
+    ) {
+        return postService.get20LatestPostsOfUserNotLoggedIn(username, page);
     }
-
 
 
     @PreAuthorize(("@ownerCheck.userCanDeletePost(#postId)"))
-    @CrossOrigin(origins = origin)
-    @DeleteMapping("/delete_post_by_id/{postId}")
-    public ResponseEntity<String> deletePostById(@PathVariable Long postId)
+    @DeleteMapping("/{postId}")
+    public ResponseText deletePostById(@PathVariable Long postId)
     {
-        postService.deletePost(postId);
-        return ResponseEntity.status(HttpStatus.OK).body("Post deleted successfully");
-
+        return postService.deletePost(postId);
     }
 
 

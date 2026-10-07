@@ -2,6 +2,8 @@ package com.example.Reddit.clone.Services;
 
 
 import com.example.Reddit.clone.DTO.CommentDTO;
+import com.example.Reddit.clone.DTO.ResponseText;
+import com.example.Reddit.clone.DTO.ResponseTextType;
 import com.example.Reddit.clone.Entity.*;
 import com.example.Reddit.clone.Exception.NotFoundException;
 import com.example.Reddit.clone.Exception.NotFound;
@@ -68,7 +70,7 @@ public class CommentService {
    }
 
 
-    public Comment saveComment(CommentDTO commentDTO) {
+    public CommentDTO saveComment(CommentDTO commentDTO) {
         User user = userRepository.findByUsername(SecurityUtils.getUsername())
                 .orElseThrow(UserException::new);
 
@@ -89,7 +91,7 @@ public class CommentService {
         else
             messageService.saveMessageNewReplyToPost(savedComment);
 
-        return savedComment;
+        return commentMapper.entityToDTO(comment, null, comment.getIsPrimeComment(), !comment.getChildren().isEmpty());
     }
 
 
@@ -130,7 +132,7 @@ public class CommentService {
     }
 
 
-    public void deleteComment(Long commentId) {
+    public ResponseText deleteComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMENT));
 
@@ -143,6 +145,7 @@ public class CommentService {
             comment.setTitle("...");
             commentRepository.save(comment);
         }
+        return new ResponseText(ResponseTextType.DELETED);
     }
 
 

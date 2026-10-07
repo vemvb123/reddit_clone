@@ -3,6 +3,7 @@ package com.example.Reddit.clone.Services;
 
 import com.example.Reddit.clone.Config.JwtService;
 import com.example.Reddit.clone.DTO.MessageDTO;
+import com.example.Reddit.clone.DTO.ResponseText;
 import com.example.Reddit.clone.Entity.*;
 import com.example.Reddit.clone.Exception.*;
 import com.example.Reddit.clone.Mapper.MessageMapper;
@@ -68,12 +69,13 @@ public class MessageService {
     }
 
 
-    public void deleteMessage(Long messageId) {
+    public ResponseText deleteMessage(Long messageId) {
         messageRepository.deleteById(messageId);
+        return new ResponseText("Successfully deleted message");
     }
 
 
-    public void requestToJoinCommunity(String communityName) {
+    public ResponseText requestToJoinCommunity(String communityName) {
         User user = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
@@ -89,10 +91,11 @@ public class MessageService {
                         .build();
 
         messageRepository.save(message);
+        return new ResponseText("Successfully requested to join community");
     }
 
 
-    public void acceptRequestToJoinCommunity(String communityName, String usernameRequestingToJoin) {
+    public ResponseText acceptRequestToJoinCommunity(String communityName, String usernameRequestingToJoin) {
         //check if user exists
         User user = userRepository.findByUsername(usernameRequestingToJoin)
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
@@ -115,6 +118,7 @@ public class MessageService {
             throw new CommunityException(CommunityError.NOT_SENT_REQUEST, user.getUsername(), communityName);
 
         communityRepository.addUserToCommunity(user.getId(), community.getId());
+        return new ResponseText("Successfully accepted request to join community");
     }
 
 }

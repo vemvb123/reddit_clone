@@ -6,5 +6,6 @@ public enum NotFound {
     COMMENT,
     COMMUNITY,
     USER,
-    FRIEND_REQUEST
+    FRIEND_REQUEST,
+    MESSAGE
 }

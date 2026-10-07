@@ -3,6 +3,7 @@ package com.example.Reddit.clone.Services;
 
 import com.example.Reddit.clone.Config.JwtService;
 import com.example.Reddit.clone.DTO.PostDTO;
+import com.example.Reddit.clone.DTO.ResponseText;
 import com.example.Reddit.clone.Entity.Community;
 import com.example.Reddit.clone.Entity.CommunityType;
 import com.example.Reddit.clone.Entity.Post;
@@ -101,7 +102,7 @@ public class PostService {
     }
 
 
-    public void setImage(MultipartFile file, Long postId) {
+    public ResponseText setImage(MultipartFile file, Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException(NotFound.POST));
 
@@ -132,14 +133,16 @@ public class PostService {
                 e.printStackTrace();
             }
         }
+        return new ResponseText("File saved successfully");
     }
 
 
-    public void deletePost(Long postId) {
+    public ResponseText deletePost(Long postId) {
         if (!postRepository.existsById(postId))
             throw new NotFoundException(NotFound.POST);
 
         postRepository.deleteById(postId);
+        return new ResponseText("Post deleted successfully");
     }
 
 

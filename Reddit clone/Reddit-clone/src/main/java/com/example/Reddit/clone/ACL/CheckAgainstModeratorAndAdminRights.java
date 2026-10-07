@@ -4,13 +4,13 @@ package com.example.Reddit.clone.ACL;
 import com.example.Reddit.clone.Config.JwtService;
 import com.example.Reddit.clone.Entity.Community;
 import com.example.Reddit.clone.Entity.User;
-import com.example.Reddit.clone.Repository.CommentRepository;
+import com.example.Reddit.clone.Exception.NotFound;
+import com.example.Reddit.clone.Exception.NotFoundException;
 import com.example.Reddit.clone.Repository.CommunityRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import com.example.Reddit.clone.Services.ExceptionUtils;
 import com.example.Reddit.clone.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -39,7 +39,8 @@ public class CheckAgainstModeratorAndAdminRights {
     }
 
     public boolean userIsAdministratorOrModerator(String communityName) {
-        Community community = communityRepository.findByTitle(communityName).orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(communityName));
+        Community community = communityRepository.findByTitle(communityName)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         return (userRepository.findCommunitiesUserIsAdministratorOf( SecurityUtils.getUsername() ).contains(community)
                 || userRepository.findCommunitiesUserIsModeratorOf( SecurityUtils.getUsername() ).contains(community));
 
@@ -69,9 +70,12 @@ public class CheckAgainstModeratorAndAdminRights {
     }
 
     public boolean canBanUsers(String communityName, String usernameToBan) {
-        Community community = communityRepository.findByTitle(communityName).orElseThrow();
-        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
-        User userToBan = userRepository.findByUsername(usernameToBan).orElseThrow(() -> ExceptionUtils.noUserWithThatName(usernameToBan));
+        Community community = communityRepository.findByTitle(communityName)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() )
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+        User userToBan = userRepository.findByUsername(usernameToBan)
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
         if (user == userToBan)
             return false;
@@ -104,8 +108,10 @@ public class CheckAgainstModeratorAndAdminRights {
 
 
     public boolean canDeleteCommunity(String communityName) {
-        Community community = communityRepository.findByTitle(communityName).orElseThrow();
-        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
+        Community community = communityRepository.findByTitle(communityName)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() )
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
         if (user.getAdministratorOnCommunities().contains(community))
             return true;
@@ -114,14 +120,18 @@ public class CheckAgainstModeratorAndAdminRights {
         return false;
     }
 
-    public boolean canDeleteOthersComments(String communityName) {
-        Community community = communityRepository.findByTitle(communityName).orElseThrow();
-        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
-
-        if (communityRepository.findAdminsOfCommunity(communityName).contains(user))
+    public boolean canDeleteOthersComments(long communityId) {
+        Community community = communityRepository.findById(communityId)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() )
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+        // if user is admin
+        if (communityRepository.findAdminsOfCommunityById(communityId).contains(user))
             return true;
-        else if (communityRepository.findModsOfCommunity(communityName).contains(user))
+        // if user is a moderator with the right to delete comment
+        else if (communityRepository.findModsOfCommunityById(communityId).contains(user))
             return community.getModeratorCanDeleteOthersComments();
+        // user is regular user, without the right to delete comments
         return false;
     }
 
@@ -130,9 +140,9 @@ public class CheckAgainstModeratorAndAdminRights {
         Community community = communityRepository.findByTitle(communityName).orElseThrow();
         User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
 
-        if (communityRepository.findAdminsOfCommunity( communityName ) .contains( user ))
+        if (communityRepository.findAdminsOfCommunityByTitle( communityName ) .contains( user ))
             return true;
-        else if (communityRepository.findModsOfCommunity(communityName).contains(user))
+        else if (communityRepository.findModsOfCommunityByTitle(communityName).contains(user))
             return community.getModeratorCanDeleteOthersPosts();
         return false;
     }

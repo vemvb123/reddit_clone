@@ -2,6 +2,8 @@ package com.example.Reddit.clone.Services;
 
 import com.example.Reddit.clone.Config.JwtService;
 import com.example.Reddit.clone.DTO.CommunityDTO;
+import com.example.Reddit.clone.DTO.ResponseText;
+import com.example.Reddit.clone.DTO.ResponseTextType;
 import com.example.Reddit.clone.DTO.UserDTO;
 import com.example.Reddit.clone.Entity.Community;
 import com.example.Reddit.clone.Entity.Message;
@@ -51,7 +53,7 @@ public class UserService {
     }
 
 
-    public void setImage(MultipartFile file, String username) {
+    public ResponseText setImage(MultipartFile file, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
@@ -75,6 +77,7 @@ public class UserService {
                 e.printStackTrace();
             }
         }
+        return new ResponseText(ResponseTextType.FILE_SAVED);
 
     }
 
@@ -95,7 +98,7 @@ public class UserService {
     }
 
 
-    public void sendFriendRequestFromUser(String toUsername) {
+    public ResponseText sendFriendRequestFromUser(String toUsername) {
         String fromUsername = SecurityUtils.getUsername();
         User fromUser = userRepository.findByUsername(fromUsername)
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
@@ -113,6 +116,7 @@ public class UserService {
         message.setFromUser(fromUser);
         message.setEventHappendAt(LocalDateTime.now());
         messageRepository.save(message);
+        return new ResponseText("Sent request successfully");
     }
 
 
@@ -128,7 +132,7 @@ public class UserService {
     }
 
 
-    public void acceptFriendRequest(String fromUsername) {
+    public ResponseText acceptFriendRequest(String fromUsername) {
         User fromUser = userRepository.findByUsername(fromUsername)
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
@@ -141,11 +145,12 @@ public class UserService {
 
         makeUsersBecomeFriends(toUser, fromUser);
         deleteFriendRequestsBetweenUsers(toUser, fromUser);
+        return new ResponseText("Request accepted successfully");
     }
 
 
 
-    public void changeOthersCanSeePostsAndComments(Integer allowedToSeePosts, Integer allowedToSeeComments) {
+    public ResponseText changeOthersCanSeePostsAndComments(Integer allowedToSeePosts, Integer allowedToSeeComments) {
         User user = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
@@ -160,10 +165,10 @@ public class UserService {
             user.setOtherUsersCanSeeComments(false);
 
         userRepository.save(user);
-
+        return new ResponseText("Changed who can see posts and comments of user");
     }
 
-    public void setWallpaper(MultipartFile file, String username) {
+    public ResponseText setWallpaper(MultipartFile file, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
@@ -187,6 +192,7 @@ public class UserService {
                 e.printStackTrace();
             }
         }
+        return new ResponseText(ResponseTextType.FILE_SAVED);
     }
 
 }

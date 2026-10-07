@@ -5,9 +5,12 @@ import com.example.Reddit.clone.Config.JwtService;
 import com.example.Reddit.clone.DTO.CommentDTO;
 import com.example.Reddit.clone.DTO.PostDTO;
 import com.example.Reddit.clone.Entity.*;
+import com.example.Reddit.clone.Exception.NotFound;
+import com.example.Reddit.clone.Exception.NotFoundException;
 import com.example.Reddit.clone.Repository.*;
 import com.example.Reddit.clone.Services.ExceptionUtils;
 import com.example.Reddit.clone.utils.SecurityUtils;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -17,29 +20,15 @@ import java.security.Principal;
 import java.util.Objects;
 
 @Component
+@AllArgsConstructor
 public class OwnerCheck {
 
-
-
-    @Autowired
     private CommunityRepository communityRepository;
-
-    @Autowired
     private PostRepository postRepository;
-
-    @Autowired
     private CommentRepository commentRepository;
-
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
     private JwtService jwtService;
-
-    @Autowired
     private CheckAgainstModeratorAndAdminRights checkAgainstModeratorAndAdminRights;
-
-    @Autowired
     private MessageRepository messageRepository;
 
     // first determines if the post is being edited, or made for the first time
@@ -65,8 +54,10 @@ public class OwnerCheck {
         User user = userRepository.findByUsername(username).orElseThrow(() -> ExceptionUtils.noUserWithThatName(username));
         return user.getOtherUsersCanSeePosts();
     }
+
     public boolean userCanViewOtherUsersComments(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> ExceptionUtils.noUserWithThatName(username));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
         return user.getOtherUsersCanSeeComments();
     }
 
@@ -80,19 +71,22 @@ public class OwnerCheck {
     }
 
     public boolean userOwnsMessage(Long messageId) {
-        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow(() -> ExceptionUtils.noUserWithThatName( SecurityUtils.getUsername() ));
-        Message message = messageRepository.findById(messageId).orElseThrow(() -> new RuntimeException("No message with that id"));
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() )
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NotFoundException(NotFound.MESSAGE));
 
-        return (Objects.equals(message.getToUser().getId(), user.getId()));
+        long userInMessage = message.getToUser().getId();
+        return (Objects.equals(userInMessage, user.getId()));
     }
 
     public boolean canDeleteComment(Long commentId) {
         if (userOwnsComment(commentId))
             return true;
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> ExceptionUtils.noCommentWithThatId(commentId));
-        Community community = communityRepository.getComuntiyByTitle(comment.getPost().getCommunity().getTitle());
-        boolean moderatorAllowedToDeleteComment = checkAgainstModeratorAndAdminRights.canDeleteOthersComments(comment.getPost().getCommunity().getTitle());
-        return moderatorAllowedToDeleteComment;
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMENT));
+        long communityId = comment.getPost().getId();
+        return checkAgainstModeratorAndAdminRights.canDeleteOthersComments(communityId);
     }
 
     public boolean userCanDeletePost(Long postId) {
@@ -110,19 +104,26 @@ public class OwnerCheck {
     }
 
     public boolean userCanMakeThisComment(CommentDTO commentDTO) {
-        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() )
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+        Post post = postRepository.findById(commentDTO.postId())
+                .orElseThrow(() -> new NotFoundException(NotFound.POST));
+        Community community = communityRepository.findById( post.getCommunity().getId() )
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
-        Post post = postRepository.findById(commentDTO.getPostId()).orElseThrow(() -> new RuntimeException("No post with the id " + commentDTO.getPostId()));
-        Community community = communityRepository.findByTitle( post.getCommunity().getTitle() ).orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(post.getCommunity().getTitle()));
-
-        if (commentDTO.getId() == null)
+        if (commentDTO.id() == null)
+            // Community is public
             if (community.getCommunityType() == CommunityType.PUBLIC)
                 return true;
-            else if (community.getCommunityType() == CommunityType.RESTRICTED ||  community.getCommunityType() == CommunityType.PRIVATE)
+            // community is restricted or private, then user has to be a member
+            else if (community.getCommunityType() == CommunityType.RESTRICTED
+                    ||  community.getCommunityType() == CommunityType.PRIVATE)
                 return userRepository.findCommunitiesUserIsMemberOf( SecurityUtils.getUsername() ).contains(community);
-
-        Comment comment = commentRepository.findById(commentDTO.getId()).orElseThrow();
-        return Objects.equals(user.getId(), comment.getUser().getId());
+        // user owns the comment
+        Comment comment = commentRepository.findById(commentDTO.id())
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMENT));
+        long userIdOfComment = comment.getUser().getId();
+        return Objects.equals(user.getId(), userIdOfComment);
     }
 
 
@@ -137,10 +138,20 @@ public class OwnerCheck {
     }
 
 
+    public boolean usernameIsSameAsToken(String username) {
+        String usernameOfRequester = SecurityUtils.getUsername();
+        return Objects.equals(usernameOfRequester , username);
+    }
+
+
     public boolean userOwnsComment(Long commentId) {
-        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
-        Comment comment = commentRepository.findById(commentId).orElseThrow();
-        return Objects.equals(user.getId(), comment.getUser().getId());
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() )
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMENT));
+
+        long userIdOfComment = comment.getUser().getId();
+        return Objects.equals(user.getId(), userIdOfComment);
     }
 
     public boolean userOwnsComment(CommentDTO commentDTO) {
