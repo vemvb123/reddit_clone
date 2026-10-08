@@ -126,7 +126,7 @@ public class EntityTest {
         AuthenticationResponse response = objectMapper.readValue(content, AuthenticationResponse.class);
 
 
-        return response.getToken();
+        return response.token();
     }
 
 
@@ -137,12 +137,16 @@ public class EntityTest {
         User user = register_user();
         String token = getUserToken();
 
-        var communityDTO = CommunityDTO.builder()
-                .username(authenticationRequest.getUsername())
-                .communityType(CommunityType.PUBLIC)
-                .description("a description")
-                .title("communityTitle")
-                .build();
+        var communityDTO = new CommunityDTO(
+                "community title",
+                "a description",
+                CommunityType.PUBLIC,
+                null,
+                authenticationRequest.username(),
+                null,
+                false, false, false, false, false, false, false, false
+                );
+
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/community/save_community")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -151,15 +155,16 @@ public class EntityTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.communityType", equalTo( CommunityType.PUBLIC.toString() )  ))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title", equalTo( communityDTO.getTitle() )))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description", equalTo( communityDTO.getDescription() )))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title", equalTo( communityDTO.title() )))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description", equalTo( communityDTO.description() )))
                 .andReturn();
 
-        assertTrue(communityRepository.existsByTitle(communityDTO.getTitle()));
-        Community community = communityRepository.findByTitle(communityDTO.getTitle()) .orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(communityDTO.getTitle()));
-        assertEquals(community.getTitle(), communityDTO.getTitle());
-        assertEquals(community.getCommunityType(), communityDTO.getCommunityType());
-        assertEquals(community.getDescription(), communityDTO.getDescription());
+        assertTrue(communityRepository.existsByTitle(communityDTO.title()));
+        Community community = communityRepository.findByTitle(communityDTO.title())
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
+        assertEquals(community.getTitle(), communityDTO.title());
+        assertEquals(community.getCommunityType(), communityDTO.communityType());
+        assertEquals(community.getDescription(), communityDTO.description());
 
 
 
@@ -388,7 +393,7 @@ public class EntityTest {
         String content = result.getResponse().getContentAsString();
         AuthenticationResponse response = objectMapper.readValue(content, AuthenticationResponse.class);
 
-        String token = response.getToken();
+        String token = response.token();
 
         return token;
     }

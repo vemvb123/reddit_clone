@@ -116,7 +116,7 @@ public class RightsTest {
         String content = result.getResponse().getContentAsString();
         AuthenticationResponse response = objectMapper.readValue(content, AuthenticationResponse.class);
 
-        String token = response.getToken();
+        String token = response.token();
 
         return token;
     }

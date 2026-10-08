@@ -74,7 +74,7 @@ class AuthenticationTest {
                 .andDo(print());
 
 
-        assertTrue(userRepository.existsByUsername(registerRequest.getUsername()));
+        assertTrue(userRepository.existsByUsername(registerRequest.username()));
         assertFalse(userRepository.existsByUsername("random_username"));
     }
 
@@ -91,7 +91,7 @@ class AuthenticationTest {
                         .content(objectMapper.writeValueAsString(registerRequest)))
                         .andExpect(MockMvcResultMatchers.status().isOk());
 
-        assertTrue(userRepository.existsByUsername(registerRequest.getUsername()));
+        assertTrue(userRepository.existsByUsername(registerRequest.username()));
 
 
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/authenticate")
@@ -113,7 +113,7 @@ class AuthenticationTest {
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        assertTrue(userRepository.existsByUsername(registerRequest.getUsername()));
+        assertTrue(userRepository.existsByUsername(registerRequest.username()));
 
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/auth/authenticate")
@@ -125,8 +125,8 @@ class AuthenticationTest {
         String content = result.getResponse().getContentAsString();
         AuthenticationResponse response = objectMapper.readValue(content, AuthenticationResponse.class);
 
-        String username = jwtService.extractUsername( response.getToken() );
-        assertEquals(authenticationRequest.getUsername(), username);
+        String username = jwtService.extractUsername( response.token() );
+        assertEquals(authenticationRequest.username(), username);
 
 
 

@@ -22,13 +22,13 @@ import java.util.Set;
 public class AuthenticationService {
 
     private final UserRepository userRepository;
-    private final RoleRepository rolerRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
-        Role role = rolerRepository.findByName("USER");
+        Role role = roleRepository.findByName("USER");
         Set<Role> roles = new HashSet<>();
         roles.add(role);
 
@@ -37,12 +37,9 @@ public class AuthenticationService {
                 request.lastname(),
                 request.email(),
                 request.username(),
-                passwordencoder.encode(request.password()),
-                roles,
-                true,
-                true
+                passwordEncoder.encode(request.password()),
+                roles
         );
-
 
         userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);

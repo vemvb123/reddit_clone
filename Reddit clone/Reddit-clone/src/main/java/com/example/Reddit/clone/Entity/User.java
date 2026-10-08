@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -31,6 +32,15 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private String username;
+
+    public User(String firstname, String lastname, String email, String password, String username, Set<Role> roles) {
+        this.firstName = firstname;
+        this.lastName = lastname;
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.roles = roles;
+    }
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER)
@@ -62,7 +72,6 @@ public class User implements UserDetails {
     @ToString.Exclude
     private Set<Message> messages;
 
-
     @JsonIgnore
     @OneToMany(mappedBy = "fromUser")
     @ToString.Exclude
@@ -92,8 +101,6 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "community_id"))
     private Set<Community> moderatorOnCommunities;
 
-
-
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
@@ -102,23 +109,13 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "community_id"))
     private Set<Community> bannedFromCommunities;
 
-
-
-
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<Role> roles = getRoles();
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-
-        for (Role role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role.getName()));
-        }
-
-        return authorities;
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toSet());
     }
-
-
 
     @JsonIgnore
     @ManyToMany
@@ -129,10 +126,6 @@ public class User implements UserDetails {
     )
     @ToString.Exclude
     Set<User> friends = new HashSet<>();
-
-
-
-
 
     @Override
     public String getPassword() {
@@ -176,10 +169,6 @@ public class User implements UserDetails {
     public Set<Role> getRoles() {
         return this.roles;
     }
-
-
-
-
 
     @Override
     public boolean equals(Object o) {
