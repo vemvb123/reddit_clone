@@ -5,6 +5,8 @@ import com.example.Reddit.clone.DTO.CommentDTO;
 import com.example.Reddit.clone.DTO.CommunityDTO;
 import com.example.Reddit.clone.DTO.PostDTO;
 import com.example.Reddit.clone.Entity.*;
+import com.example.Reddit.clone.Exception.NotFound;
+import com.example.Reddit.clone.Exception.NotFoundException;
 import com.example.Reddit.clone.Repository.*;
 import com.example.Reddit.clone.Services.ExceptionUtils;
 import org.junit.jupiter.api.Test;
@@ -76,19 +78,18 @@ public class EntityTest {
             private MessageRepository messageRepository;
 
 
-    RegisterRequest registerRequest = RegisterRequest.builder()
-            .firstname("hans")
-            .lastname("larsen")
-            .email("hans@email.com")
-            .password("password1")
-            .username("username1")
-            .build();
+    RegisterRequest registerRequest = new RegisterRequest(
+            "hans",
+            "larsen",
+            "hans@email.com",
+            "password1",
+            "username1"
+    );
 
-
-    AuthenticationRequest authenticationRequest = AuthenticationRequest.builder()
-            .username(registerRequest.getUsername())
-            .password(registerRequest.getPassword())
-            .build();
+    AuthenticationRequest authenticationRequest = new AuthenticationRequest(
+            registerRequest.username(),
+            registerRequest.password()
+    );
 
 
     private void createRoles() {
@@ -109,7 +110,8 @@ public class EntityTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)));
 
-        User user = userRepository.findByUsername(registerRequest.getUsername()) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(registerRequest.getUsername()));
+        User user = userRepository.findByUsername(registerRequest.username())
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
         return user;
     }
 
@@ -356,28 +358,26 @@ public class EntityTest {
 
     // only the user itself can delete its own post
     public User registerOwnUser(String firstname, String lastname, String email, String password, String username) throws Exception {
-        RegisterRequest registerRequestOtherUser = RegisterRequest.builder()
-                .firstname(firstname)
-                .lastname(lastname)
-                .email(email)
-                .password(password)
-                .username(username)
-                .build();
-
+        RegisterRequest registerRequestOtherUser = new RegisterRequest(
+                firstname,
+                lastname,
+                email,
+                password,
+                username
+        );
 
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registerRequestOtherUser)));
 
-        User otherUser = userRepository.findByUsername(registerRequestOtherUser.getUsername()) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(registerRequestOtherUser.getUsername()));
+        User otherUser = userRepository.findByUsername(registerRequestOtherUser.username())
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
         return otherUser;
     }
 
     public String getTokenOfUserWithUsername(String username, String password) throws Exception {
-        AuthenticationRequest authenticationRequest = AuthenticationRequest.builder()
-                .username(username)
-                .password(password)
-                .build();
+        AuthenticationRequest authenticationRequest = new AuthenticationRequest(
+                username, password);
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/auth/authenticate")
                         .contentType(MediaType.APPLICATION_JSON)

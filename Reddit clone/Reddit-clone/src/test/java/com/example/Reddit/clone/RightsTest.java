@@ -10,6 +10,8 @@ import com.example.Reddit.clone.DTO.CommunityDTO;
 import com.example.Reddit.clone.DTO.ModeratorRightsDTO;
 import com.example.Reddit.clone.DTO.PostDTO;
 import com.example.Reddit.clone.Entity.*;
+import com.example.Reddit.clone.Exception.NotFound;
+import com.example.Reddit.clone.Exception.NotFoundException;
 import com.example.Reddit.clone.Repository.*;
 import com.example.Reddit.clone.Services.ExceptionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -82,28 +84,28 @@ public class RightsTest {
     }
 
     private User makeUser(String firstname, String lastname, String email, String password, String username) throws Exception {
-            RegisterRequest registerRequestOtherUser = RegisterRequest.builder()
-                    .firstname(firstname)
-                    .lastname(lastname)
-                    .email(email)
-                    .password(password)
-                    .username(username)
-                    .build();
-
+            RegisterRequest registerRequestOtherUser = new RegisterRequest(
+                    firstname,
+                    lastname,
+                    email,
+                    password,
+                    username
+            );
 
             mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(registerRequestOtherUser)));
 
-            User user = userRepository.findByUsername(registerRequestOtherUser.getUsername()) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(registerRequestOtherUser.getUsername()));
+            User user = userRepository.findByUsername(registerRequestOtherUser.username())
+                    .orElseThrow(() -> new NotFoundException(NotFound.USER));
             return user;
     }
 
     private String getTokenOfUser(String username, String password) throws Exception {
-        AuthenticationRequest authenticationRequest = AuthenticationRequest.builder()
-                .username(username)
-                .password(password)
-                .build();
+        AuthenticationRequest authenticationRequest = new AuthenticationRequest(
+                username,
+                password
+        );
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/auth/authenticate")
                         .contentType(MediaType.APPLICATION_JSON)

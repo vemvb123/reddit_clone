@@ -3,15 +3,16 @@ package com.example.Reddit.clone.ChatStuff;
 import com.example.Reddit.clone.Config.JwtService;
 import com.example.Reddit.clone.Entity.Chat;
 import com.example.Reddit.clone.Entity.ChatMessage;
-import com.example.Reddit.clone.Entity.Message;
 import com.example.Reddit.clone.Entity.User;
+import com.example.Reddit.clone.Exception.NotFound;
+import com.example.Reddit.clone.Exception.NotFoundException;
+import com.example.Reddit.clone.Mapper.ChatMessageMapper;
 import com.example.Reddit.clone.Repository.ChatMessageRepository;
 import com.example.Reddit.clone.Repository.ChatRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import com.example.Reddit.clone.Services.ExceptionUtils;
 import com.example.Reddit.clone.utils.SecurityUtils;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,35 +31,25 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api/chat")
 @EnableAutoConfiguration
-@RequiredArgsConstructor
+@AllArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class ChatController {
-    final String origin = "http://localhost:3000";
 
-    @Autowired
     private ChatServiceImpl chatService;
-
-    @Autowired
     private JwtService jwtService;
-
-    @Autowired
     private UserRepository userRepository;
-
-
-    @Autowired
     private ChatRepository chatRepository;
-
-    @Autowired
     private ChatMessageRepository chatMessageRepository;
+    private ChatMessageMapper mapper;
 
-    @CrossOrigin(origins = origin)
+
     @GetMapping("/{chatId}/messages")
     public ResponseEntity<List<ChatMessageDTO>> getChatMessages(@PathVariable Long chatId) {
         List<ChatMessage> messages = chatService.getChatMessages(chatId);
 
         List<ChatMessageDTO> messageDTOs = new ArrayList<>();
         for (ChatMessage message : messages)
-            messageDTOs.add( new ChatMessageDTO().mapObjectToDTO(message) );
+            messageDTOs.add(mapper.entityToDto(message) );
 
         return new ResponseEntity<>(messageDTOs, HttpStatus.OK);
     }
@@ -71,7 +62,8 @@ public class ChatController {
 
     ) {
         Chat chat = chatRepository.findById(chatId) .orElseThrow();
-        User sender = userRepository.findByUsername(chatMessageDTO.getSender() ).orElseThrow();
+        User sender = userRepository.findByUsername(chatMessageDTO.sender() )
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
         User receiver;
         if (Objects.equals(chat.getUser1().getUsername(), sender.getUsername()))
@@ -82,20 +74,18 @@ public class ChatController {
 
         var message = ChatMessage.builder()
                 .chat(chat)
-                .content(chatMessageDTO.getContent())
+                .content(chatMessageDTO.content())
                 .sentAt(LocalDateTime.now())
                 .sender(sender)
                 .receiver(receiver)
                 .build();
 
-
         // Return the processed message to be broadcast to subscribers
         ChatMessage savedMessage = chatMessageRepository.save(message);
-        return new ChatMessageDTO().mapObjectToDTO(savedMessage);
+        return mapper.entityToDto(savedMessage);
     }
 
 
-    @CrossOrigin(origins = origin)
     @PostMapping("/getChatOrCreateIfAlreadyExists/{usernameChatWith}")
     public ResponseEntity<Long> getChatMessages(
             @PathVariable String usernameChatWith

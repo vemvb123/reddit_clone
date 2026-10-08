@@ -47,18 +47,19 @@ class AuthenticationTest {
     @Autowired
     private JwtService jwtService;
 
-    RegisterRequest registerRequest = RegisterRequest.builder()
-                                .firstname("hans")
-                                .lastname("larsen")
-                                .email("hans@email.com")
-                                .password("password1")
-                                .username("username1")
-                                .build();
 
-    AuthenticationRequest authenticationRequest = AuthenticationRequest.builder()
-                                .username(registerRequest.getUsername())
-                                .password(registerRequest.getPassword())
-                                .build();
+    RegisterRequest registerRequest = new RegisterRequest(
+                                "hans",
+                                "larsen",
+                                "hans@email.com",
+                                "password1",
+                                "username1"
+    );
+
+    AuthenticationRequest authenticationRequest = new AuthenticationRequest(
+            registerRequest.username(), registerRequest.password() );
+
+
     @Test
     public void user_can_register_and_is_saved_to_database() throws Exception {
 

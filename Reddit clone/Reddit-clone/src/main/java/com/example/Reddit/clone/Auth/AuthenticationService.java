@@ -4,9 +4,11 @@ package com.example.Reddit.clone.Auth;
 import com.example.Reddit.clone.Config.JwtService;
 import com.example.Reddit.clone.Entity.Role;
 import com.example.Reddit.clone.Entity.User;
+import com.example.Reddit.clone.Exception.NotFound;
+import com.example.Reddit.clone.Exception.NotFoundException;
 import com.example.Reddit.clone.Repository.RoleRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,24 +18,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class AuthenticationService {
 
     private final UserRepository userRepository;
-
     private final RoleRepository rolerRepository;
-
     private final PasswordEncoder passwordEncoder;
-
     private final JwtService jwtService;
-
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
         Role role = rolerRepository.findByName("USER");
         Set<Role> roles = new HashSet<>();
         roles.add(role);
-
 
         var user = User.builder()
                 .firstName(request.getFirstname())
@@ -48,36 +45,33 @@ public class AuthenticationService {
 
         userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .build();
+        return new AuthenticationResponse(
+                jwtToken
+        );
     }
 
 
-
-
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-
-
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
+                        request.username(),
+                        request.password()
                 )
         );
-        var user  = userRepository.findByUsername(request.getUsername())
-                .orElseThrow();
 
+        var user  = userRepository.findByUsername(request.username())
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
         var jwtToken = jwtService.generateToken(user);
 
-        return AuthenticationResponse.builder()
-                .firstname(user.getFirstName())
-                .lastname(user.getLastName())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .roles(user.getRoles())
-                .token(jwtToken)
-                .build();
+        return new AuthenticationResponse(
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getUsername(),
+                user.getRoles(),
+                jwtToken
+        );
+
     }
 
 

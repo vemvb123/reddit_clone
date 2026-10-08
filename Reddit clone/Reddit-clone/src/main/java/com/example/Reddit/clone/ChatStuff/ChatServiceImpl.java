@@ -2,11 +2,10 @@ package com.example.Reddit.clone.ChatStuff;
 
 import com.example.Reddit.clone.Entity.Chat;
 import com.example.Reddit.clone.Entity.ChatMessage;
-import com.example.Reddit.clone.Entity.Message;
 import com.example.Reddit.clone.Entity.User;
 import com.example.Reddit.clone.Repository.ChatMessageRepository;
 import com.example.Reddit.clone.Repository.ChatRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,14 +15,12 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@AllArgsConstructor
 public class ChatServiceImpl implements ChatService {
 
-
-    @Autowired
     ChatRepository chatRepository;
-
-    @Autowired
     ChatMessageRepository chatMessageRepository;
+
 
     @Override
     public Chat createChat(User user1, User user2) {

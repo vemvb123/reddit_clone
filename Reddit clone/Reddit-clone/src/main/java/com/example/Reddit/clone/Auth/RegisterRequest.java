@@ -1,21 +1,9 @@
 package com.example.Reddit.clone.Auth;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class RegisterRequest {
-
-    private String firstname;
-    private String lastname;
-    private String email;
-    private String password;
-    private String username;
-
-}
-
+public record RegisterRequest(
+    String firstname,
+    String lastname,
+    String email,
+    String password,
+    String username
+) {}

@@ -1,25 +1,32 @@
 package com.example.Reddit.clone.Auth;
 
 import com.example.Reddit.clone.Entity.Role;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class AuthenticationResponse {
+public record AuthenticationResponse(
+    String firstname,
+    String lastname,
+    String email,
+    String username,
+    Set<Role> roles,
+    String token
+) {
+    public AuthenticationResponse(
+        String firstname,
+        String lastname,
+        String email,
+        String username,
+        String token
+    ) {
+        this(firstname, lastname, email, username, new HashSet<>(), token);
+    }
 
-    private String firstname;
-    private String lastname;
-    private String email;
-    private String username;
-    private Set<Role> roles = new HashSet<>();
-    private String token;
+    public AuthenticationResponse(
+        String token
+    ) {
+        this(null, null, null, null, null, token);
+    }
 
 }
