@@ -220,7 +220,7 @@ public class CommunityService {
 
     public ModeratorRightsDTO getModeratorRights(long communityId) {
         Community community = communityRepository.findById(communityId)
-                .orElseThrow(() -> new CommunityException(CommunityError.NOT_FOUND, community.getTitle()));
+                .orElseThrow(() -> new CommunityException(CommunityError.NOT_FOUND, communityId));
         return communityMapper.communityToModeratorRightsDto(community);
     }
 
@@ -237,7 +237,7 @@ public class CommunityService {
         if (userIsModerator)
             communityRepository.removeModeratorPowers(user.getId(), community.getId());
         else if (userIsAdmin)
-            if (communityRepository.findAdminsOfCommunityByTitle(community.getTitle()).size() == 1 && communityRepository.findMembersOfCommunityById(community.getTitle()).size() > 1)
+            if (communityRepository.findAdminsOfCommunityByTitle(community.getTitle()).size() == 1 && communityRepository.findMembersOfCommunityById(community.getId()).size() > 1)
                 //if admin is only admin left, while there are still others user, then throw an error. else if admin is only user left, then unsubscribe
                 throw new CommunityException(CommunityError.CANNOT_UNSUBSCRIBE_AS_ADMINISTRATOR, user.getUsername(), community.getTitle());
             else
