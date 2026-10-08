@@ -8,7 +8,6 @@ import lombok.*;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
@@ -23,23 +22,15 @@ import java.util.*;
 @Table(name = "`user`")  // Enclose the table name in backticks
 public class User implements UserDetails {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
-
     private String firstName;
-
     private String lastName;
-
     private String email;
-
     private String password;
-
     private String username;
-
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER)
@@ -50,30 +41,16 @@ public class User implements UserDetails {
     )
     private Set<Role> roles = new HashSet<>();
 
-
-
     private String pathToProfileImage;
-
     private String pathToWallpaperImage;
-
-
 
     @JsonIgnoreProperties("user")
     @OneToMany(mappedBy = "user")
     @ToString.Exclude
     private Set<Comment> comments;
 
-
-
-
-
     private Boolean otherUsersCanSeePosts = true;
     private Boolean otherUsersCanSeeComments = true;
-
-
-
-
-
 
     @JsonIgnoreProperties("user")
     @OneToMany(mappedBy = "user")

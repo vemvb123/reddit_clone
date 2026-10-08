@@ -32,16 +32,17 @@ public class AuthenticationService {
         Set<Role> roles = new HashSet<>();
         roles.add(role);
 
-        var user = User.builder()
-                .firstName(request.getFirstname())
-                .lastName((request.getLastname()))
-                .email((request.getEmail()))
-                .username((request.getUsername()))
-                .password(passwordEncoder.encode(request.getPassword()))
-                .roles(roles)
-                .otherUsersCanSeePosts(true)
-                .otherUsersCanSeeComments(true)
-                .build();
+        User user = new User(
+                request.firstname(),
+                request.lastname(),
+                request.email(),
+                request.username(),
+                passwordencoder.encode(request.password()),
+                roles,
+                true,
+                true
+        );
+
 
         userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);
