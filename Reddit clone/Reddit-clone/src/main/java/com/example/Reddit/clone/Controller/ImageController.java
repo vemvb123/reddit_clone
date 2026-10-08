@@ -1,9 +1,6 @@
 package com.example.Reddit.clone.Controller;
 
 
-import com.example.Reddit.clone.ACL.CanPartakeInCommunity;
-import com.example.Reddit.clone.ACL.OwnerCheck;
-import com.example.Reddit.clone.Services.CommunityService;
 import com.example.Reddit.clone.Services.FileService;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -12,7 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
@@ -23,11 +23,7 @@ import java.io.IOException;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class ImageController {
 
-    final String origin = "http://localhost:3000";
-    private CommunityService communityService;
     private FileService fileService;
-    private OwnerCheck ownerCheck;
-    private CanPartakeInCommunity canPartakeInCommunity;
 
     @GetMapping("/{fileName}")
     public ResponseEntity<byte[]> downloadFile(

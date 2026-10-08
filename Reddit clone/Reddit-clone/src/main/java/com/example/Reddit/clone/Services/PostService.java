@@ -53,8 +53,8 @@ public class PostService {
 
 
     @Transactional
-    public PostDTO savePost(PostDTO postDTO, String communityName) {
-        Community community = communityRepository.findByTitle(communityName)
+    public PostDTO savePost(PostDTO postDTO, long communityId) {
+        Community community = communityRepository.findById(communityId)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -82,8 +82,8 @@ public class PostService {
     }
 
 
-    public List<PostDTO> get20LatestPosts(String communityName, int page) {
-        Community community = communityRepository.findByTitle(communityName)
+    public List<PostDTO> get20LatestPosts(long communityId, int page) {
+        Community community = communityRepository.findById(communityId)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         List<Post> posts = postRepository.find20LaterPostAfterPost(community.getTitle(), PageRequest.of(page, 10));

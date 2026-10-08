@@ -52,4 +52,18 @@ public enum CommunityError {
                     );
         };
     }
+
+     public String message(long communityId) {
+        return switch (this) {
+            case NOT_FOUND ->
+                    "Community " + communityId + " was not found";
+
+            default ->
+                    throw new IllegalStateException(
+                            "This error does not support only communityName: " + this
+                    );
+        };
+    }
+
+
 }

@@ -48,7 +48,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p WHERE " +
             "p.community.title = :communityTitle " +
             "ORDER BY p.createdAt DESC")
-    public List<Post> findLaterPostAfterPost(@Param("communityTitle") String communityTitle);
+    public List<Post> findLaterPostAfterPostByTitle(@Param("communityTitle") String communityTitle);
+
+
+    @Query("SELECT p FROM Post p WHERE " +
+            "p.community.id = :communityId " +
+            "ORDER BY p.createdAt DESC")
+    public List<Post> findLaterPostAfterPostById(@Param("communityId") long communityId);
+
 
 
     @Query("SELECT p FROM Post p WHERE p.user.username LIKE :username")

@@ -11,12 +11,8 @@ import com.example.Reddit.clone.Repository.*;
 import com.example.Reddit.clone.Services.ExceptionUtils;
 import com.example.Reddit.clone.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-import java.security.Principal;
 import java.util.Objects;
 
 @Component
@@ -34,26 +30,31 @@ public class OwnerCheck {
     // first determines if the post is being edited, or made for the first time
     // if its made for the first time, it determines wether the user has access to the community
     // if the post is being edited, it determines if the user is the owner of the post
-    public boolean userCanMakeThisPost(PostDTO postDTO, String communityName) {
-        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
-        Community community = communityRepository.findByTitle(communityName).orElseThrow();
+    public boolean userCanMakeThisPost(PostDTO postDTO, long communityId) {
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() )
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+        Community community = communityRepository.findById(communityId)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
-        if (postDTO.getId() == null)
+        if (postDTO.id() == null)
             if (community.getCommunityType() == CommunityType.PUBLIC)
                 return true;
-            else if (community.getCommunityType() == CommunityType.RESTRICTED || community.getCommunityType() == CommunityType.PRIVATE)
+            else if (community.getCommunityType() == CommunityType.RESTRICTED
+                    || community.getCommunityType() == CommunityType.PRIVATE)
                 return userRepository.findCommunitiesUserIsMemberOf( SecurityUtils.getUsername() ) .contains(community);
 
-        Post post = postRepository.findById(postDTO.getId()).orElseThrow();
+        Post post = postRepository.findById(postDTO.id())
+                .orElseThrow(() -> new NotFoundException(NotFound.POST));
         return Objects.equals(post.getUser().getId(), user.getId());
     }
 
 
-
     public boolean userCanViewOtherUsersPosts(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> ExceptionUtils.noUserWithThatName(username));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
         return user.getOtherUsersCanSeePosts();
     }
+
 
     public boolean userCanViewOtherUsersComments(String username) {
         User user = userRepository.findByUsername(username)
@@ -62,15 +63,16 @@ public class OwnerCheck {
     }
 
 
-    public boolean userCanRequestToJoinCommunity(String communityName) {
-        User user = userRepository.findByUsername( SecurityUtils.getUsername() ) .orElseThrow(() -> ExceptionUtils.noUserWithThatName( SecurityUtils.getUsername() ));
-        Community community = communityRepository.findByTitle(communityName) .orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(communityName));
+    public boolean userCanRequestToJoinCommunity(long communityId) {
+        Community community = communityRepository.findById(communityId)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         if (userRepository.findCommunitiesUserIsMemberOf( SecurityUtils.getUsername() ).contains(community))
             return false;
         return true;
     }
 
-    public boolean userOwnsMessage(Long messageId) {
+
+    public boolean userOwnsMessage(long messageId) {
         User user = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
         Message message = messageRepository.findById(messageId)
@@ -80,7 +82,7 @@ public class OwnerCheck {
         return (Objects.equals(userInMessage, user.getId()));
     }
 
-    public boolean canDeleteComment(Long commentId) {
+    public boolean canDeleteComment(long commentId) {
         if (userOwnsComment(commentId))
             return true;
         Comment comment = commentRepository.findById(commentId)
@@ -89,15 +91,15 @@ public class OwnerCheck {
         return checkAgainstModeratorAndAdminRights.canDeleteOthersComments(communityId);
     }
 
-    public boolean userCanDeletePost(Long postId) {
+    public boolean userCanDeletePost(long postId) {
         if (userOwnsPost(postId))
             return true;
         Post post = postRepository.findById(postId) .orElseThrow(() -> ExceptionUtils.noPostWithThatId(postId));
-        return checkAgainstModeratorAndAdminRights.canDeleteOthersPosts(post.getCommunity().getTitle());
+        return checkAgainstModeratorAndAdminRights.canDeleteOthersPosts(post.getCommunity().getId());
     }
 
 
-    public boolean userOwnsPost(Long postId) {
+    public boolean userOwnsPost(long postId) {
         User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
         Post post = postRepository.findById(postId).orElseThrow();
         return Objects.equals(user.getId(), post.getUser().getId());
@@ -154,11 +156,12 @@ public class OwnerCheck {
         return Objects.equals(user.getId(), userIdOfComment);
     }
 
+
     public boolean userOwnsComment(CommentDTO commentDTO) {
-        if (commentDTO.getUserId() == null)
+        if (commentDTO.id() == null)
             return true;
         User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
-        return Objects.equals(commentDTO.getUserId(), user.getId());
+        return Objects.equals(commentDTO.userId(), user.getId());
     }
 
 

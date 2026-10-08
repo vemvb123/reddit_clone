@@ -9,4 +9,9 @@ public class CommunityException extends RuntimeException {
     public CommunityException(CommunityError error, String communityName) {
         super(error.message(communityName));
     }
+
+     public CommunityException(CommunityError error, long communityId) {
+        super(error.message(communityId));
+    }
+
 }

@@ -57,8 +57,8 @@ public class CommunityService {
     }
 
 
-    public ResponseText setWallpaper(MultipartFile file, String communityName) {
-        Community community = communityRepository.findByTitle(communityName)
+    public ResponseText setWallpaper(MultipartFile file, long communityId) {
+        Community community = communityRepository.findById(communityId)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         if (!file.isEmpty()) {
@@ -93,8 +93,15 @@ public class CommunityService {
     }
 
 
-    public ResponseText setLogo(MultipartFile file, String communityName) {
-        Community community = communityRepository.findByTitle(communityName)
+    public CommunityDTO getCommunityById(long communityId) {
+        Community community = communityRepository.findById(communityId)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
+        return communityMapper.entityToDto(community);
+    }
+
+
+    public ResponseText setLogo(MultipartFile file, long communityId) {
+        Community community = communityRepository.findById(communityId)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         if (!file.isEmpty()) {
@@ -122,10 +129,10 @@ public class CommunityService {
     }
 
 
-    public ResponseText makeUserBecomeMember(String communityName) {
+    public ResponseText makeUserBecomeMember(long communityId) {
         User user = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
-        Community community = communityRepository.findByTitle(communityName)
+        Community community = communityRepository.findById(communityId)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         //check if user is not already a member
@@ -136,24 +143,27 @@ public class CommunityService {
         return new ResponseText(ResponseTextType.BECAME_MEMBER);
     }
 
-    public ResponseText deleteCommunity(String communityName) {
-        Community community = communityRepository.findByTitle(communityName)
+
+    public ResponseText deleteCommunity(long communityId) {
+        Community community = communityRepository.findById(communityId)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
-        postRepository.deleteAll( postRepository.findLaterPostAfterPost( communityName) );
+        postRepository.deleteAll( postRepository.findLaterPostAfterPostById( communityId) );
         communityRepository.deleteCommunity(community.getId());
         return new ResponseText(ResponseTextType.DELETED);
     }
 
 
-    public ResponseText makeUserBecomeAdmin(String usernameToBecomeAdmin, String communityName) {
-        User user = userRepository.findByUsername( usernameToBecomeAdmin )   .orElseThrow(() -> ExceptionUtils.noUserWithThatName(usernameToBecomeAdmin));
-        Community community = communityRepository.findByTitle( communityName )   .orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(communityName));
+    public ResponseText makeUserBecomeAdmin(String usernameToBecomeAdmin, long communityId) {
+        User user = userRepository.findByUsername( usernameToBecomeAdmin )
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+        Community community = communityRepository.findById( communityId )
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         //checks if user is a member, if user is not already a moderator (if so, remove mod rights and upgrade to admin rights), if user is not already an administrator
         if (! userRepository.findCommunitiesUserIsMemberOf(usernameToBecomeAdmin) .contains(community))
-            throw new CommunityException(CommunityError.ALREADY_MEMBER, usernameToBecomeAdmin, communityName);
+            throw new CommunityException(CommunityError.ALREADY_MEMBER, usernameToBecomeAdmin, community.getTitle());
         if (userRepository.findCommunitiesUserIsAdministratorOf(usernameToBecomeAdmin) .contains(community))
-            throw new CommunityException(CommunityError.ALREADY_ADMINISTRATOR, usernameToBecomeAdmin, communityName);
+            throw new CommunityException(CommunityError.ALREADY_ADMINISTRATOR, usernameToBecomeAdmin, community.getTitle());
         if (userRepository.findCommunitiesUserIsModeratorOf(usernameToBecomeAdmin) .contains(community))
             communityRepository.removeModeratorPowers(user.getId(), community.getId());
 
@@ -162,34 +172,36 @@ public class CommunityService {
     }
 
 
-    public ResponseText makeUserBecomeMod(String usernameToBecomeMod, String communityName) {
-        User user = userRepository.findByUsername(usernameToBecomeMod).orElseThrow(() -> ExceptionUtils.noUserWithThatName(usernameToBecomeMod));
-        Community community = communityRepository.findByTitle(communityName).orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(communityName));
+    public ResponseText makeUserBecomeMod(String usernameToBecomeMod, long communityId) {
+        User user = userRepository.findByUsername(usernameToBecomeMod)
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+        Community community = communityRepository.findById(communityId)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         //checks if user is a member, if user is not already a moderator, if user is not already an administrator
         if (!userRepository.findCommunitiesUserIsMemberOf(usernameToBecomeMod).contains(community))
-            throw new CommunityException(CommunityError.NOT_MEMBER, usernameToBecomeMod, communityName);
+            throw new CommunityException(CommunityError.NOT_MEMBER, usernameToBecomeMod, community.getTitle());
         if (userRepository.findCommunitiesUserIsModeratorOf(usernameToBecomeMod).contains(community))
-            throw new CommunityException(CommunityError.ALREADY_MODERATOR, usernameToBecomeMod, communityName);
+            throw new CommunityException(CommunityError.ALREADY_MODERATOR, usernameToBecomeMod, community.getTitle());
         if (userRepository.findCommunitiesUserIsAdministratorOf(usernameToBecomeMod).contains(community))
-            throw new CommunityException(CommunityError.ALREADY_ADMINISTRATOR, usernameToBecomeMod, communityName);
+            throw new CommunityException(CommunityError.ALREADY_ADMINISTRATOR, usernameToBecomeMod, community.getTitle());
 
         communityRepository.addModToCommunity(user.getId(), community.getId());
         return new ResponseText("User became moderator successfully");
     }
 
 
-    public Set<UserDTO> getUsers(String communityName) {
-        Set<User> users = communityRepository.findMembersOfCommunity(communityName);
+    public Set<UserDTO> getUsers(long communityId) {
+        Set<User> users = communityRepository.findMembersOfCommunityById(communityId);
         return users.stream()
                 .map(user -> userMapper.entityToDto(user))
                 .collect(Collectors.toSet());
     }
 
 
-    public ResponseText changeModeratorRights(String communityName, ModeratorRightsDTO dto) {
+    public ResponseText changeModeratorRights(long communityId, ModeratorRightsDTO dto) {
 
-        Community community = communityRepository.findByTitle( communityName )
+        Community community = communityRepository.findById( communityId )
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         community.setModeratorCanChangeCommunityImage( dto.changeCommunityImage() );
@@ -206,9 +218,9 @@ public class CommunityService {
     }
 
 
-    public ModeratorRightsDTO getModeratorRights(String communityName) {
-        Community community = communityRepository.findByTitle(communityName)
-                .orElseThrow(() -> new CommunityException(CommunityError.NOT_FOUND, communityName));
+    public ModeratorRightsDTO getModeratorRights(long communityId) {
+        Community community = communityRepository.findById(communityId)
+                .orElseThrow(() -> new CommunityException(CommunityError.NOT_FOUND, community.getTitle()));
         return communityMapper.communityToModeratorRightsDto(community);
     }
 
@@ -225,7 +237,7 @@ public class CommunityService {
         if (userIsModerator)
             communityRepository.removeModeratorPowers(user.getId(), community.getId());
         else if (userIsAdmin)
-            if (communityRepository.findAdminsOfCommunityByTitle(community.getTitle()).size() == 1 && communityRepository.findMembersOfCommunity(community.getTitle()).size() > 1)
+            if (communityRepository.findAdminsOfCommunityByTitle(community.getTitle()).size() == 1 && communityRepository.findMembersOfCommunityById(community.getTitle()).size() > 1)
                 //if admin is only admin left, while there are still others user, then throw an error. else if admin is only user left, then unsubscribe
                 throw new CommunityException(CommunityError.CANNOT_UNSUBSCRIBE_AS_ADMINISTRATOR, user.getUsername(), community.getTitle());
             else
@@ -233,27 +245,28 @@ public class CommunityService {
         communityRepository.unsubscribeUserFromCommunity(user.getId(), community.getId());
 
         //if community has no members, delete community
-        if (communityRepository.findMembersOfCommunity(community.getTitle()).isEmpty())
+        if (communityRepository.findMembersOfCommunityById(community.getId()).isEmpty())
             communityRepository.deleteById(community.getId());
     }
 
 
-    public ResponseText unsubscribeUserFromCommunity(String communityName) {
-        User user = userRepository.findByUsername(jwtService.extractUsername( SecurityUtils.getUsername() ) ).orElseThrow(() -> ExceptionUtils.noUserWithThatName( SecurityUtils.getUsername() ));
-        Community community = communityRepository.findByTitle(communityName).orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(communityName));
-
+    public ResponseText unsubscribeUserFromCommunity(long communityId) {
+        User user = userRepository.findByUsername(jwtService.extractUsername( SecurityUtils.getUsername() ) )
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+        Community community = communityRepository.findById(communityId)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         //check if user is member of community
         if (!userRepository.findCommunitiesUserIsMemberOf(user.getUsername()).contains(community))
-            throw new CommunityException(CommunityError.NOT_MEMBER, user.getUsername(), communityName);
+            throw new CommunityException(CommunityError.NOT_MEMBER, user.getUsername(), community.getTitle());
         unSubUser(user, community);
 
         return new ResponseText("Successfully unsubscribed from community");
     }
 
 
-    public ResponseText banUserFromCommunity(String communityName, String usernameToBan) {
-        Community community = communityRepository.findByTitle(communityName)
-                .orElseThrow(() -> new CommunityException(CommunityError.NOT_FOUND, communityName));
+    public ResponseText banUserFromCommunity(long communityId, String usernameToBan) {
+        Community community = communityRepository.findById(communityId)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         User user = userRepository.findByUsername(usernameToBan)
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
@@ -261,7 +274,8 @@ public class CommunityService {
 
         unSubUser(
                 userRepository.findByUsername(usernameToBan).orElseThrow(),
-                communityRepository.findByTitle(communityName).orElseThrow()
+                communityRepository.findById(community.getId())
+                        .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY))
         );
         return new ResponseText("Banned users successfully");
     }
@@ -279,28 +293,25 @@ public class CommunityService {
     }
 
 
-    public UserHasRoleInCommunityResponse userHasRoleInCommunity(String communityName) {
+    public UserHasRoleInCommunityResponse userHasRoleInCommunity(long communityId) {
         // check if user is member
         Set<Community> communitiesMemberOf = userRepository.findCommunitiesUserIsMemberOf(SecurityUtils.getUsername());
         boolean userIsMember = communitiesMemberOf.stream()
-            .anyMatch(community -> communityName.equals(community.getTitle()));
+            .anyMatch(community -> communityId == community.getId());
         if (!userIsMember)
             return new UserHasRoleInCommunityResponse(UserHasRoleInCommunityResponseRoles.NOT_MEMBER);
-
         // check if user is admin
         Set<Community> communitiesAdminOf = userRepository.findCommunitiesUserIsAdministratorOf( SecurityUtils.getUsername() );
         boolean userIsAdmin = communitiesAdminOf.stream()
-                .anyMatch(community -> communityName.equals(community.getTitle()));
+                .anyMatch(community -> communityId == community.getId());
         if (userIsAdmin)
             return new UserHasRoleInCommunityResponse(UserHasRoleInCommunityResponseRoles.ADMIN);
-
         // check if user is mod
         Set<Community> communitiesModOf = userRepository.findCommunitiesUserIsModeratorOf( SecurityUtils.getUsername() );
         boolean userIsMod = communitiesModOf.stream()
-                .anyMatch(community -> communityName.equals(community.getTitle()));
+                .anyMatch(community -> communityId == community.getId());
         if (userIsMod)
             return new UserHasRoleInCommunityResponse(UserHasRoleInCommunityResponseRoles.MOD);
-
         // return user is regular member
         return new UserHasRoleInCommunityResponse(UserHasRoleInCommunityResponseRoles.MEMBER);
     }
@@ -316,14 +327,14 @@ public class CommunityService {
     }
 
 
-    public Set<MemberDTO> getMembers(String communityName) {
+    public Set<MemberDTO> getMembers(long communityId) {
         User foundUser = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
-        Set<User> admins = communityRepository.findAdminsOfCommunityByTitle(communityName);
-        Set<User> mods = communityRepository.findModsOfCommunityByTitle(communityName);
+        Set<User> admins = communityRepository.findAdminsOfCommunityById(communityId);
+        Set<User> mods = communityRepository.findModsOfCommunityById(communityId);
         Set<User> friends = userRepository.getFriendsOfUser(foundUser.getId());
-        Set<User> membersUser = communityRepository.findMembersOfCommunity(communityName);
+        Set<User> membersUser = communityRepository.findMembersOfCommunityById(communityId);
 
         Set<MemberDTO> members = friends.stream()
                 .map(friend -> communityMapper.userToMemberDto(

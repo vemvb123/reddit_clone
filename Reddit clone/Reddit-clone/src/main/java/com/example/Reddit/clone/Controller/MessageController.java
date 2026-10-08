@@ -36,32 +36,32 @@ public class MessageController {
     }
 
 
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministratorOrModerator(#communityName)"))
-    @GetMapping("/join_community/{page}/{communityName}")
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministratorOrModerator(#communityId)"))
+    @GetMapping("/join_community/{page}/{communityId}")
     public List<MessageDTO> get10RequestsToJoinCommunity(
             @PathVariable Integer page,
-            @PathVariable String communityName
+            @PathVariable long communityId
     ) {
-        return messageService.getRequestsToJoinCommunity(page, communityName);
+        return messageService.getRequestsToJoinCommunity(page, communityId);
     }
 
 
-    @PreAuthorize(("@ownerCheck.userCanRequestToJoinCommunity(#communityName)"))
-    @PostMapping("/join_community/{communityName}")
+    @PreAuthorize(("@ownerCheck.userCanRequestToJoinCommunity(#communityId)"))
+    @PostMapping("/join_community/{communityId}")
     public ResponseText requestToJoinCommunity(
-            @PathVariable String communityName
+            @PathVariable long communityId
     ) {
-         return messageService.requestToJoinCommunity(communityName);
+         return messageService.requestToJoinCommunity(communityId);
     }
 
 
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministratorOrModerator(#communityName)"))
-    @PostMapping("/accept_join_community/{communityName}/{usernameRequestingToJoin}")
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministratorOrModerator(#communityId)"))
+    @PostMapping("/accept_join_community/{communityId}/{usernameRequestingToJoin}")
     public ResponseText requestToJoinCommunity(
-            @PathVariable String communityName,
+            @PathVariable long communityId,
             @PathVariable String usernameRequestingToJoin
     ) {
-        return messageService.acceptRequestToJoinCommunity(communityName, usernameRequestingToJoin);
+        return messageService.acceptRequestToJoinCommunity(communityId, usernameRequestingToJoin);
     }
 
 

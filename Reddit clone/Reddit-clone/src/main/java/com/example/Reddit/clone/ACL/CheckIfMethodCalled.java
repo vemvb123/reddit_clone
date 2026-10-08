@@ -6,14 +6,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class CheckIfMethodCalled {
 
-
     public boolean check() {
         return true;
     }
-
-
-
-
-
 
 }

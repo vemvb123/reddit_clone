@@ -12,7 +12,6 @@ import com.example.Reddit.clone.DTO.PostDTO;
 import com.example.Reddit.clone.Entity.*;
 import com.example.Reddit.clone.Repository.*;
 import com.example.Reddit.clone.Services.ExceptionUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +28,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.UnsupportedEncodingException;
-import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.notNullValue;
@@ -149,7 +145,7 @@ public class RightsTest {
                 .andDo(print());
 
         assertTrue(communityRepository.existsByTitle(communityDTO.getTitle()));
-        assertTrue(communityRepository.findMembersOfCommunity(communityDTO.getTitle()).contains(user));
+        assertTrue(communityRepository.findMembersOfCommunityByTitle(communityDTO.getTitle()).contains(user));
         assertTrue(communityRepository.findAdminsOfCommunity(communityDTO.getTitle()).contains(user));
 
 

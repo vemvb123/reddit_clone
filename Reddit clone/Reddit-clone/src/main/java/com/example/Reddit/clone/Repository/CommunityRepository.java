@@ -58,8 +58,10 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     public void addModToCommunity(@Param("userId") Long userId, @Param("communityId") Long communityId);
 
     @Query("SELECT c.members FROM Community c WHERE c.title LIKE :communityName")
-    Set<User> findMembersOfCommunity(String communityName);
+    Set<User> findMembersOfCommunityByTitle(String communityName);
 
+    @Query("SELECT c.members FROM Community c WHERE c.id = :communityId")
+    Set<User> findMembersOfCommunityById(long communityId);
 
     @Modifying
     @Query(value = "DELETE FROM user_community_moderator WHERE user_id = :userId AND community_id = :communityId", nativeQuery = true)
