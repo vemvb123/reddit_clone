@@ -8,7 +8,6 @@ import com.example.Reddit.clone.Entity.*;
 import com.example.Reddit.clone.Exception.NotFound;
 import com.example.Reddit.clone.Exception.NotFoundException;
 import com.example.Reddit.clone.Repository.*;
-import com.example.Reddit.clone.Services.ExceptionUtils;
 import com.example.Reddit.clone.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -94,7 +93,8 @@ public class OwnerCheck {
     public boolean userCanDeletePost(long postId) {
         if (userOwnsPost(postId))
             return true;
-        Post post = postRepository.findById(postId) .orElseThrow(() -> ExceptionUtils.noPostWithThatId(postId));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException(NotFound.POST));
         return checkAgainstModeratorAndAdminRights.canDeleteOthersPosts(post.getCommunity().getId());
     }
 

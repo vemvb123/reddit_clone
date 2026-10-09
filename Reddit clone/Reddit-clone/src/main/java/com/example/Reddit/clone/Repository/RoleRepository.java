@@ -1,7 +1,5 @@
 package com.example.Reddit.clone.Repository;
 
-import com.example.Reddit.clone.Entity.Role;
-import com.example.Reddit.clone.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

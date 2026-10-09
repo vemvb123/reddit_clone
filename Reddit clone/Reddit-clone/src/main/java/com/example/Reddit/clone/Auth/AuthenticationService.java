@@ -2,7 +2,7 @@ package com.example.Reddit.clone.Auth;
 
 
 import com.example.Reddit.clone.Config.JwtService;
-import com.example.Reddit.clone.Entity.Role;
+import com.example.Reddit.clone.Entity.RoleEnum;
 import com.example.Reddit.clone.Entity.User;
 import com.example.Reddit.clone.Exception.NotFound;
 import com.example.Reddit.clone.Exception.NotFoundException;
@@ -28,9 +28,8 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
-        Role role = roleRepository.findByName("USER");
-        Set<Role> roles = new HashSet<>();
-        roles.add(role);
+        Set<RoleEnum> roles = new HashSet<>();
+        roles.add(RoleEnum.USER);
 
         User user = new User(
                 request.firstname(),
@@ -47,7 +46,6 @@ public class AuthenticationService {
                 jwtToken
         );
     }
-
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(

@@ -13,12 +13,10 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@ToString
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Community {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,45 +26,35 @@ public class Community {
     private String title;
 
     private String communityWallpaper;
-
     private String communityImage;
-
     private String description;
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "community", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    @ToString.Exclude
     private Set<Post> posts;
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "communityRequestingToJoin", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
     private Set<Message> requestsToJoinCommunity;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "community_type")
     private CommunityType communityType;
 
-
     @JsonIgnore
     @ManyToMany(mappedBy = "communities", fetch = FetchType.LAZY)
-    @ToString.Exclude
     private Set<User> members = new HashSet<>();
-
 
     @JsonIgnore
     @ManyToMany(mappedBy = "administratorOnCommunities", fetch = FetchType.LAZY)
-    @ToString.Exclude
     private Set<User> administrators = new HashSet<>();
 
     @JsonIgnore
     @ManyToMany(mappedBy = "moderatorOnCommunities", fetch = FetchType.LAZY)
-    @ToString.Exclude
     private Set<User> moderators = new HashSet<>();
 
     @JsonIgnore
     @ManyToMany(mappedBy = "bannedFromCommunities", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @ToString.Exclude
     private Set<User> bannedUsers = new HashSet<>();
 
     // rights of moderators
@@ -79,9 +67,6 @@ public class Community {
     private Boolean moderatorCanMakeAnnouncement = false;
     private Boolean moderatorCanChangeCommunityDescription = false;
 
-
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
@@ -89,7 +74,6 @@ public class Community {
         return id != null && Objects.equals(id, community.id);
     }
 
-    @Override
     public int hashCode() {
         return getClass().hashCode();
     }

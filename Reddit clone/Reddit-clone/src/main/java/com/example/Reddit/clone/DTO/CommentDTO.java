@@ -1,7 +1,10 @@
 package com.example.Reddit.clone.DTO;
 
+import lombok.Builder;
+
 import java.time.LocalDateTime;
 
+@Builder
 public record CommentDTO(
 
     Long id,

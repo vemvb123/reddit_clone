@@ -36,39 +36,59 @@ public class CommentMapper {
     }
 
     public CommentDTO entityToDTO(Comment comment, Boolean isLastChild, Boolean isPrimeComment, Boolean hasChildren) {
+        String usernameRepliedTo = null;
+        String usernameRepliedToPathToImage = null;
+        Long userId = null;
+        String username;
+        String pathToUserImage = null;
+        Long parentCommentId = null;
+
         if ((comment.getParent() != null) && (comment.getUser() != null) && (comment.getLastUpdated() != null)) {
             usernameRepliedTo = comment.getParent().getUser().getUsername();
             usernameRepliedToPathToImage = comment.getParent().getUser().getPathToProfileImage();
         }
 
-        pathToImage = comment.getPathToImage();
-        communityName = comment.getPost().getCommunity().getTitle();
-        pathToCommunityImage = comment.getPost().getCommunity().getCommunityImage();
-        id = comment.getId();
-        title = comment.getTitle();
-        description = comment.getDescription();
+        String pathToImage = comment.getPathToImage();
+        String communityName = comment.getPost().getCommunity().getTitle();
+        String pathToCommunityImage = comment.getPost().getCommunity().getCommunityImage();
+        long id = comment.getId();
+        String title = comment.getTitle();
+        String description = comment.getDescription();
         if (comment.getUser() != null) {
             userId = comment.getUser().getId();
             username = comment.getUser().getUsername();
             pathToUserImage = comment.getUser().getPathToProfileImage();
-
         }
         else
             username = "Anonymus";
 
-        postId = comment.getPost().getId();
-        createdAt = comment.getCreatedAt();
+        long postId = comment.getPost().getId();
+        LocalDateTime createdAt = comment.getCreatedAt();
 
         if (comment.getParent() != null)
             parentCommentId = comment.getParent().getId();
 
+        return new CommentDTO(
+            id,
+            title,
+            description,
+            userId,
+            postId,
+            parentCommentId,
+            communityName,
+            usernameRepliedTo,
+            usernameRepliedToPathToImage,
+            username,
+            isLastChild,
+            isPrimeComment,
+            hasChildren,
+            createdAt,
+            pathToImage,
+            pathToUserImage,
+            pathToCommunityImage
+        );
 
 
-        this.isLastChild = isLastChild;
-        this.isPrimeComment = isPrimeComment;
-        this.hasChildren = hasChildren;
-
-        return this;
     }
 
 }

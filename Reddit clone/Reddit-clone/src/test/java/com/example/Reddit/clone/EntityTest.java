@@ -1,6 +1,8 @@
 package com.example.Reddit.clone;
 
+import com.example.Reddit.clone.Auth.AuthenticationRequest;
 import com.example.Reddit.clone.Auth.AuthenticationResponse;
+import com.example.Reddit.clone.Auth.RegisterRequest;
 import com.example.Reddit.clone.DTO.CommentDTO;
 import com.example.Reddit.clone.DTO.CommunityDTO;
 import com.example.Reddit.clone.DTO.PostDTO;
@@ -8,39 +10,26 @@ import com.example.Reddit.clone.Entity.*;
 import com.example.Reddit.clone.Exception.NotFound;
 import com.example.Reddit.clone.Exception.NotFoundException;
 import com.example.Reddit.clone.Repository.*;
-import com.example.Reddit.clone.Services.ExceptionUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import com.example.Reddit.clone.Auth.AuthenticationRequest;
-import com.example.Reddit.clone.Auth.RegisterRequest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import com.example.Reddit.clone.Entity.User;
-import com.example.Reddit.clone.Repository.UserRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
@@ -49,33 +38,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:application-test.properties")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@RequiredArgsConstructor
 @AutoConfigureMockMvc
 public class EntityTest {
 
-
-    @Autowired
-            private UserRepository userRepository;
-
-    @Autowired
-            private PostRepository postRepository;
-
-    @Autowired
-            private CommentRepository commentRepository;
-
-    @Autowired
-            private CommunityRepository communityRepository;
-
-    @Autowired
-            private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    RoleRepository roleRepository;
-
-    @Autowired
-            private MessageRepository messageRepository;
+    final private UserRepository userRepository;
+    final private PostRepository postRepository;
+    final private CommentRepository commentRepository;
+    final private CommunityRepository communityRepository;
+    final private MockMvc mockMvc;
+    final private ObjectMapper objectMapper;
+    final private RoleRepository roleRepository;
+    final private MessageRepository messageRepository;
 
 
     RegisterRequest registerRequest = new RegisterRequest(
@@ -85,6 +59,7 @@ public class EntityTest {
             "password1",
             "username1"
     );
+
 
     AuthenticationRequest authenticationRequest = new AuthenticationRequest(
             registerRequest.username(),
@@ -324,7 +299,7 @@ public class EntityTest {
         for (Comment comment : comments) {
             commentIds.add(comment.getId());
             if (Objects.equals(comment.getTitle(), "title1"))
-                assertTrue(commentRepository.getReplyIntervall(comment.getId(), PageRequest.of(0, 10)).contains(savedComment2));
+                assertTrue(commentRepository.getReplyInterval(comment.getId(), PageRequest.of(0, 10)).contains(savedComment2));
         }
 
 
@@ -456,13 +431,8 @@ public class EntityTest {
                 .andReturn();
 
         assertFalse(postRepository.existsByTitle(post.getTitle()));
-
-
-
-
-
-
     }
+
 
     private Community insertCommunity(String title, String description, Set<User> members, CommunityType communityType, Set<User> admins, Set<User> mods) {
         var community = Community.builder()
@@ -477,11 +447,13 @@ public class EntityTest {
     }
 
     private Post insertPost(String title, User user, String content, Community community) {
+        Community savedCommunity = communityRepository.findByTitle(community.getTitle())
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         var post = Post.builder()
                 .title(title)
                 .user(user)
                 .content(content)
-                .community(communityRepository.findByTitle(community.getTitle()) .orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(community.getTitle())))
+                .community(savedCommunity)
                 .createdAt(LocalDateTime.now())
                 .build();
         return postRepository.save(post);

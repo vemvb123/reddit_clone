@@ -13,10 +13,9 @@ import com.example.Reddit.clone.Entity.*;
 import com.example.Reddit.clone.Exception.NotFound;
 import com.example.Reddit.clone.Exception.NotFoundException;
 import com.example.Reddit.clone.Repository.*;
-import com.example.Reddit.clone.Services.ExceptionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,35 +43,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @TestPropertySource(locations = "classpath:application-test.properties")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @AutoConfigureMockMvc
+@AllArgsConstructor
 public class RightsTest {
 
 
-    @Autowired
     private RoleRepository roleRepository;
-
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
     private CommunityRepository communityRepository;
-
-    @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
     private CommentRepository commentRepository;
-
-
-    @Autowired
     private PostRepository postRepository;
-
-    @Autowired
     private JwtService jwtService;
-
-
 
 
     private void makeRoles() {
@@ -146,12 +128,9 @@ public class RightsTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description", notNullValue()))
                 .andDo(print());
 
-        assertTrue(communityRepository.existsByTitle(communityDTO.getTitle()));
-        assertTrue(communityRepository.findMembersOfCommunityByTitle(communityDTO.getTitle()).contains(user));
-        assertTrue(communityRepository.findAdminsOfCommunity(communityDTO.getTitle()).contains(user));
-
-
-
+        assertTrue(communityRepository.existsByTitle(communityDTO.title()));
+        assertTrue(communityRepository.findMembersOfCommunityByTitle(communityDTO.title()).contains(user));
+        assertTrue(communityRepository.findAdminsOfCommunityByTitle(communityDTO.title()).contains(user));
     }
 
 
@@ -180,7 +159,8 @@ public class RightsTest {
         String json = result.getResponse().getContentAsString();
         PostDTO response = objectMapper.readValue(json, PostDTO.class);
 
-        return postRepository.findById(response.getId()) .orElseThrow(() -> new RuntimeException("No post with that id"));
+        return postRepository.findById(response.id())
+                .orElseThrow(() -> new NotFoundException(NotFound.POST));
 
 
     }
@@ -205,7 +185,7 @@ public class RightsTest {
         String json = result.getResponse().getContentAsString();
         CommentDTO response = objectMapper.readValue(json, CommentDTO.class);
 
-        return commentRepository.findById(response.getId()) .orElseThrow(() -> new RuntimeException("No comment with that id"));
+        return commentRepository.findById(response.id()) .orElseThrow(() -> new RuntimeException("No comment with that id"));
 
     }
 
@@ -229,7 +209,8 @@ public class RightsTest {
         String json = result.getResponse().getContentAsString();
         CommunityDTO response = objectMapper.readValue(json, CommunityDTO.class);
 
-        return communityRepository.findByTitle(response.getTitle()) .orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(response.getTitle()));
+        return communityRepository.findByTitle(response.title())
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
     }
 
     public void makeUserBecomeMod(String authorization, String communityName, String usernameToBecomeMod) throws Exception {

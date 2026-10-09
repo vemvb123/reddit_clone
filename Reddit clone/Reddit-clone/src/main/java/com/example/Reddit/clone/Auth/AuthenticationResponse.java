@@ -1,6 +1,6 @@
 package com.example.Reddit.clone.Auth;
 
-import com.example.Reddit.clone.Entity.Role;
+import com.example.Reddit.clone.Entity.RoleEnum;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,7 +10,7 @@ public record AuthenticationResponse(
     String lastname,
     String email,
     String username,
-    Set<Role> roles,
+    Set<RoleEnum> roles,
     String token
 ) {
     public AuthenticationResponse(

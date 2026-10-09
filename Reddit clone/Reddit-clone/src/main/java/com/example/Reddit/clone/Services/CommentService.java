@@ -58,7 +58,7 @@ public class CommentService {
 
     public List<CommentDTO> getCommentInterval(Long postId, int page) {
         Comment lastChild = commentRepository.getLastChildOfPost(postId, PageRequest.of(0,1));
-        List<Comment> commentInterval = commentRepository.getCommentIntervall(postId, PageRequest.of(page, 10));
+        List<Comment> commentInterval = commentRepository.getCommentInterval(postId, PageRequest.of(page, 10));
 
         return commentInterval.stream()
                 .map(comment -> commentMapper.entityToDTO(
@@ -150,7 +150,8 @@ public class CommentService {
 
 
     public List<CommentDTO> get20LatestCommentsOfUserLoggedIn(String username, Integer page) {
-        User user = userRepository.findByUsername(SecurityUtils.getUsername()).orElseThrow(() -> ExceptionUtils.noUserWithThatName(username));
+        User user = userRepository.findByUsername(SecurityUtils.getUsername())
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
         Set<Comment> comments = commentRepository.getCommentsOfUserOrderByCreatedAt(user.getUsername(), PageRequest.of(page, 20));
 
         Set<Community> userCommunities = userRepository.findCommunitiesUserIsMemberOf(SecurityUtils.getUsername());
@@ -169,7 +170,7 @@ public class CommentService {
 
     public List<CommentDTO> get20LatestCommentsOfUserNotLoggedIn(String username, Integer page) {
         User user = userRepository.findByUsername(username )
-                .orElseThrow(() -> ExceptionUtils.noUserWithThatName(username));
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
         Set<Comment> comments = commentRepository.getCommentsOfUserOrderByCreatedAt(user.getUsername(), PageRequest.of(page, 20));
 
         return comments.stream()

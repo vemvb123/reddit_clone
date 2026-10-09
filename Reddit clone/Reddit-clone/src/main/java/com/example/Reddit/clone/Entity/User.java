@@ -16,10 +16,7 @@ import java.util.stream.Collectors;
 @Entity
 @Getter
 @Setter
-@ToString
-@RequiredArgsConstructor
-@Builder
-@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "`user`")  // Enclose the table name in backticks
 public class User implements UserDetails {
 
@@ -33,7 +30,7 @@ public class User implements UserDetails {
     private String password;
     private String username;
 
-    public User(String firstname, String lastname, String email, String password, String username, Set<Role> roles) {
+    public User(String firstname, String lastname, String email, String password, String username, Set<RoleEnum> roles) {
         this.firstName = firstname;
         this.lastName = lastname;
         this.email = email;
@@ -43,20 +40,14 @@ public class User implements UserDetails {
     }
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_has_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
+    @ElementCollection
+    private Set<RoleEnum> roles = new HashSet<>();
 
     private String pathToProfileImage;
     private String pathToWallpaperImage;
 
     @JsonIgnoreProperties("user")
     @OneToMany(mappedBy = "user")
-    @ToString.Exclude
     private Set<Comment> comments;
 
     private Boolean otherUsersCanSeePosts = true;
@@ -64,17 +55,14 @@ public class User implements UserDetails {
 
     @JsonIgnoreProperties("user")
     @OneToMany(mappedBy = "user")
-    @ToString.Exclude
     private Set<Post> posts;
 
     @JsonIgnore
     @OneToMany(mappedBy = "toUser")
-    @ToString.Exclude
     private Set<Message> messages;
 
     @JsonIgnore
     @OneToMany(mappedBy = "fromUser")
-    @ToString.Exclude
     private Set<Message> messagesFrom;
 
     @JsonIgnore
@@ -111,7 +99,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<Role> roles = getRoles();
+        Set<RoleEnum> roles = getRoles();
         return roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toSet());
@@ -124,53 +112,41 @@ public class User implements UserDetails {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
-    @ToString.Exclude
+
     Set<User> friends = new HashSet<>();
 
     @Override
     public String getPassword() {
         return this.password;
     }
-
     @Override
     public String getUsername() {
         return this.username;
     }
-
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
-
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
-
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
-
     @Override
     public boolean isEnabled() {
         return true;
     }
 
-    public String getLastName() {
-        return this.lastName;
-    }
-
     public String getEmail() {
         return this.email;
     }
-
-
-    public Set<Role> getRoles() {
+    public Set<RoleEnum> getRoles() {
         return this.roles;
     }
 
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
@@ -178,7 +154,6 @@ public class User implements UserDetails {
         return id != null && Objects.equals(id, user.id);
     }
 
-    @Override
     public int hashCode() {
         return getClass().hashCode();
     }

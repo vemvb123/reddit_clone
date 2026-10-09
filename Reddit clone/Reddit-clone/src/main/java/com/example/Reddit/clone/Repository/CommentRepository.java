@@ -20,7 +20,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> getReplyInterval(@Param("parentCommentId") Long parentCommentId, PageRequest pageRequest);
 
     @Query(value = "SELECT c FROM Comment c WHERE c.post.id = :postId AND c.parent IS NULL ORDER BY c.createdAt DESC")
-    List<Comment> getCommentIntervall(@Param("postId") Long postId, PageRequest pageRequest);
+    List<Comment> getCommentInterval(@Param("postId") Long postId, PageRequest pageRequest);
 
     @Query(value = "SELECT c FROM Comment c WHERE c.parent IS NULL AND c.post.id = :postId ORDER BY c.id DESC")
     Comment getLastChildOfPost(Long postId, PageRequest pageRequest);

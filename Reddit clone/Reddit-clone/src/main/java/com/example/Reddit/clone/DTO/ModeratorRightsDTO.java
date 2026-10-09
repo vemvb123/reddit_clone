@@ -1,6 +1,8 @@
 package com.example.Reddit.clone.DTO;
 
+import lombok.Builder;
 
+@Builder
 public record ModeratorRightsDTO(
      boolean banUsers,
      boolean changeCommunityImage,

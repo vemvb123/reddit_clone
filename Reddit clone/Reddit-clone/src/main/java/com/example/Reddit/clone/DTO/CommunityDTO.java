@@ -2,8 +2,9 @@ package com.example.Reddit.clone.DTO;
 
 
 import com.example.Reddit.clone.Entity.CommunityType;
+import lombok.Builder;
 
-
+@Builder
 public record CommunityDTO(
      String title,
      String description,

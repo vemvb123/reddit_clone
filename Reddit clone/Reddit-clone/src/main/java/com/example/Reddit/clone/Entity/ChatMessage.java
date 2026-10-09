@@ -6,12 +6,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Builder
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class ChatMessage {
 
     @Id
@@ -20,7 +17,6 @@ public class ChatMessage {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id")
-    @ToString.Exclude
     private Chat chat;
 
     @ManyToOne
@@ -30,7 +26,6 @@ public class ChatMessage {
     private User receiver;
 
     private String content;
-
     private LocalDateTime sentAt;
 
 

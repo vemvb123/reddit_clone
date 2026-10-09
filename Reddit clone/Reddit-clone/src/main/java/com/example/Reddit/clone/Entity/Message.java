@@ -10,24 +10,16 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Message {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-
-
     private MessageTopic messageTopic;
-
-
-
     private LocalDateTime eventHappendAt;
-
-
 
     //a user can have many messages
     //a message can only be for one user
@@ -42,8 +34,6 @@ public class Message {
     @ManyToOne
     @JoinColumn(name = "user_from_id")
     private User fromUser;
-
-
 
     @JsonIgnore
     @ManyToOne

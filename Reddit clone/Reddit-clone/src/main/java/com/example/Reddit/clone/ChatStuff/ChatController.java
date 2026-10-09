@@ -10,7 +10,6 @@ import com.example.Reddit.clone.Mapper.ChatMessageMapper;
 import com.example.Reddit.clone.Repository.ChatMessageRepository;
 import com.example.Reddit.clone.Repository.ChatRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
-import com.example.Reddit.clone.Services.ExceptionUtils;
 import com.example.Reddit.clone.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -90,8 +89,10 @@ public class ChatController {
     public ResponseEntity<Long> getChatMessages(
             @PathVariable String usernameChatWith
             ) {
-        User userFromToken = userRepository.findByUsername(SecurityUtils.getUsername()) .orElseThrow(() -> ExceptionUtils.noUserWithThatName( SecurityUtils.getUsername() ));
-        User userChatWith = userRepository.findByUsername(usernameChatWith) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(usernameChatWith));
+        User userFromToken = userRepository.findByUsername(SecurityUtils.getUsername())
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+        User userChatWith = userRepository.findByUsername(usernameChatWith)
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
         if (Objects.equals(userFromToken.getUsername(), userChatWith.getUsername())) {
             throw new RuntimeException();

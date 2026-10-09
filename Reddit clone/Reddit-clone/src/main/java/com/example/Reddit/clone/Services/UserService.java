@@ -9,6 +9,8 @@ import com.example.Reddit.clone.Entity.Community;
 import com.example.Reddit.clone.Entity.Message;
 import com.example.Reddit.clone.Entity.MessageTopic;
 import com.example.Reddit.clone.Entity.User;
+import com.example.Reddit.clone.Exception.MessageException;
+import com.example.Reddit.clone.Exception.MessageExceptionMessage;
 import com.example.Reddit.clone.Exception.NotFound;
 import com.example.Reddit.clone.Exception.NotFoundException;
 import com.example.Reddit.clone.Mapper.CommunityMapper;
@@ -107,7 +109,7 @@ public class UserService {
 
         //se om ikke person allerede har sendt/fått request
         if (messageRepository.findFriendRequestFromUserToUser(fromUsername, toUsername) != null)
-            ExceptionUtils.friendRequestHasAlreadyBeenSent(toUsername, fromUsername);
+            throw new MessageException(MessageExceptionMessage.FRIEND_REQUEST_ALREADY_SENT);
 
         Message message = new Message();
         message.setMessageTopic(MessageTopic.NewFriendRequest);

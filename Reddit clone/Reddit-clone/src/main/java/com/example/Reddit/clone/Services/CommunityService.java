@@ -282,8 +282,10 @@ public class CommunityService {
 
 
     public ResponseText removeModeratorRightsFromUser(String communityName, String userToHaveModeratorRightsRemoved) {
-        Community community = communityRepository.findByTitle(communityName) .orElseThrow(() -> ExceptionUtils.noCommunityWithThatName(communityName));
-        User user = userRepository.findByUsername(userToHaveModeratorRightsRemoved) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(userToHaveModeratorRightsRemoved));
+        Community community = communityRepository.findByTitle(communityName)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
+        User user = userRepository.findByUsername(userToHaveModeratorRightsRemoved)
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
         //check if user is moderator
         if (!userRepository.findCommunitiesUserIsModeratorOf(userToHaveModeratorRightsRemoved).contains(community))

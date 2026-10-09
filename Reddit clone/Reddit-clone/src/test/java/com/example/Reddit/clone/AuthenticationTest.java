@@ -5,8 +5,9 @@ import com.example.Reddit.clone.Auth.AuthenticationResponse;
 import com.example.Reddit.clone.Auth.RegisterRequest;
 import com.example.Reddit.clone.Config.JwtService;
 import com.example.Reddit.clone.Entity.User;
+import com.example.Reddit.clone.Exception.NotFound;
+import com.example.Reddit.clone.Exception.NotFoundException;
 import com.example.Reddit.clone.Repository.UserRepository;
-import com.example.Reddit.clone.Services.ExceptionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +82,8 @@ class AuthenticationTest {
 
 
     private User getUser(String username) {
-        return userRepository.findByUsername(username) .orElseThrow(() -> ExceptionUtils.noUserWithThatName(username));
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
     }
 
     @Test
