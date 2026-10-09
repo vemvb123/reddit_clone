@@ -8,7 +8,7 @@ export async function setProfileImage(file, username)
     formData.append('file', file);
 
     const api = createAxiosInstance();
-    var link = "http://localhost:8080/user/set_profile_image_for_user/" + username
+    var link = "http://localhost:8080/user/profile_image/" + username
     return (await request(() => api.post(link, formData)).status);
 }
 
@@ -17,7 +17,7 @@ export async function setProfileImage(file, username)
 export async function getUser(username)
 {
     const api = createAxiosInstance();
-    var link = "http://localhost:8080/user/get_user_by_username/" + username
+    var link = "http://localhost:8080/user/" + username
     return (await request(() => api.get(link)).data);
 }
 
@@ -28,7 +28,7 @@ export async function setWallpaper(file, username)
     formData.append('file', file);
 
     const api = createAxiosInstance();
-    var link = "http://localhost:8080/user/setWallpaper/" + username
+    var link = "http://localhost:8080/user/wallpaper/" + username
     return (await request(() => api.get(link, formData)).status);
 }
 
@@ -36,7 +36,7 @@ export async function setWallpaper(file, username)
 export async function getUseByToken()
 {
     const api = createAxiosInstance();
-    var link = "http://localhost:8080/user/get_user_by_token"
+    var link = "http://localhost:8080/user/token"
     return (await request(() => api.get(link)).data);
 }
 
@@ -63,7 +63,7 @@ export async function acceptFriendRequest(fromUsername)
 export async function getCommunitiesUserIsMemberOf(username)
 {
     const api = createAxiosInstance();
-    var link = "http://localhost:8080/user/get_communities_of_user/" + username
+    var link = "http://localhost:8080/user/communities_of_user/" + username
     return (await request(() => api.get(link)).data);
 }
 

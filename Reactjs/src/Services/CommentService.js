@@ -1,78 +1,62 @@
 import { createAxiosInstance, request, isNotTokenNon } from './utils';
 
 
-
-export async function getComment(commentId)
-{
+export async function getComment(commentId) {
     const api = createAxiosInstance();
-    var link = "http://localhost:8080/comment/get_comment/" + commentId
+    var link = "http://localhost:8080/comment/" + commentId
     return (await request(() => api.get(link))).data;
 }
 
 
-
-
-
-
-export async function getCommentsOfUser(page, username)
-{
+export async function getCommentsOfUser(page, username) {
     const api = createAxiosInstance();
     if (isNotTokenNon()) {
-        var link = "http://localhost:8080/comment/get_20_latets_comments_of_user_not_logged_in/" + page + "/" + username
+        var link = "http://localhost:8080/comment/not_logged_in/" + page + "/" + username
     } else {
-        var link = "http://localhost:8080/comment/get_20_latets_comments_of_user/" + page + "/" + username
+        var link = "http://localhost:8080/comment/" + page + "/" + username
     }
     return (await request(() => api.get(link))).data;
 }
 
 
-
-export async function saveComment(commentData)
-{
+export async function saveComment(commentData) {
     const api = createAxiosInstance();
-    var link = "http://localhost:8080/comment/saveComment"
+    var link = "http://localhost:8080/comment"
     return (await request(() => api.post(link, commentData))).status;
 }
 
 
-
-export async function deleteComment(commentId)
-{
+export async function deleteComment(commentId) {
     const api = createAxiosInstance();
-    var link = "http://localhost:8080/comment/delete_comment/" + commentId
-    return (await request(() => api.post(link, null))).status;
+    var link = "http://localhost:8080/comment/" + commentId
+    return (await request(() => api.delete(link, null))).status;
 }
 
 
-export async function getAllCommentsOfPost(postId)
-{
+export async function getAllCommentsOfPost(postId) {
     const api = createAxiosInstance();
-    var link = "http://localhost:8080/comment/getCommentsOfPost/" + postId;
+    var link = "http://localhost:8080/comment/" + postId;
     return (await request(() => api.get(link))).data;
 }
 
 
-
-export async function getIntervallOfComments(postId, fromPostId, parentCommentId)
-{
+export async function getIntervallOfComments(postId, fromPostId, parentCommentId) {
     const api = createAxiosInstance();
     if (isNotTokenNon) {
-        var link = "http://localhost:8080/comment/getIntervallOfComments/" + postId + "/" + fromPostId + "/" + parentCommentId;
+        var link = "http://localhost:8080/comment/" + postId + "/" + fromPostId + "/" + parentCommentId;
     } else {
-        var link = "http://localhost:8080/comment/getIntervallOfCommentsWithoutToken/" + postId + "/" + fromPostId + "/" + parentCommentId;
+        var link = "http://localhost:8080/comment/" + postId + "/" + fromPostId + "/" + parentCommentId;
     }
     return (await request(() => api.get(link))).data;
 }
 
 
-
-export async function setImage(file, commentId)
-{
+export async function setImage(file, commentId) {
     const formData = new FormData();
     formData.append('file', file);
 
     const api = createAxiosInstance();
-    var link = "http://localhost:8080/comment/setCommentImage/" + commentId
+    var link = "http://localhost:8080/comment/image/" + commentId
     return (await request(() => api.post(link, formData))).status;
 }
 

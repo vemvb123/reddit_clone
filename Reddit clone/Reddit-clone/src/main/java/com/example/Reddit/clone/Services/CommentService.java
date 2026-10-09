@@ -83,6 +83,8 @@ public class CommentService {
 
         Comment comment = commentMapper.dtoToEntity(commentDTO, post, parentComment, user);
         Comment savedComment = commentRepository.save(comment);
+        post.getComments().add(comment);
+        postRepository.save(post);
 
         //making message to user the comment is meant for
         if (parentComment != null)
