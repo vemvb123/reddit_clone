@@ -15,7 +15,7 @@ import com.example.Reddit.clone.Repository.CommunityRepository;
 import com.example.Reddit.clone.Repository.PostRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import com.example.Reddit.clone.utils.SecurityUtils;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,19 +30,17 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PostService {
 
     @Value("${images.path}")
     public String pathToSaveImages;
 
-    private CommunityRepository communityRepository;
-    private UserRepository userRepository;
-    private PostRepository postRepository;
-
-    private JwtService jwtService;
-
-    private PostMapper postMapper;
+    final private CommunityRepository communityRepository;
+    final private UserRepository userRepository;
+    final private PostRepository postRepository;
+    final private JwtService jwtService;
+    final private PostMapper postMapper;
 
 
     public PostDTO getPost(Long postId) {

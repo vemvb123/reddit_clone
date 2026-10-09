@@ -5,15 +5,15 @@ import com.example.Reddit.clone.DTO.CommentDTO;
 import com.example.Reddit.clone.DTO.ResponseText;
 import com.example.Reddit.clone.DTO.ResponseTextType;
 import com.example.Reddit.clone.Entity.*;
-import com.example.Reddit.clone.Exception.NotFoundException;
 import com.example.Reddit.clone.Exception.NotFound;
+import com.example.Reddit.clone.Exception.NotFoundException;
 import com.example.Reddit.clone.Exception.UserException;
 import com.example.Reddit.clone.Mapper.CommentMapper;
 import com.example.Reddit.clone.Repository.CommentRepository;
 import com.example.Reddit.clone.Repository.PostRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import com.example.Reddit.clone.utils.SecurityUtils;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -27,17 +27,17 @@ import java.util.Objects;
 import java.util.Set;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CommentService {
 
 
     @Value("${images.path}")
     public String pathToSaveImages;
 
-    private UserRepository userRepository;
-    private PostRepository postRepository;
-    private MessageService messageService;
-    private CommentRepository commentRepository;
+    final private UserRepository userRepository;
+    final private PostRepository postRepository;
+    final private MessageService messageService;
+    final private CommentRepository commentRepository;
 
     private CommentMapper commentMapper;
 

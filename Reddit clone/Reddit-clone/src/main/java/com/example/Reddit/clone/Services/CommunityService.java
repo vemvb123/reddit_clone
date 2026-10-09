@@ -15,7 +15,7 @@ import com.example.Reddit.clone.Repository.CommunityRepository;
 import com.example.Reddit.clone.Repository.PostRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import com.example.Reddit.clone.utils.SecurityUtils;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,20 +26,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CommunityService {
 
     @Value("${images.path}")
     public String pathToSaveImages;
 
-    private CommunityRepository communityRepository;
-    private UserRepository userRepository;
-    private PostRepository postRepository;
-
-    private JwtService jwtService;
-
-    private CommunityMapper communityMapper;
-    private UserMapper userMapper;
+    final private CommunityRepository communityRepository;
+    final private UserRepository userRepository;
+    final private PostRepository postRepository;
+    final private JwtService jwtService;
+    final private CommunityMapper communityMapper;
+    final private UserMapper userMapper;
 
 
     public CommunityDTO saveCommunity(CommunityDTO communityDTO) {

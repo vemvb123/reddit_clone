@@ -11,7 +11,7 @@ import com.example.Reddit.clone.Repository.CommunityRepository;
 import com.example.Reddit.clone.Repository.MessageRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import com.example.Reddit.clone.utils.SecurityUtils;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -19,17 +19,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MessageService {
 
-    private MessageRepository messageRepository;
-    private UserRepository userRepository;
-    private CommunityRepository communityRepository;
-
-    private JwtService jwtService;
-
-    private MessageMapper messageMapper;
-
+    final private MessageRepository messageRepository;
+    final private UserRepository userRepository;
+    final private CommunityRepository communityRepository;
+    final private JwtService jwtService;
+    final private MessageMapper messageMapper;
 
 
     public void saveMessageNewReplyToPost(Comment comment) {

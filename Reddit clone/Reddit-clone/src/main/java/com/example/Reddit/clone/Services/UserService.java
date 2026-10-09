@@ -18,7 +18,7 @@ import com.example.Reddit.clone.Mapper.UserMapper;
 import com.example.Reddit.clone.Repository.MessageRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import com.example.Reddit.clone.utils.SecurityUtils;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,20 +31,19 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
-
 
     @Value("${images.path}")
     public String pathToSaveImages;
 
-    private UserRepository userRepository;
-    private MessageRepository messageRepository;
+    final private UserRepository userRepository;
+    final private MessageRepository messageRepository;
 
-    private JwtService jwtService;
+    final private JwtService jwtService;
 
-    private UserMapper userMapper;
-    private CommunityMapper communityMapper;
+    final private UserMapper userMapper;
+    final private CommunityMapper communityMapper;
 
 
 
