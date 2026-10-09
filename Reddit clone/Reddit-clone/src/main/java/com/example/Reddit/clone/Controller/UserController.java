@@ -23,8 +23,6 @@ import java.util.List;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class UserController {
 
-    final String origin = "http://localhost:3000";
-
     //@Autowired
     //private OwnerCheck ownerCheck;
 
@@ -58,7 +56,6 @@ public class UserController {
         return userService.sendFriendRequestFromUser(toUsername);
     }
 
-    @CrossOrigin(origins = origin)
     @PostMapping("/accept_friend_request/{fromUsername}") //fromUsername - Brukernavn til bruker som request er fra
     public ResponseText acceptFriendRequest(@PathVariable String fromUsername)
     {
@@ -66,7 +63,6 @@ public class UserController {
     }
 
 
-    @CrossOrigin(origins = origin)
     @PostMapping("/see_posts_and_comments/{allowedToSeePosts}/{allowedToSeeComments}") //fromUsername - Brukernavn til bruker som request er fra
     public ResponseText changeOthersCanSeePostsAndComments(
             @PathVariable Integer allowedToSeePosts,
@@ -77,7 +73,6 @@ public class UserController {
 
 
     //Todo: post - save file path
-    @CrossOrigin(origins = origin)
     //@PreAuthorize(("@ownerCheck.userOwnsImage(#authorization, #username)"))
     @PostMapping("/profile_image/{username}")
     public ResponseText setProfileImage(
