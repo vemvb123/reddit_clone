@@ -73,16 +73,14 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public void sendMessage(User sender, User receiver, String content, Long chatId) {
 
-        var message = ChatMessage.builder()
-                .sender(sender)
-                .receiver(receiver)
-                .content(content)
-                .sentAt(LocalDateTime.now())
-                .chat(chatRepository.getById(chatId))
-                .build();
+        ChatMessage message = new ChatMessage();
+        message.setSender(sender);
+        message.setReceiver(receiver);
+        message.setContent(content);
+        message.setSentAt(LocalDateTime.now());
+        message.setChat(chatRepository.getById(chatId));
 
         chatMessageRepository.save(message);
-
     }
 
     @Override

@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @Setter
 @NoArgsConstructor
 @Table(name = "`user`")  // Enclose the table name in backticks
+@ToString
 public class User implements UserDetails {
 
     @Id
@@ -41,11 +42,13 @@ public class User implements UserDetails {
 
     @JsonIgnore
     @ElementCollection
+    @ToString.Exclude
     private Set<RoleEnum> roles = new HashSet<>();
 
     private String pathToProfileImage;
     private String pathToWallpaperImage;
 
+    @ToString.Exclude
     @JsonIgnoreProperties("user")
     @OneToMany(mappedBy = "user")
     private Set<Comment> comments;
@@ -53,58 +56,58 @@ public class User implements UserDetails {
     private Boolean otherUsersCanSeePosts = true;
     private Boolean otherUsersCanSeeComments = true;
 
+    @ToString.Exclude
     @JsonIgnoreProperties("user")
     @OneToMany(mappedBy = "user")
     private Set<Post> posts;
 
+    @ToString.Exclude
     @JsonIgnore
     @OneToMany(mappedBy = "toUser")
     private Set<Message> messages;
 
+    @ToString.Exclude
     @JsonIgnore
     @OneToMany(mappedBy = "fromUser")
     private Set<Message> messagesFrom;
 
+    @ToString.Exclude
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_community",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "community_id"))
-    private Set<Community> communities;
+    private Set<Community> communities = new HashSet<>();
 
     @JsonIgnore
+    @ToString.Exclude
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_community_admin",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "community_id"))
-    private Set<Community> administratorOnCommunities;
+    private Set<Community> administratorOnCommunities = new HashSet<>();
 
+    @ToString.Exclude
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_community_moderator",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "community_id"))
-    private Set<Community> moderatorOnCommunities;
+    private Set<Community> moderatorOnCommunities = new HashSet<>();
 
+    @ToString.Exclude
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_community_banned",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "community_id"))
-    private Set<Community> bannedFromCommunities;
+    private Set<Community> bannedFromCommunities = new HashSet<>();
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<RoleEnum> roles = getRoles();
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .collect(Collectors.toSet());
-    }
-
+    @ToString.Exclude
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -112,8 +115,17 @@ public class User implements UserDetails {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
-
     Set<User> friends = new HashSet<>();
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        Set<RoleEnum> roles = getRoles();
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.name()))
+                .collect(Collectors.toSet());
+    }
+
 
     @Override
     public String getPassword() {

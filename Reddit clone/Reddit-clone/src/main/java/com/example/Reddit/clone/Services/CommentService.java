@@ -38,8 +38,7 @@ public class CommentService {
     final private PostRepository postRepository;
     final private MessageService messageService;
     final private CommentRepository commentRepository;
-
-    private CommentMapper commentMapper;
+    final private CommentMapper commentMapper;
 
 
     public List<CommentDTO> getReplyInterval(Long parentCommentId, int page) {
@@ -88,7 +87,7 @@ public class CommentService {
         //making message to user the comment is meant for
         if (parentComment != null)
             messageService.saveMessageNewReplyToComment(savedComment);
-        else
+        if (!Objects.equals(post.getUser().getUsername(), SecurityUtils.getUsername()))
             messageService.saveMessageNewReplyToPost(savedComment);
 
         return commentMapper.entityToDTO(comment, null, comment.getIsPrimeComment(), !comment.getChildren().isEmpty());

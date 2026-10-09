@@ -136,10 +136,11 @@ public class PostService {
 
 
     public ResponseText deletePost(Long postId) {
-        if (!postRepository.existsById(postId))
-            throw new NotFoundException(NotFound.POST);
+        Post post = postRepository.findById(postId)
+                        .orElseThrow(() -> new NotFoundException(NotFound.POST));
 
-        postRepository.deleteById(postId);
+        postRepository.delete(post);
+        postRepository.flush();
         return new ResponseText("Post deleted successfully");
     }
 

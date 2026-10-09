@@ -16,6 +16,7 @@ import com.example.Reddit.clone.Repository.PostRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import com.example.Reddit.clone.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CommunityService {
 
     @Value("${images.path}")
@@ -51,6 +53,7 @@ public class CommunityService {
         //adding the user as a administrator to the community
         communityRepository.addAdminToCommunity(user.getId(), savedCommunity.getId());
 
+        log.info("Saved community " + community + "..." + " from request " + communityDTO);
         return communityMapper.entityToDto(savedCommunity);
     }
 

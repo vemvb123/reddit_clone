@@ -1,6 +1,7 @@
 package com.example.Reddit.clone.Auth;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationController {
 
     final String origin = "http://localhost:3000";
@@ -20,6 +22,7 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> register(
             @RequestBody RegisterRequest request
     ) {
+        log.info("Call to register user {}", request.toString());
         return ResponseEntity.ok(service.register(request));
     }
 
@@ -30,6 +33,7 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticationRequest request
     ) {
+        log.info("Call to authenticate user {}", request.toString());
         return ResponseEntity.ok(service.authenticate(request));
 
     }

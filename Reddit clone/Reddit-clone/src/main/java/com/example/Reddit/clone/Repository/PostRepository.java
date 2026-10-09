@@ -65,7 +65,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
 
 
-    @Query("SELECT p FROM Post p WHERE p.community.communityType = 'PUBLIC' ORDER BY createdAt DESC")
+    @Query("SELECT p FROM Post p WHERE p.community.communityType = 'PUBLIC' ORDER BY p.createdAt DESC")
     List<Post> getLatestsPostsOfPublicCommunities(PageRequest of);
 
 

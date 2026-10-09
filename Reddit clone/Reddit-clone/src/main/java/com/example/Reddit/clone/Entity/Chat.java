@@ -13,6 +13,9 @@ import java.util.Set;
                 @UniqueConstraint(columnNames = {"user1_id", "user2_id"})
         }
 )
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Chat {
 
     @Id

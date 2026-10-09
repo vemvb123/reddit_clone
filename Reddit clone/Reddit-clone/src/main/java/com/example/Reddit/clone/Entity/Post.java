@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -37,9 +38,9 @@ public class Post {
 
     @JsonIgnoreProperties("post")
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Comment> comments;
+    private Set<Comment> comments = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "community_id")
     @ToString.Exclude
     private Community community;

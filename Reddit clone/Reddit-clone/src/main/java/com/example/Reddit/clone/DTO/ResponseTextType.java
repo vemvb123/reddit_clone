@@ -18,4 +18,3 @@ public enum ResponseTextType {
         return message;
     }
 }
-}

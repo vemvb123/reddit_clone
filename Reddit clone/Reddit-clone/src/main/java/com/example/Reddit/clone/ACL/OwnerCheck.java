@@ -86,7 +86,7 @@ public class OwnerCheck {
             return true;
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMENT));
-        long communityId = comment.getPost().getId();
+        long communityId = comment.getPost().getCommunity().getId();
         return checkAgainstModeratorAndAdminRights.canDeleteOthersComments(communityId);
     }
 
@@ -100,10 +100,13 @@ public class OwnerCheck {
 
 
     public boolean userOwnsPost(long postId) {
-        User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow();
-        Post post = postRepository.findById(postId).orElseThrow();
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() )
+                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException(NotFound.POST));
         return Objects.equals(user.getId(), post.getUser().getId());
     }
+
 
     public boolean userCanMakeThisComment(CommentDTO commentDTO) {
         User user = userRepository.findByUsername( SecurityUtils.getUsername() )

@@ -70,14 +70,12 @@ public class ChatController {
         else
             receiver = chat.getUser1();
 
-
-        var message = ChatMessage.builder()
-                .chat(chat)
-                .content(chatMessageDTO.content())
-                .sentAt(LocalDateTime.now())
-                .sender(sender)
-                .receiver(receiver)
-                .build();
+        ChatMessage message = new ChatMessage();
+        message.setSender(sender);
+        message.setReceiver(receiver);
+        message.setContent(chatMessageDTO.content());
+        message.setSentAt(LocalDateTime.now());
+        message.setChat(chat);
 
         // Return the processed message to be broadcast to subscribers
         ChatMessage savedMessage = chatMessageRepository.save(message);

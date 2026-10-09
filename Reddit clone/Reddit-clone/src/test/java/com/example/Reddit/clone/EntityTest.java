@@ -11,16 +11,15 @@ import com.example.Reddit.clone.Exception.NotFound;
 import com.example.Reddit.clone.Exception.NotFoundException;
 import com.example.Reddit.clone.Repository.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.TestConstructor;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -33,13 +32,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureTestDatabase
-@ActiveProfiles("test")
-@TestPropertySource(locations = "classpath:application-test.properties")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@RequiredArgsConstructor
+@SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
+@RequiredArgsConstructor
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+@Transactional
 public class EntityTest {
 
     final private UserRepository userRepository;
@@ -48,7 +46,6 @@ public class EntityTest {
     final private CommunityRepository communityRepository;
     final private MockMvc mockMvc;
     final private ObjectMapper objectMapper;
-    final private RoleRepository roleRepository;
     final private MessageRepository messageRepository;
 
 
@@ -67,19 +64,7 @@ public class EntityTest {
     );
 
 
-    private void createRoles() {
-        Role roleUser = new Role();
-        roleUser.setName("USER");
-
-        Role roleAdmin = new Role();
-        roleAdmin.setName("ADMIN");
-
-        roleRepository.save(roleUser);
-        roleRepository.save(roleAdmin);
-    }
-
     private User register_user() throws Exception {
-        createRoles();
 
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -100,11 +85,8 @@ public class EntityTest {
         String content = result.getResponse().getContentAsString();
         AuthenticationResponse response = objectMapper.readValue(content, AuthenticationResponse.class);
 
-
-        return response.token();
+        return "Bearer " + response.token();
     }
-
-
 
 
     @Test
@@ -123,7 +105,7 @@ public class EntityTest {
                 );
 
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/community/save_community")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/community")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", token) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(communityDTO)))
@@ -140,12 +122,6 @@ public class EntityTest {
         assertEquals(community.getTitle(), communityDTO.title());
         assertEquals(community.getCommunityType(), communityDTO.communityType());
         assertEquals(community.getDescription(), communityDTO.description());
-
-
-
-
-
-
     }
 
 
@@ -168,11 +144,12 @@ public class EntityTest {
                 .communityType(CommunityType.PUBLIC)
                 .build();
         Community savedCommunity = communityRepository.save(community);
+        user.getAdministratorOnCommunities().add(savedCommunity);
+        user = userRepository.save(user);
 
         assertTrue(communityRepository.existsByTitle(community.getTitle()));
-        assertTrue(community.getAdministrators().contains(user));
-        assertTrue(community.getMembers().contains(user));
-
+        assertTrue(savedCommunity.getAdministrators().contains(user));
+        assertTrue(savedCommunity.getMembers().contains(user));
 
         // adding post in community
         var postDTO = PostDTO.builder()
@@ -180,9 +157,7 @@ public class EntityTest {
                         .content("content")
                         .build();
 
-
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/post/save_post_to_community/" + community.getTitle())
+        mockMvc.perform(MockMvcRequestBuilders.post("/post/" + community.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", token) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(postDTO)))
@@ -190,18 +165,14 @@ public class EntityTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
 
-
-
         List<Post> posts = postRepository.findAllByOrderByCreatedAtAsc();
-        assertTrue(posts.size() > 0);
+        assertTrue(!posts.isEmpty());
 
-        Post savedPost = posts.get(0);
+        Post savedPost = posts.getFirst();
         assertTrue(postRepository.find20LaterPostAfterPost(community.getTitle(), PageRequest.of(0, 10)).contains(savedPost));
 
-
-
         // deleting community
-        mockMvc.perform(MockMvcRequestBuilders.post("/community/delete_community/" + community.getTitle())
+        mockMvc.perform(MockMvcRequestBuilders.delete("/community/" + community.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", token) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(null)))
@@ -209,16 +180,8 @@ public class EntityTest {
                 .andReturn();
 
         assertFalse(communityRepository.existsByTitle(community.getTitle()));
-        assertFalse(postRepository.findAllByOrderByCreatedAtAsc().size() == 0);
-
-
-
-
+        assertTrue(postRepository.findAllByOrderByCreatedAtAsc().isEmpty());
     }
-
-
-
-
 
 
     // when deleting post, comments for that post are deleted
@@ -252,7 +215,7 @@ public class EntityTest {
                 .content("content")
                 .build();
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/post/save_post_to_community/" + community.getTitle())
+        mockMvc.perform(MockMvcRequestBuilders.post("/post/" + community.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", token) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(postDTO)))
@@ -302,21 +265,14 @@ public class EntityTest {
                 assertTrue(commentRepository.getReplyInterval(comment.getId(), PageRequest.of(0, 10)).contains(savedComment2));
         }
 
-
-
-
-
-
         // delete post api
-        mockMvc.perform(MockMvcRequestBuilders.delete("/post/delete_post_by_id/" + savedPost.getId())
+        mockMvc.perform(MockMvcRequestBuilders.delete("/post/" + savedPost.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", token) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(null)))
                 .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
-
-
 
         // check if post is deleted
         assertFalse(postRepository.existsById(savedPost.getId()));
@@ -325,11 +281,6 @@ public class EntityTest {
         // check if comments for the post is deleted
         for (Long id : commentIds)
             assertFalse(commentRepository.existsById(id));
-
-
-
-
-
     }
 
 
@@ -350,10 +301,10 @@ public class EntityTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registerRequestOtherUser)));
 
-        User otherUser = userRepository.findByUsername(registerRequestOtherUser.username())
+        return userRepository.findByUsername(registerRequestOtherUser.username())
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
-        return otherUser;
     }
+
 
     public String getTokenOfUserWithUsername(String username, String password) throws Exception {
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(
@@ -368,7 +319,7 @@ public class EntityTest {
         String content = result.getResponse().getContentAsString();
         AuthenticationResponse response = objectMapper.readValue(content, AuthenticationResponse.class);
 
-        String token = response.token();
+        String token = "Bearer " + response.token();
 
         return token;
     }
@@ -378,7 +329,6 @@ public class EntityTest {
     public void only_the_user_itself_can_delete_its_own_post() throws Exception {
         User user = register_user();
         String token = getUserToken();
-
 
         // register another user
         User otherUser = registerOwnUser("karl", "kristian", "karl@email.com", "password2", "username2");
@@ -396,8 +346,6 @@ public class EntityTest {
                 .build();
         Community savedCommunity = communityRepository.save(community);
 
-
-
         // have user have a post in community
         var post = Post.builder()
                 .user(user)
@@ -408,9 +356,8 @@ public class EntityTest {
                 .build();
         Post savedPost = postRepository.save(post);
 
-
         //make otherUser delete the post
-        mockMvc.perform(MockMvcRequestBuilders.delete("/post/delete_post_by_id/" + savedPost.getId())
+        mockMvc.perform(MockMvcRequestBuilders.delete("/post/" + savedPost.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", otherToken) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(null)))
@@ -422,7 +369,7 @@ public class EntityTest {
 
 
         //make user delete the post
-        mockMvc.perform(MockMvcRequestBuilders.delete("/post/delete_post_by_id/" + savedPost.getId())
+        mockMvc.perform(MockMvcRequestBuilders.delete("/post/" + savedPost.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", token) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(null)))
@@ -499,7 +446,7 @@ public class EntityTest {
         assertTrue(commentRepository.existsById(comment.getId()));
 
         // have other user delete comment
-        mockMvc.perform(MockMvcRequestBuilders.post("/comment/delete_comment/" + comment.getId())
+        mockMvc.perform(MockMvcRequestBuilders.delete("/comment/" + comment.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", otherToken) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(null)))
@@ -509,9 +456,8 @@ public class EntityTest {
 
         assertTrue(commentRepository.existsById(comment.getId()));
 
-
         // have the user itself delete comment
-        mockMvc.perform(MockMvcRequestBuilders.post("/comment/delete_comment/" + comment.getId())
+        mockMvc.perform(MockMvcRequestBuilders.delete("/comment/" + comment.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", token) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(null)))
@@ -535,17 +481,12 @@ public class EntityTest {
 
         // creating post
         Post post = insertPost("title", user, "content", community);
-
         // creating comment
         Comment parentComment = insertComment(true, user, "description", "title", post, null);
-
-
         // adding child to comment
         Comment childComment = insertComment(true, user, "description", "title", post, parentComment);
-
-
         // deleting parent comment
-        mockMvc.perform(MockMvcRequestBuilders.post("/comment/delete_comment/" + parentComment.getId())
+        mockMvc.perform(MockMvcRequestBuilders.delete("/comment/" + parentComment.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", token) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(null)))
@@ -591,7 +532,7 @@ public class EntityTest {
 
 
         // deleting parent comment
-        mockMvc.perform(MockMvcRequestBuilders.post("/comment/delete_comment/" + childComment.getId())
+        mockMvc.perform(MockMvcRequestBuilders.post("/comment/" + childComment.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", token) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(null)))
@@ -628,7 +569,7 @@ public class EntityTest {
                 .build();
 
         // user DONT get message for having made comment on ones own post
-        mockMvc.perform(MockMvcRequestBuilders.post("/comment/saveComment")
+        mockMvc.perform(MockMvcRequestBuilders.post("/comment")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", token) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(commentDTO)))
@@ -643,7 +584,7 @@ public class EntityTest {
         User otherUser = registerOwnUser("firstname", "lastname", "firstname@email.com", "password", "username2");
         String otherToken = getTokenOfUserWithUsername("username2", "password");
 
-        MvcResult response = mockMvc.perform(MockMvcRequestBuilders.post("/comment/saveComment")
+        MvcResult response = mockMvc.perform(MockMvcRequestBuilders.post("/comment")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", otherToken) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(commentDTO)))
@@ -695,7 +636,7 @@ public class EntityTest {
                 .isPrimeComment(true)
                 .build();
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/comment/saveComment")
+        mockMvc.perform(MockMvcRequestBuilders.post("/comment")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", otherToken) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(commentDTO)))
@@ -718,7 +659,7 @@ public class EntityTest {
                 .isPrimeComment(true)
                 .build();
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/comment/saveComment")
+        mockMvc.perform(MockMvcRequestBuilders.post("/comment")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", otherToken) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(commentDTOchild)))

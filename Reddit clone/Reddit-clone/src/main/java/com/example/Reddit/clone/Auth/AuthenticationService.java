@@ -6,9 +6,9 @@ import com.example.Reddit.clone.Entity.RoleEnum;
 import com.example.Reddit.clone.Entity.User;
 import com.example.Reddit.clone.Exception.NotFound;
 import com.example.Reddit.clone.Exception.NotFoundException;
-import com.example.Reddit.clone.Repository.RoleRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,10 +19,10 @@ import java.util.Set;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class AuthenticationService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -35,13 +35,14 @@ public class AuthenticationService {
                 request.firstname(),
                 request.lastname(),
                 request.email(),
-                request.username(),
                 passwordEncoder.encode(request.password()),
+                request.username(),
                 roles
         );
 
-        userRepository.save(user);
-        var jwtToken = jwtService.generateToken(user);
+        User savedUser = userRepository.save(user);
+        log.info("Saved user {}", savedUser);
+        var jwtToken = jwtService.generateToken(savedUser);
         return new AuthenticationResponse(
                 jwtToken
         );

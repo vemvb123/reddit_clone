@@ -12,58 +12,46 @@ import com.example.Reddit.clone.DTO.PostDTO;
 import com.example.Reddit.clone.Entity.*;
 import com.example.Reddit.clone.Exception.NotFound;
 import com.example.Reddit.clone.Exception.NotFoundException;
-import com.example.Reddit.clone.Repository.*;
+import com.example.Reddit.clone.Repository.CommentRepository;
+import com.example.Reddit.clone.Repository.CommunityRepository;
+import com.example.Reddit.clone.Repository.PostRepository;
+import com.example.Reddit.clone.Repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.TestConstructor;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureTestDatabase
-@ActiveProfiles("test")
-@TestPropertySource(locations = "classpath:application-test.properties")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@SpringBootTest
 @AutoConfigureMockMvc
-@AllArgsConstructor
+@ActiveProfiles("test")
+@RequiredArgsConstructor
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+@Transactional
 public class RightsTest {
 
 
-    private RoleRepository roleRepository;
-    private UserRepository userRepository;
-    private CommunityRepository communityRepository;
-    private MockMvc mockMvc;
-    private ObjectMapper objectMapper;
-    private CommentRepository commentRepository;
-    private PostRepository postRepository;
-    private JwtService jwtService;
+    final private UserRepository userRepository;
+    final private CommunityRepository communityRepository;
+    final private MockMvc mockMvc;
+    final private ObjectMapper objectMapper;
+    final private CommentRepository commentRepository;
+    final private PostRepository postRepository;
+    final private JwtService jwtService;
 
-
-    private void makeRoles() {
-        Set<Role> roles = new HashSet<>();
-        roles.add(Role.builder() .name("ADMIN").build() );
-        roles.add(Role.builder() .name("USER").build() );
-
-        roleRepository.saveAll(roles);
-    }
 
     private User makeUser(String firstname, String lastname, String email, String password, String username) throws Exception {
             RegisterRequest registerRequestOtherUser = new RegisterRequest(
@@ -83,6 +71,7 @@ public class RightsTest {
             return user;
     }
 
+
     private String getTokenOfUser(String username, String password) throws Exception {
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(
                 username,
@@ -98,17 +87,13 @@ public class RightsTest {
         String content = result.getResponse().getContentAsString();
         AuthenticationResponse response = objectMapper.readValue(content, AuthenticationResponse.class);
 
-        String token = response.token();
-
-        return token;
+        return "Bearer " + response.token();
     }
-
 
 
     @Test
     public void user_making_community_gets_admin_rights() throws Exception {
 
-        makeRoles();
         User user = makeUser("firstname", "lastname", "email.com", "password", "username");
         String token = getTokenOfUser("username", "password");
 
@@ -118,7 +103,7 @@ public class RightsTest {
                         .communityType(CommunityType.PUBLIC)
                         .build();
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/community/save_community")
+        mockMvc.perform(MockMvcRequestBuilders.post("/community")
                         .header("Authorization", token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(communityDTO)))
@@ -134,21 +119,14 @@ public class RightsTest {
     }
 
 
-    @Test
-    public void normal_users_dont_have_mod_rights() {
-
-    }
-
-
-
-    public Post makePost(String title, String content, String authorization, String communityName) throws Exception {
+    public Post makePost(String title, String content, String authorization, long communityId) throws Exception {
 
         var postRequest = PostDTO.builder()
                 .title(title)
                 .content(content)
                 .build();
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/post/save_post_to_community/" + communityName)
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/post/" + communityId)
                         .header("Authorization", authorization)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(postRequest)))
@@ -174,7 +152,7 @@ public class RightsTest {
                 .postId(postId)
                 .build();
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/comment/saveComment")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/comment")
                         .header("Authorization", authorization)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(commentRequest)))
@@ -198,7 +176,7 @@ public class RightsTest {
                 .communityType(communityType)
                 .build();
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/community/save_community")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/community")
                         .header("Authorization", authorization)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(communityRequest)))
@@ -213,8 +191,8 @@ public class RightsTest {
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
     }
 
-    public void makeUserBecomeMod(String authorization, String communityName, String usernameToBecomeMod) throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/community/makeUserBecomeMod/" + communityName + "/" + usernameToBecomeMod)
+    public void makeUserBecomeMod(String authorization, long communityId, String usernameToBecomeMod) throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/community/mod/" + communityId + "/" + usernameToBecomeMod)
                         .header("Authorization", authorization)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(null)))
@@ -222,9 +200,9 @@ public class RightsTest {
                 .andDo(print());
     }
 
-    public void makeUserBecomeMember(String authorization, String communityName) throws Exception {
+    public void makeUserBecomeMember(String authorization, long communityId) throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/community/makeUserBecomeMember/" + communityName)
+        mockMvc.perform(MockMvcRequestBuilders.post("/community/member/" + communityId)
                         .header("Authorization", authorization)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(null)))
@@ -232,10 +210,6 @@ public class RightsTest {
                 .andDo(print());
 
     }
-
-
-
-
 
 
 
@@ -243,7 +217,6 @@ public class RightsTest {
     @Transactional
     public void admins_can_set_rights_and_mods_are_allowed_and_restricted_by_rights() throws Exception {
         // making users
-        makeRoles();
 
         User admin = makeUser("firstname", "lastname", "email.com", "password", "admin");
         String adminToken = getTokenOfUser("admin", "password");
@@ -256,19 +229,19 @@ public class RightsTest {
 
         // making community
         Community community = makeCommunity("title", "description", CommunityType.PUBLIC, adminToken);
-        makeUserBecomeMember(normalUserToken, community.getTitle());
-        makeUserBecomeMember(modToken, community.getTitle());
-        makeUserBecomeMod(adminToken, community.getTitle(), mod.getUsername());
+        makeUserBecomeMember(normalUserToken, community.getId());
+        makeUserBecomeMember(modToken, community.getId());
+        makeUserBecomeMod(adminToken, community.getId(), mod.getUsername());
 
 
         // ===========================================================
         // moderatorCanDeleteOthersPosts;
         // ===========================================================
         // post
-        Post post = makePost("title", "content", normalUserToken, community.getTitle());
+        Post post = makePost("title", "content", normalUserToken, community.getId());
 
         // mod deleting post while not allowed
-        mockMvc.perform(MockMvcRequestBuilders.delete("/post/delete_post_by_id/" + post.getId())
+        mockMvc.perform(MockMvcRequestBuilders.delete("/post/" + post.getId())
                         .header("Authorization", modToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(null)))
@@ -279,36 +252,30 @@ public class RightsTest {
 
        // admin makes it so mod is allowed to delete others posts
         assertFalse(communityRepository.findByTitle(community.getTitle()).orElseThrow().getModeratorCanDeleteOthersPosts());
-
         var changeModeratorRightsRequest = ModeratorRightsDTO.builder().deleteOthersPosts(true).build();
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/community/change_moderator_rights/" + community.getTitle())
+        mockMvc.perform(MockMvcRequestBuilders.post("/community/mod_rights/" + community.getId())
                         .header("Authorization", adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changeModeratorRightsRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print());
-
-        assertTrue(communityRepository.findByTitle(community.getTitle()) .orElseThrow() .getModeratorCanDeleteOthersPosts());
+        assertTrue(communityRepository.findByTitle(community.getTitle())
+                .orElseThrow().getModeratorCanDeleteOthersPosts());
 
         // mod deleting post while allowed
-        mockMvc.perform(MockMvcRequestBuilders.delete("/post/delete_post_by_id/" + post.getId())
+        mockMvc.perform(MockMvcRequestBuilders.delete("/post/" + post.getId())
                         .header("Authorization", modToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(null)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print());
 
-
-
         // moderatorCanDeleteOthersComments;
-        Post postForComment = makePost("title", "content", normalUserToken, community.getTitle());
-
-
+        Post postForComment = makePost("title", "content", normalUserToken, community.getId());
         Comment comment = makeComment("title", "description", normalUserToken, postForComment.getId(), null);
 
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/comment/delete_comment/" + comment.getId())
+        mockMvc.perform(MockMvcRequestBuilders.delete("/comment/" + comment.getId())
                         .header("Authorization", modToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(null)))
@@ -320,14 +287,14 @@ public class RightsTest {
                 .deleteOthersComments(true)
                 .build();
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/community/change_moderator_rights/" + community.getTitle())
+        mockMvc.perform(MockMvcRequestBuilders.post("/community/mod_rights/" + community.getId())
                         .header("Authorization", adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(moderatorCanDeleteOthersCommentsRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(print());
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/comment/delete_comment/" + comment.getId())
+        mockMvc.perform(MockMvcRequestBuilders.delete("/comment/" + comment.getId())
                         .header("Authorization", modToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(null)))

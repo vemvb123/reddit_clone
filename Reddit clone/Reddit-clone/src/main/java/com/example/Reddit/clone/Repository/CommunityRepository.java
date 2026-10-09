@@ -78,13 +78,13 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     @Query("SELECT c.administrators FROM Community c WHERE c.title LIKE :communityName")
     Set<User> findAdminsOfCommunityByTitle(String communityName);
 
-    @Query("SELECT c.administrators FROM Community c WHERE c.id = :comunityId")
+    @Query("SELECT c.administrators FROM Community c WHERE c.id = :communityId")
     Set<User> findAdminsOfCommunityById(long communityId);
 
     @Query("SELECT c.moderators FROM Community c WHERE c.title LIKE :communityName")
     Set<User> findModsOfCommunityByTitle(String communityName);
 
-    @Query("SELECT c.moderators FROM Community c WHERE c.id = :communityName")
+    @Query("SELECT c.moderators FROM Community c WHERE c.id = :communityId")
     Set<User> findModsOfCommunityById(long communityId);
 
     @Modifying
