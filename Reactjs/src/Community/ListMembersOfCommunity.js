@@ -33,7 +33,7 @@ export default function ListMembersOfCommunity({communityName}) {
                 <RoundImage 
                     imageUrl={
                         user.pathToProfileImage
-                        ? `http://localhost:8080/image/get_file_by_filename/${user.pathToProfileImage}`
+                        ? `http://localhost:8080/image/${user.pathToProfileImage}`
                         : defaultImageUrl
                     } to={`/profile/${user.username}`} sizeInPixels={"80px"}></RoundImage>
                 <Card.Title>{user.username}</Card.Title>

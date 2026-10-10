@@ -36,7 +36,7 @@ export default function ViewCommunitiesOfUser({ username: propsUsername }) {
           <RoundImage
             imageUrl={
               community.communityImage
-                ? `http://localhost:8080/image/get_file_by_filename/${community.communityImage}`
+                ? `http://localhost:8080/image/${community.communityImage}`
                 : defaultImageUrl
             }
             to={`/community/${community.title}`}

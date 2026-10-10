@@ -3,35 +3,27 @@ import { Form, Button } from 'react-bootstrap';
 import React, { useState } from 'react';
 import * as postService from "../Services/PostService"
 
-
 export default function CreatePost() {
 
   let params = useParams()
   const communityName = params.community_name;
-
 
   const [postData, setPostData] = useState({
     title: '',
     content: '',
   });
 
-
-
-
-
-
-
-
-
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    postService.savePost(postData, communityName);
+    const response = await postService.savePost(postData, communityName)
+    try {
+        if (response.status === 200) {
+            window.location.href = "/community/" + communityName + "/" + response.data.id
+        }
+    } catch (error) {
+          console.log(error)
+    }
   };
-
-
-
-
 
 
   return (

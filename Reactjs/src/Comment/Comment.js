@@ -82,11 +82,11 @@ const [showReplies, setShowReplies] = useState(true)
         {/* Viser kommentaren */}
         <Card>
             <Card.Body>
-                <Card.Img src={`http://localhost:8080/image/get_file_by_filename/${props.pathToImage}`}></Card.Img>
+                <Card.Img src={`http://localhost:8080/image/${props.pathToImage}`}></Card.Img>
                 <Card.Title>{props.username}</Card.Title>
 
 
-                <RoundImage imageUrl={`http://localhost:8080/image/get_file_by_filename/${props.pathToUserImage}`} to={`/profile/${props.username}`} sizeInPixels={"50px"} text={"See profile"}/>
+                <RoundImage imageUrl={`http://localhost:8080/image/${props.pathToUserImage}`} to={`/profile/${props.username}`} sizeInPixels={"50px"} text={"See profile"}/>
                 
                 
                 

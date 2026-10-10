@@ -19,6 +19,7 @@ import com.example.Reddit.clone.Repository.MessageRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import com.example.Reddit.clone.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -84,6 +86,7 @@ public class UserService {
 
 
     public UserDTO getUserByToken() {
+        log.info("Retrieving user by token: " + SecurityUtils.getUsername());
         User user = userRepository.findByUsername(SecurityUtils.getUsername())
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
         return userMapper.entityToDto(user);

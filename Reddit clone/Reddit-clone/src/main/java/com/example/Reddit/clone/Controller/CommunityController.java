@@ -24,10 +24,10 @@ public class CommunityController {
     private CheckAgainstModeratorAndAdminRights checkAgainstModeratorAndAdminRights;
 
 
-    @GetMapping("/role/{communityId}")
-    public UserHasRoleInCommunityResponse userHasRoleInCommunity(@PathVariable long communityId)
+    @GetMapping("/role/{communityName}")
+    public UserHasRoleInCommunityResponse userHasRoleInCommunity(@PathVariable String communityName)
     {
-        return communityService.userHasRoleInCommunity(communityId);
+        return communityService.userHasRoleInCommunity(communityName);
     }
 
     @PostMapping
@@ -38,138 +38,138 @@ public class CommunityController {
     }
 
 
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.canDeleteCommunity(#communityId)"))
-    @DeleteMapping("/{communityId}")
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.canDeleteCommunity(#communityName)"))
+    @DeleteMapping("/{communityName}")
     public ResponseText deleteCommunity(
-            @PathVariable long communityId
+            @PathVariable String communityName
     ) {
-        return communityService.deleteCommunity(communityId);
+        return communityService.deleteCommunity(communityName);
     }
 
 
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#communityId)"))
-    @PostMapping("/mod_rights/{communityId}")
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#communityName)"))
+    @PostMapping("/mod_rights/{communityName}")
     public ResponseText changeModeratorRights(
-            @PathVariable long communityId,
+            @PathVariable String communityName,
             @RequestBody ModeratorRightsDTO changeModeratorRightsRequest
     ) {
-        return communityService.changeModeratorRights(communityId, changeModeratorRightsRequest);
+        return communityService.changeModeratorRights(communityName, changeModeratorRightsRequest);
     }
 
 
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#communityId)"))
-    @PostMapping("/remove_mod/{communityId}/{userToHaveModeratorRightsRemoved}")
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#communityName)"))
+    @PostMapping("/remove_mod/{communityName}/{userToHaveModeratorRightsRemoved}")
     public ResponseText removeModeratorRightsFromUser(
-            @PathVariable String communityId,
+            @PathVariable String communityName,
             @PathVariable String userToHaveModeratorRightsRemoved
     ) {
-        return communityService.removeModeratorRightsFromUser(communityId, userToHaveModeratorRightsRemoved);
+        return communityService.removeModeratorRightsFromUser(communityName, userToHaveModeratorRightsRemoved);
     }
 
 
-    @GetMapping("/members/{communityId}")
-    public Set<MemberDTO> getMembers(@PathVariable long communityId) {
-        return communityService.getMembers(communityId);
+    @GetMapping("/members/{communityName}")
+    public Set<MemberDTO> getMembers(@PathVariable String communityName) {
+        return communityService.getMembers(communityName);
     }
 
 
 
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministratorOrModerator(#communityId)"))
-    @GetMapping("/mod_rights/{communityId}")
-    public ModeratorRightsDTO getModeratorRights(@PathVariable long communityId) {
-        return communityService.getModeratorRights(communityId);
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministratorOrModerator(#communityName)"))
+    @GetMapping("/mod_rights/{communityName}")
+    public ModeratorRightsDTO getModeratorRights(@PathVariable String communityName) {
+        return communityService.getModeratorRights(communityName);
     }
 
 
     //Todo: Kan bare bli invitert til private, brukeren selv må klikke for å bli bruker
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userCanSubscribe(#communityId)"))
-    @PostMapping("/member/{communityId}")
-    public ResponseText makeUserBecomeMember(@PathVariable long communityId)
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userCanSubscribe(#communityName)"))
+    @PostMapping("/member/{communityName}")
+    public ResponseText makeUserBecomeMember(@PathVariable String communityName)
     {
-        return communityService.makeUserBecomeMember(communityId);
+        return communityService.makeUserBecomeMember(communityName);
     }
 
     //authorization - The user making the other user become admin
     //userToBecomeAdmin - The user reciving admin rights in community
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#communityId)"))
-    @PostMapping("/admin/{communityId}/{usernameToBecomeAdmin}")
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#communityName)"))
+    @PostMapping("/admin/{communityName}/{usernameToBecomeAdmin}")
     public ResponseText makeUserAdmin(
-            @PathVariable long communityId,
+            @PathVariable String communityName,
             @PathVariable String usernameToBecomeAdmin
     ) {
-        return communityService.makeUserBecomeAdmin(usernameToBecomeAdmin, communityId);
+        return communityService.makeUserBecomeAdmin(usernameToBecomeAdmin, communityName);
     }
 
     //authorization - The user making the other user become mod
     //userToBecomeAdmin - The user reciving mod rights in community
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#communityId)"))
-    @PostMapping("/mod/{communityId}/{usernameToBecomeMod}")
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.userIsAdministrator(#communityName)"))
+    @PostMapping("/mod/{communityName}/{usernameToBecomeMod}")
     public ResponseText makeUserBecomeMod(
-            @PathVariable long communityId,
+            @PathVariable String communityName,
             @PathVariable String usernameToBecomeMod
     ) {
-        return communityService.makeUserBecomeMod(usernameToBecomeMod, communityId);
+        return communityService.makeUserBecomeMod(usernameToBecomeMod, communityName);
     }
 
 
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.canBanUsers(#communityId, #usernameToBan)"))
-    @PostMapping("/ban/{communityId}/{usernameToBan}")
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.canBanUsers(#communityName, #usernameToBan)"))
+    @PostMapping("/ban/{communityName}/{usernameToBan}")
     public ResponseText banUserFromCommunity(
-            @PathVariable long communityId,
+            @PathVariable String communityName,
             @PathVariable String usernameToBan
     ) {
-        return communityService.banUserFromCommunity(communityId, usernameToBan);
+        return communityService.banUserFromCommunity(communityName, usernameToBan);
     }
 
 
-    @PostMapping("/unsubscribe/{communityId}")
+    @PostMapping("/unsubscribe/{communityName}")
     public ResponseText unsubscribeFromCommunity(
-            @PathVariable long communityId
+            @PathVariable String communityName
     ) {
-        return communityService.unsubscribeUserFromCommunity(communityId);
+        return communityService.unsubscribeUserFromCommunity(communityName);
     }
 
 
     //Todo: Bare administrator kan gjøre dette
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.canChangeWallpaper(#communityId)"))
-    @PostMapping("/wallpaper/{communityId}")
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.canChangeWallpaper(#communityName)"))
+    @PostMapping("/wallpaper/{communityName}")
     public ResponseText setWallpaper(
             @RequestParam("file") MultipartFile file,
-            @PathVariable long communityId
+            @PathVariable String communityName
     ) {
-        return communityService.setWallpaper(file, communityId);
+        return communityService.setWallpaper(file, communityName);
     }
 
     //Todo: Bare administrator kan gjøre dette
-    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.canChangeCommunityImage(#communityId)"))
-    @PostMapping("/logo/{communityId}")
+    @PreAuthorize(("@checkAgainstModeratorAndAdminRights.canChangeCommunityImage(#communityName)"))
+    @PostMapping("/logo/{communityName}")
     public ResponseText setLogo(
             @RequestParam("file") MultipartFile file,
-            @PathVariable long communityId
+            @PathVariable String communityName
     ) {
-        return communityService.setLogo(file, communityId);
+        return communityService.setLogo(file, communityName);
     }
 
 
-    @GetMapping("/{communityId}")
+    @GetMapping("/{communityName}")
     public CommunityDTO getCommunityByName(
-            @PathVariable long communityId
+            @PathVariable String communityName
     ) {
-        return communityService.getCommunityById(communityId);
+        return communityService.getCommunityById(communityName);
     }
 
 
-    @GetMapping("/users/{communityId}")
+    @GetMapping("/users/{communityName}")
     public Set<UserDTO> getUsers(
-            @PathVariable long communityId
+            @PathVariable String communityName
     ) {
-        return communityService.getUsers(communityId);
+        return communityService.getUsers(communityName);
     }
 
     // TODO: utfyll
-    @PostMapping("/remove_admin/{communityId}")
+    @PostMapping("/remove_admin/{communityName}")
     public ResponseText removeAdmin(
-            @PathVariable long communityId
+            @PathVariable String communityName
     ) {
         return new ResponseText("endpoint not developed");
     }

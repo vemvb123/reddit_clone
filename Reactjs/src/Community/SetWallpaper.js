@@ -8,14 +8,8 @@ import * as communityService from "../Services/CommunityService"
 
 export default function SetWallpaper() {
 
-
-
     let params = useParams()
     const communityName = params.community_name;
-
-
-
-
 
     const [selectedFile, setSelectedFile] = useState(null);
 
@@ -48,19 +42,19 @@ export default function SetWallpaper() {
     };
   
 
-    const handleUpload = () => {
-        communityService.setWallpaper(selectedFile, communityName)
+    const handleUpload = async (e) => {
+        const response = await communityService.setWallpaper(selectedFile, communityName)
+        try {
+            if (response.status === 200) {
+                window.location.href = '/community/' + communityName
+            }
+        } catch (e) {
+            console.error("Error: ", e)
+        }
       };
 
 
-      
-
-
   return (
-
-
-
-
     <>
       <Form.Group className="mb-5">
         <Form.Label>Upload file</Form.Label>
@@ -69,14 +63,6 @@ export default function SetWallpaper() {
         {preview && <img src={preview} alt="File Preview" style={{ maxWidth: '100%' }} />}
       </Form.Group>
     </>
-
-
-
-
-
-
-
-
 
 
   )

@@ -37,50 +37,35 @@ import ViewModPrivleges from './Community/ViewModPrivleges';
 import ViewAllPublicCommunityPosts from './Community/ViewAllPublicCommunityPosts';
 
 
-
-
-
 class App extends React.Component {
   constructor(props) {
     super(props);
-    
-    
+
     this.state = {
       isAutherized: false,
     }
-    
 
-
-    
   }
-
-
-
-
-
 
   checkIfAuthorized() {
-    console.log("Updated State:", store.getState().user);
-    
+    const token = localStorage.getItem("token");
 
-
-    let token = localStorage.getItem("token")
-
-    if (token !== null) //det finnes en token
-    {
-      (async () => {
-        const tokenStatus = await auth.checkValidToken(localStorage.getItem("token"));
-          if (tokenStatus !== 200) //token er utløpt
-          {this.setState({isAutherized: false})
-          localStorage.setItem('token', "non")
-        }
-          else if (tokenStatus === 200) //token er valid
-          {this.setState({isAutherized: true})}
-      })()
-        
+    if (!token) {
+      this.setState({ isAutherized: false });
+      return;
     }
-  }
 
+    (async () => {
+      const tokenStatus = await auth.checkValidToken(token);
+
+      if (tokenStatus === 200) {
+        this.setState({ isAutherized: true });
+      } else {
+        localStorage.removeItem("token");
+        this.setState({ isAutherized: false });
+      }
+      })();
+    }
 
 
 
@@ -89,37 +74,13 @@ class App extends React.Component {
     this.checkIfAuthorized()
   }
 
-
-
-
   render() {
     const { isAutherized } = this.state;
 
-
-
-
-
   return (
     <>
-
-
-
-
-      
-
-
-
-    
-      
       <Router>
-
-
-
       {isAutherized ? <NavbarLoggedIn /> : <NavbarLoggedout/>}
-
-
-
-
 
         <Routes>
         <Route path='/' element={
@@ -145,17 +106,12 @@ class App extends React.Component {
             </> 
           }/>
 
-
-
-
-
-
-
           <Route path='/chat/:chatId/:user' element={
             <>
             <Chat/>
             </>
           }/>
+
           <Route path='/community/:community_name' element={
             <>
             <ViewCommunity/>
@@ -171,6 +127,7 @@ class App extends React.Component {
             <ViewPost/>
             </>
           }/>
+
           <Route path='/:postId/set_image' element={
             <>
             <SetPostImage/>
@@ -198,6 +155,7 @@ class App extends React.Component {
             <SetWallpaper/>
             </>
           }/>
+
           <Route path='/community/:community_name/requestsToJoin' element={
             <>
             <RequestsToJoinCommunity/>
@@ -261,12 +219,6 @@ class App extends React.Component {
             <CommunitySettings/>
             </>
           }/>
-
-
-          
-
-
-
 
         </Routes>
 

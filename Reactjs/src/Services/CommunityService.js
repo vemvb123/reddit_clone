@@ -1,12 +1,12 @@
 
-import { createAxiosInstance, request, isNotTokenNon } from './utils';
+import { createAxiosInstance, request, hasToken } from './utils';
 
 
 
 export async function saveCommunity(communityData) {
     const api = createAxiosInstance();
     var link = "http://localhost:8080/community"
-    return (await request(() => api.post(link, communityData))).status;
+    return (await request(() => api.post(link, communityData)));
 }
 
 
@@ -28,7 +28,7 @@ export async function makeUserBecomeMemberOfCommunity(communityName) {
 export async function unsubscribeFromCommunity(communityName) {
     const api = createAxiosInstance();
     var link = "http://localhost:8080/community/unsubscribe/" + communityName
-    return (await request(() => api.post(link, null))).status;
+    return (await request(() => api.post(link, null)));
 }
 
 
@@ -83,15 +83,15 @@ export async function makeUserBecomeAdmin(usernameAdmin, communityName) {
 
 export async function updateModeratorRights(communityName, moderatorRights) {
     const api = createAxiosInstance();
-    var link = "http://localhost:8080/community/mod_right/" + communityName
-    return (await request(() => api.post(link, moderatorRights))).status;
+    var link = "http://localhost:8080/community/mod_rights/" + communityName
+    return (await request(() => api.post(link, moderatorRights))).data;
 }
 
 
 export async function getModeratorRights(communityName) {
     const api = createAxiosInstance();
-    var link = "http://localhost:8080/community/mod_righs/" + communityName
-    return (await request(() => api.get(link))).status;
+    var link = "http://localhost:8080/community/mod_rights/" + communityName
+    return (await request(() => api.get(link))).data;
 }
 
 
@@ -104,7 +104,7 @@ export async function getUsers(communityName) {
 
 export async function getCommunity(communityName) {
     const api = createAxiosInstance();
-    if (isNotTokenNon()) {
+    if (hasToken()) {
         var link = "http://localhost:8080/community/" + communityName
 
     } else {
@@ -134,8 +134,8 @@ export async function getMembersOfCommunity(communityName) {
 
 
 export async function getUserIsHasRoleInCommunityOrIsNotAMember(communityName) {
-    if (isNotTokenNon) {
-        return {role: "NON_MEMBER"}
+    if (!hasToken) {
+        return {role: "NOT_MEMBER"}
     }
     const api = createAxiosInstance();
     var link = "http://localhost:8080/community/role/" + communityName
@@ -149,5 +149,5 @@ export async function setWallpaper(file, communityName) {
 
     const api = createAxiosInstance();
     var link = "http://localhost:8080/community/wallpaper/" + communityName
-    return (await request(() => api.post(link, formData))).status;
+    return (await request(() => api.post(link, formData)));
 }

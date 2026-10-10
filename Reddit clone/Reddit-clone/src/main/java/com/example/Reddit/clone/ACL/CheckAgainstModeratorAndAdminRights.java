@@ -21,22 +21,22 @@ public class CheckAgainstModeratorAndAdminRights {
     private UserRepository userRepository;
     private CommunityRepository communityRepository;
 
-    public boolean userIsModerator(long communityId) {
-        Community community = communityRepository.findById(communityId)
+    public boolean userIsModerator(String communityName) {
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         return (userRepository.findCommunitiesUserIsModeratorOf(SecurityUtils.getUsername()) .contains(community));
     }
 
 
-    public boolean userIsAdministrator(long communityId) {
-        Community community = communityRepository.findById(communityId)
+    public boolean userIsAdministrator(String communityName) {
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         return userRepository.findCommunitiesUserIsAdministratorOf( SecurityUtils.getUsername() ) .contains(community);
     }
 
 
-    public boolean userIsAdministratorOrModerator(long communityId) {
-        Community community = communityRepository.findById(communityId)
+    public boolean userIsAdministratorOrModerator(String communityName) {
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         return (userRepository.findCommunitiesUserIsAdministratorOf( SecurityUtils.getUsername() ).contains(community)
@@ -44,8 +44,8 @@ public class CheckAgainstModeratorAndAdminRights {
     }
 
 
-    public boolean canChangeCommunityImage(long communityId) {
-        Community community = communityRepository.findById(communityId)
+    public boolean canChangeCommunityImage(String communityName) {
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         User user = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
@@ -58,8 +58,8 @@ public class CheckAgainstModeratorAndAdminRights {
     }
 
 
-    public boolean canChangeWallpaper(long communityId) {
-        Community community = communityRepository.findById(communityId)
+    public boolean canChangeWallpaper(String communityName) {
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         User user = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
@@ -72,8 +72,8 @@ public class CheckAgainstModeratorAndAdminRights {
     }
 
 
-    public boolean canBanUsers(long communityId, String usernameToBan) {
-        Community community = communityRepository.findById(communityId)
+    public boolean canBanUsers(String communityName, String usernameToBan) {
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         User user = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
@@ -96,10 +96,10 @@ public class CheckAgainstModeratorAndAdminRights {
 
 
     // TODO: if community is private/restricted, there must be an invite beforehand
-    public boolean userCanSubscribe(long communityId) {
+    public boolean userCanSubscribe(String communityName) {
         User user = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
-        Community community = communityRepository.findById(communityId)
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         //user is not banned
@@ -109,8 +109,8 @@ public class CheckAgainstModeratorAndAdminRights {
     }
 
 
-    public boolean canDeleteCommunity(long communityId) {
-        Community community = communityRepository.findById(communityId)
+    public boolean canDeleteCommunity(String communityName) {
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         User user = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
@@ -123,38 +123,38 @@ public class CheckAgainstModeratorAndAdminRights {
     }
 
 
-    public boolean canDeleteOthersComments(long communityId) {
-        Community community = communityRepository.findById(communityId)
+    public boolean canDeleteOthersComments(String communityName) {
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         User user = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
         // if user is admin
-        if (communityRepository.findAdminsOfCommunityById(communityId).contains(user))
+        if (communityRepository.findAdminsOfCommunityByTitle(communityName).contains(user))
             return true;
         // if user is a moderator with the right to delete comment
-        else if (communityRepository.findModsOfCommunityById(communityId).contains(user))
+        else if (communityRepository.findModsOfCommunityByTitle(communityName).contains(user))
             return community.getModeratorCanDeleteOthersComments();
         // user is regular user, without the right to delete comments
         return false;
     }
 
 
-    public boolean canDeleteOthersPosts(long communityId) {
-        Community community = communityRepository.findById(communityId)
+    public boolean canDeleteOthersPosts(String communityName) {
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         User user = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
-        if (communityRepository.findAdminsOfCommunityById( communityId ) .contains( user ))
+        if (communityRepository.findAdminsOfCommunityByTitle( communityName ) .contains( user ))
             return true;
-        else if (communityRepository.findModsOfCommunityById( communityId ).contains(user))
+        else if (communityRepository.findModsOfCommunityByTitle( communityName ).contains(user))
             return community.getModeratorCanDeleteOthersPosts();
         return false;
     }
 
 
-    public boolean canMakeAnnouncments(long communityId) {
-        Community community = communityRepository.findById(communityId)
+    public boolean canMakeAnnouncments(String communityName) {
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         User user = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
@@ -167,8 +167,8 @@ public class CheckAgainstModeratorAndAdminRights {
     }
 
 
-    public boolean canChangeCommunityDescription(long communityId) {
-        Community community = communityRepository.findById(communityId)
+    public boolean canChangeCommunityDescription(String communityName) {
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         User user = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));

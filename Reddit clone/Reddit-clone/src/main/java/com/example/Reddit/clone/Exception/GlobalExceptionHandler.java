@@ -1,8 +1,10 @@
 package com.example.Reddit.clone.Exception;
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -33,7 +35,6 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleException(Exception e) {
         return buildExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR, e, "Something went wrong");
@@ -45,11 +46,21 @@ public class GlobalExceptionHandler {
         return buildExceptionResponse(HttpStatus.NOT_FOUND, e);
    }
 
+    @ExceptionHandler(UsernameAlreadyExists.class)
+    public ResponseEntity<ExceptionResponse> handleBadCredentialException(UsernameAlreadyExists e) {
+        return buildExceptionResponse(HttpStatus.CONFLICT, e);
+   }
 
-   @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ExceptionResponse> handleAccessDeniedException(
-        AccessDeniedException e
-    ) {
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ExceptionResponse> handleBadCredentialException(BadCredentialsException e) {
+        return buildExceptionResponse(HttpStatus.FORBIDDEN, e, "Invalid username or password");
+   }
+
+   @ExceptionHandler({
+           AccessDeniedException.class,
+           MalformedJwtException.class
+   })
+    public ResponseEntity<ExceptionResponse> handleAccessDeniedException(Exception e) {
         return buildExceptionResponse(HttpStatus.FORBIDDEN, e, "Access denied");
     }
 

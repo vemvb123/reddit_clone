@@ -102,7 +102,7 @@ export default function EditComment() {
         >
           <Card.Img
             className="w-100"
-            src={`http://localhost:8080/image/get_file_by_filename/${Comment.pathToImage}`}
+            src={`http://localhost:8080/image/${Comment.pathToImage}`}
           />
           <div className="image-overlay">
             <span>Change image</span>

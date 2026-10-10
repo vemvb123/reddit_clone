@@ -11,57 +11,39 @@ import Posts from '../Post/Posts';
 
 export default function ViewAllPublicCommunityPosts() {
 
-
-
-
-
-
-    
       const [posts, setPosts] = useState([]);
       const [page, setPage] = useState(0);
-    
+
       useEffect(() => {
-        const fetchData = async () => {
-          try {
-            const token = localStorage.getItem('token');
-            const response = await postService.getAllPostsOfPublicCommunities(page);
-            setPosts((prevPosts) => [...prevPosts, ...response]);
-            console.log(response);
-          } catch (error) {
-            console.error('Error fetching posts:', error);
-          }
-        };
-    
-        fetchData();
-      }, [page]);
-    
+          const fetchData = async () => {
+              try {
+                  const response = await postService.getAllPostsOfPublicCommunities(page);
+                  if (response.status === 200) {
+                      setPosts((prevPosts) => [...prevPosts, ...response.data]);
+                  } else {
+                      console.error(response)
+                  }
+              } catch (error) {
+                  console.log('Error fetching posts:', error);
+              }
+          };
+
+          fetchData();
+        }, [page]);
+
       const handleShowMoreClick = () => {
         setPage((prevPage) => prevPage + 1);
       };
-    
 
-    
       return (
-
-                            
- 
-        <Container className=''>
-
-            <Posts posts={posts}/>
-
-          
-          <Row className="justify-content-center mt-3">
-            <Button onClick={handleShowMoreClick}>Show more posts</Button>
-          </Row>
-
-
-          
-        </Container>
-
-
-
+            <Container className=''>
+                <Posts posts={posts}/>
+                {posts?.length === 10 && (
+                 <Row className="justify-content-center mt-3">
+                    <Button onClick={handleShowMoreClick}>Show more posts</Button>
+                </Row>
+                )}
+           </Container>
     );
-  }
-  
 
-    
+  }

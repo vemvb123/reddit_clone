@@ -157,7 +157,7 @@ public class EntityTest {
                         .content("content")
                         .build();
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/post/" + community.getId())
+        mockMvc.perform(MockMvcRequestBuilders.post("/post/" + community.getTitle())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", token) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(postDTO)))
@@ -172,7 +172,7 @@ public class EntityTest {
         assertTrue(postRepository.find20LaterPostAfterPost(community.getTitle(), PageRequest.of(0, 10)).contains(savedPost));
 
         // deleting community
-        mockMvc.perform(MockMvcRequestBuilders.delete("/community/" + community.getId())
+        mockMvc.perform(MockMvcRequestBuilders.delete("/community/" + community.getTitle())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", token) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(null)))
@@ -215,7 +215,7 @@ public class EntityTest {
                 .content("content")
                 .build();
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/post/" + community.getId())
+        mockMvc.perform(MockMvcRequestBuilders.post("/post/" + community.getTitle())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", token) // Replace with a valid authorization token
                         .content(objectMapper.writeValueAsString(postDTO)))

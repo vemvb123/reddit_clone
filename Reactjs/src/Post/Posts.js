@@ -61,7 +61,7 @@ export default function Posts({ posts }) {
                       <RoundImage
                         imageUrl={
                           post.pathToCommunityImage
-                            ? `http://localhost:8080/image/get_file_by_filename/${post.pathToCommunityImage}`
+                            ? `http://localhost:8080/image/${post.pathToCommunityImage}`
                             : defaultImageUrl
                         }
                         to={`/community/${post.communityName}`}
@@ -75,7 +75,7 @@ export default function Posts({ posts }) {
                       <RoundImage
                         imageUrl={
                           post.pathToUserImage
-                            ? `http://localhost:8080/image/get_file_by_filename/${post.pathToUserImage}`
+                            ? `http://localhost:8080/image/${post.pathToUserImage}`
                             : defaultImageUrl
                         }
                         to={`/profile/${post.username}`}
@@ -94,7 +94,7 @@ export default function Posts({ posts }) {
                     <Card.Img
                       className="post-image"
                       variant="top"
-                      src={`http://localhost:8080/image/get_file_by_filename/${post.pathToPostImage}`}
+                      src={`http://localhost:8080/image/${post.pathToPostImage}`}
                       alt="Post Image"
                     />
                   )}

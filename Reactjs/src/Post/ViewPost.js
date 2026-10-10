@@ -110,7 +110,7 @@ export default function ViewPost() {
               <RoundImage
                 imageUrl={
                   post.pathToCommunityImage
-                    ? `http://localhost:8080/image/get_file_by_filename/${post.pathToCommunityImage}`
+                    ? `http://localhost:8080/image/${post.pathToCommunityImage}`
                     : defaultImageUrl
                 }
                 text={"See community"}
@@ -127,7 +127,7 @@ export default function ViewPost() {
               <RoundImage
                 imageUrl={
                   post.pathToUserImage
-                    ? `http://localhost:8080/image/get_file_by_filename/${post.pathToUserImage}`
+                    ? `http://localhost:8080/image/${post.pathToUserImage}`
                     : defaultImageUrl
                 }
                 text={"See profile"}
@@ -147,7 +147,7 @@ export default function ViewPost() {
 
               <Card.Img
                 className="w-100"
-                src={`http://localhost:8080/image/get_file_by_filename/${post.pathToPostImage}`}
+                src={`http://localhost:8080/image/${post.pathToPostImage}`}
               />
 
           )}

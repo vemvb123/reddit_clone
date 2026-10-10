@@ -2,29 +2,25 @@ import React, { useEffect, useState } from 'react';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import ListMembersOfCommunity from './ListMembersOfCommunity';
 import { useParams } from 'react-router-dom';
 import * as communityService from '../Services/CommunityService'
-
-
 
 
 const capitalizeFirstLetter = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
-
-
 export default function ChangePrivlegdeSettings() {
     let params = useParams();
     const communityName = params.community_name;
-
 
     useEffect(() => {
       const fetchData = async () => {
         try {
           const response = await communityService.getModeratorRights(communityName);
-          setModeratorRights(response); // Assuming response is already in the expected shape
+          if (response) {
+              setModeratorRights(response); // Assuming response is already in the expected shape
+          }
           console.log("her " + response)
         } catch (error) {
           console.error('Error fetching moderator rights:', error);
@@ -32,9 +28,7 @@ export default function ChangePrivlegdeSettings() {
       };
   
       fetchData();
-
     }, [])
-    
 
 
   const [moderatorRights, setModeratorRights] = useState({
@@ -55,12 +49,6 @@ export default function ChangePrivlegdeSettings() {
     communityService.updateModeratorRights(communityName, moderatorRights)
   };
 
-
-
-
-
-
-
   const [usernameMod, setUsernameMod] = useState('');
 
   const handleInputChangeMod = (e) => {
@@ -70,11 +58,6 @@ export default function ChangePrivlegdeSettings() {
   const makeUserBecomeMod = () => {
     communityService.makeUserBecomeMod(usernameMod, communityName)
   };
-
-
-
-
-
 
   const [usernameAdmin, setUsernameAdmin] = useState('');
 

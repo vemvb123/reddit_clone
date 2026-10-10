@@ -21,8 +21,6 @@ type: SET_USER,
 payload: { username, profileImage, token },
 });
 
-
-
 export const printState = () => ({
     type: PRINT_STATE,
     payload: {  },

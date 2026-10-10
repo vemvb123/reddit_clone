@@ -16,33 +16,23 @@ const Register = () => {
         username: ""
     })
 
-
-
     const handleInput = (e) => {
-        e.preventDefault();
-
         const {name, value} = e.target;
-        setRegisterData((prevData) => ({ ...prevData,
-        [name]: value }))
+        setRegisterData((prevData) => ({
+            ...prevData,
+            [name]: value
+        }))
     }
 
-
-
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         auth.register(registerData.firstname, registerData.lastname, registerData.email, registerData.password, registerData.username)
     }
 
-
-
   return (
 
-
-
-
-
-
     <div>
-    <Form className='w-50 mx-auto mt-5'>
+    <Form className='w-50 mx-auto mt-5' onSubmit={handleSubmit}>
       <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Control name='firstname' onChange={handleInput} type="text" placeholder="First name" />
       </Form.Group>
@@ -63,9 +53,7 @@ const Register = () => {
         <Form.Control name="username" onChange={handleInput} type="text" placeholder="Username" />
       </Form.Group>
 
-
-
-      <Button onClick={handleSubmit} variant="primary" type="submit">
+      <Button variant="primary" type="submit">
         Register
       </Button>
     </Form>

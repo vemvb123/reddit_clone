@@ -44,7 +44,7 @@ export default function MembersOfCommunity() {
       {members.map((member) => (
         <Card key={member.username} style={{ border: `2px solid ${getBorderColor(member)}` }} className='mb-5'>
           <RoundImage
-            imageUrl={`http://localhost:8080/image/get_file_by_filename/${member.pathToProfileImage}`}
+            imageUrl={`http://localhost:8080/image/${member.pathToProfileImage}`}
             to={`/profile/${member.username}`}
             sizeInPixels={'80px'}
           />

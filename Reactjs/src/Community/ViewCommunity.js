@@ -25,19 +25,18 @@ export default function ViewCommunity() {
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log("wtf")
       try {
         const isMember = await communityService.getUserIsHasRoleInCommunityOrIsNotAMember(communityName)
-        const response = await communityService.getCommunity(communityName)
-        
-        const postsResponse = await postService.getLatestPosts(communityName, page)
+        const community = await communityService.getCommunity(communityName)
+        const post = await postService.getLatestPosts(communityName, page)
 
-        setPosts( postsResponse )
-        setCommunity( response )
+        if (Array.isArray(post)) {
+            setPosts( post )
+        }
+        setCommunity( community )
         setRole( isMember.role )
         console.log("her her response")
-        console.log(response)
-
+        console.log(community)
 
       } catch (error) {
         console.error('Error fetching posts:', error);
@@ -52,41 +51,28 @@ export default function ViewCommunity() {
   };
 
 
-
-
   const becomeMember = () => {
-    
-        
     communityService.makeUserBecomeMemberOfCommunity(communityName)
-
-
   };
 
   const requestToJoinCommunity = () => {
-    
-        
     communityService.requestToJoinCommunity(communityName)
-
-
   };
-
-
-
-
-
-
-
 
   const deleteCommunity = () => {
-    
-        
     communityService.deleteCommunity(communityName)
-
-
   };
 
-  const unsubscribeFromCommunity = () => {
-    communityService.unsubscribeFromCommunity(communityName)
+  const unsubscribeFromCommunity = async (e) => {
+    e.preventDefault();
+    const response = await communityService.unsubscribeFromCommunity(communityName)
+    try {
+        if (response.status === 200) {
+            window.location.href = "/"
+        }
+    } catch (e) {
+        console.log("Error: ", e)
+    }
   
   }
 
@@ -97,12 +83,8 @@ export default function ViewCommunity() {
   //     <ViewCommunity communityName={communityName} />
   //         <Wallpaper imageUrl={'http://localhost:8080/image/get_file_by_filename/' + community.communityWallpaper} existingLink={"/community/" + communityName} />
 
-
-
   let imageUrl = "https://assets-prd.ignimgs.com/2022/08/17/top25animecharacters-blogroll-1660777571580.jpg"
-  
   let defaultImageUrl = "https://i.guim.co.uk/img/media/dd703cd39013271a45bc199fae6aa1ddad72faaf/0_0_2000_1200/master/2000.jpg?width=1200&height=900&quality=85&auto=format&fit=crop&s=2192262d7832a184dbb583c238563695"
-
 
 const noHoverBgStyle = `
   .no-hover-bg:hover {
@@ -114,7 +96,13 @@ return (
   <div>
     <style>{noHoverBgStyle}</style>
 
-    <Wallpaper imageUrl={`http://localhost:8080/image/get_file_by_filename/${community.communityWallpaper}`} existingLink={`/community/${communityName}`} role={role} />
+    <Wallpaper
+          imageUrl={community.communityWallpaper ? `http://localhost:8080/image/${community.communityWallpaper}` : null}
+          existingLink={`/community/${communityName}`}
+          role={role}
+    />
+
+
 
     <div style={{ textAlign: 'center', margin: '10px' }}>
       {/* TODO: Make buttons seem more like links and show them based on user's role */}
@@ -181,16 +169,15 @@ return (
 
     <Container className=''>
 
-<Posts posts={posts}/>
+    <Posts posts={posts}/>
 
-<Row className="justify-content-center mt-3">
-<Button onClick={handleShowMoreClick}>Show more posts</Button>
-</Row>
+    {posts?.length === 10 && (
+    <Row className="justify-content-center mt-3">
+        <Button onClick={handleShowMoreClick}>Show more posts</Button>
+    </Row>
+    )}
 
-
-
-</Container>
-
+    </Container>
 
   </div>
 )

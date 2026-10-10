@@ -1,7 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
-import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import * as postService from "../Services/PostService"
 
@@ -41,16 +40,20 @@ export default function SetPostImage() {
     };
   
 
-    const handleUpload = () => {
-
-        
-        postService.setImage(selectedFile, postId)
+    const handleUpload = async (e) => {
+        const response = await postService.setImage(selectedFile, postId)
+        console.log("hersa")
+        console.log(response)
+        try {
+            if (response.status === 200) {
+                console.log(response.data.text)
+            }
+        } catch (error) {
+            console.log(error)
+        }
 
 
       };
-
-
-      
 
 
   return (

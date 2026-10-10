@@ -1,11 +1,11 @@
-import { createAxiosInstance, request, isNotTokenNon } from './utils';
+import { createAxiosInstance, request, hasToken } from './utils';
 
 
 
 export async function savePost(postData, communityName) {
   const api = createAxiosInstance();
   var link = `/post/${communityName}`
-  return (await request(() => api.post(link, postData))).status;
+  return (await request(() => api.post(link, postData)));
 }
 
 
@@ -23,7 +23,7 @@ export async function getPostsOfUser(page, username) {
   const api = createAxiosInstance();  
   var link;
 
-  if (isNotTokenNon()) {
+  if (hasToken()) {
     var link = "/post/user/" + page + "/" + username;
   } else {
     var link = "/post/user/" + page + "/" + username;
@@ -49,7 +49,7 @@ export async function setImage(file, postId)
 
   const api = createAxiosInstance();
   var link = "http://localhost:8080/post/image/" + postId
-  return (await request(() => api.post(link, formData))).status;
+  return (await request(() => api.post(link, formData)));
 }
 
 
@@ -57,10 +57,10 @@ export async function setImage(file, postId)
 
 
 
-export async function getLatestPosts(token, communityName, page)
+export async function getLatestPosts(communityName, page)
 {
   const api = createAxiosInstance();
-  if (isNotTokenNon()) {
+  if (hasToken()) {
     var link = "http://localhost:8080/post/" + page + "/" + communityName
   } else {
     var link = "http://localhost:8080/post/no_logged_in/" + page + "/" + communityName
@@ -74,7 +74,7 @@ export async function getLatestPosts(token, communityName, page)
 export async function getPost(postId)
 {
   const api = createAxiosInstance();
-  if (isNotTokenNon()) {
+  if (hasToken()) {
     var link = "http://localhost:8080/post/" + postId
   } else {
     var link = "http://localhost:8080/post/no_logged_in/" + postId
@@ -84,11 +84,10 @@ export async function getPost(postId)
 
 
 
-export async function getAllPostsOfPublicCommunities(page)
-{
+export async function getAllPostsOfPublicCommunities(page) {
   const api = createAxiosInstance();
   var link = "http://localhost:8080/post/public_communities/" + page
-  return (await request(() => api.get(link))).data;
+  return (await request(() => api.get(link)));
 }
 
 

@@ -10,38 +10,33 @@ import * as userSerivce from "../Services/UserService"
 
 export default function Messages(User) {
 
-
-
-
     const [Messages, setMessages] = useState([])
-    
 
     async function getIntervallOfMessages() {
-      let result = await messageService.get10LatestMessages(0)
-      setMessages((prevMessages) => [...prevMessages, ...result]);
-
+        let messages = await messageService.get10LatestMessages(0)
+        if (messages) {
+            setMessages((prevMessages) => [...prevMessages, ...messages]);
+        }
     }
-
-    
 
     useEffect(() => {
         getIntervallOfMessages();
-      }, []);
+    }, []);
 
     const handleAcceptRequest = (fromUsername) => {
-      userSerivce.acceptFriendRequest(fromUsername)
+        userSerivce.acceptFriendRequest(fromUsername)
     };
 
     const deleteMessage = (messageId) => {
-      messageService.deleteMessage(messageId)
+        messageService.deleteMessage(messageId)
     };
 
 
-  return (
-    <NavDropdown title="Messages" id="collapsible-nav-dropdown">
+    return (
+        <NavDropdown title="Messages" id="collapsible-nav-dropdown">
 
-    <Card>
-    {Messages.map((message) => {
+        <Card>
+        {Messages.map((message) => {
             return <NavDropdown.Item>
                 {message.content}
                 {message.messageTopic === 'NewFriendRequest' && (
@@ -49,13 +44,12 @@ export default function Messages(User) {
                       Accept Request
                   </Button>
             )}
-            <Button onClick={() => deleteMessage(message.messageId)}>Delete</Button>          
+            <Button onClick={() => deleteMessage(message.messageId)}>Delete</Button>
             </NavDropdown.Item>
         })}
+        </Card>
 
-  </Card>
 
-
-  </NavDropdown>
-  )
+      </NavDropdown>
+    )
 }

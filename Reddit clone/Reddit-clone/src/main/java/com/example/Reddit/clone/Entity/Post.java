@@ -37,6 +37,7 @@ public class Post {
     private User user;
 
     @JsonIgnoreProperties("post")
+    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments = new HashSet<>();
 

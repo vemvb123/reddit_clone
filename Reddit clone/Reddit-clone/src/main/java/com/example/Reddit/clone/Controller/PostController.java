@@ -63,13 +63,13 @@ public class PostController {
     }
 
 
-    @PreAuthorize(("@ownerCheck.userCanMakeThisPost(#postDTO, #communityId)"))
-    @PostMapping("/{communityId}")
-    public PostDTO saveCommunity(
-            @PathVariable long communityId,
+    @PreAuthorize(("@ownerCheck.userCanMakeThisPost(#postDTO, #communityName)"))
+    @PostMapping("/{communityName}")
+    public PostDTO savePost(
+            @PathVariable String communityName,
             @RequestBody PostDTO postDTO
     ) {
-        return postService.savePost(postDTO, communityId);
+        return postService.savePost(postDTO, communityName);
     }
 
 
@@ -81,23 +81,23 @@ public class PostController {
     }
 
 
-    @PreAuthorize(("@canPartakeInCommunity.userCanView(#communityId)"))
-    @GetMapping("/{page}/{communityId}")
+    @PreAuthorize(("@canPartakeInCommunity.userCanViewCommunity(#communityName)"))
+    @GetMapping("/{page}/{communityName}")
     public List<PostDTO> getLatestPostsOfCommunity(
-            @PathVariable long communityId,
+            @PathVariable String communityName,
             @PathVariable Integer page
     ) {
-        return postService.get20LatestPosts(communityId, page);
+        return postService.get20LatestPosts(communityName, page);
     }
 
 
-    @PreAuthorize(("@canPartakeInCommunity.userCanView(#communityId)"))
-    @GetMapping("/not_logged_in/{page}/{communityId}")
+    @PreAuthorize(("@canPartakeInCommunity.userCanViewCommunity(#communityName)"))
+    @GetMapping("/not_logged_in/{page}/{communityName}")
     public List<PostDTO> getLatestPostsOfCommunityWithoutToken(
-            @PathVariable long communityId,
+            @PathVariable String communityName,
             @PathVariable Integer page
     ) {
-        return postService.get20LatestPosts(communityId, page);
+        return postService.get20LatestPosts(communityName, page);
     }
 
 

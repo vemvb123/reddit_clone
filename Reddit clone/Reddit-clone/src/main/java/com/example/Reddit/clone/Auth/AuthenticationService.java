@@ -6,6 +6,7 @@ import com.example.Reddit.clone.Entity.RoleEnum;
 import com.example.Reddit.clone.Entity.User;
 import com.example.Reddit.clone.Exception.NotFound;
 import com.example.Reddit.clone.Exception.NotFoundException;
+import com.example.Reddit.clone.Exception.UsernameAlreadyExists;
 import com.example.Reddit.clone.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationResponse register(RegisterRequest request) {
+    public AuthenticationResponse register(RegisterRequest request) throws UsernameAlreadyExists {
         Set<RoleEnum> roles = new HashSet<>();
         roles.add(RoleEnum.USER);
 
@@ -39,16 +40,19 @@ public class AuthenticationService {
                 request.username(),
                 roles
         );
+        if (!userRepository.existsByUsername(user.getUsername()))
+            throw new UsernameAlreadyExists();
 
         User savedUser = userRepository.save(user);
         log.info("Saved user {}", savedUser);
         var jwtToken = jwtService.generateToken(savedUser);
-        return new AuthenticationResponse(
-                jwtToken
-        );
+        return new AuthenticationResponse( jwtToken );
+
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
+        System.out.println(request);
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.username(),

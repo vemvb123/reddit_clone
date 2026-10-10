@@ -75,6 +75,16 @@ public class CanPartakeInCommunity {
     }
 
 
+    public boolean userCanViewCommunity(String communityName) {
+        Community community = communityRepository.findByTitle(communityName)
+                .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
+
+        if (community.getCommunityType() == CommunityType.PUBLIC
+                || community.getCommunityType() == CommunityType.RESTRICTED)
+            return true;
+        return false;
+    }
+
     public boolean userCanView(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException(NotFound.POST));

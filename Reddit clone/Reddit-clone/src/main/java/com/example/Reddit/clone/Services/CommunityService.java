@@ -15,6 +15,7 @@ import com.example.Reddit.clone.Repository.CommunityRepository;
 import com.example.Reddit.clone.Repository.PostRepository;
 import com.example.Reddit.clone.Repository.UserRepository;
 import com.example.Reddit.clone.utils.SecurityUtils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,12 +43,18 @@ public class CommunityService {
     final private CommunityMapper communityMapper;
     final private UserMapper userMapper;
 
+    private String formatName(String name) {
+        return name.replace(" ", "-");
+    }
 
+
+    @Transactional
     public CommunityDTO saveCommunity(CommunityDTO communityDTO) {
         // finding username of user who made community
         User user = userRepository.findByUsername( SecurityUtils.getUsername() ).orElseThrow(() -> new RuntimeException("User not found"));
         Community community = communityMapper.dtoToEntity(communityDTO);
 
+        community.setTitle( formatName( community.getTitle() ) );
         Community savedCommunity = communityRepository.save(community);
         //adding the user as a member to the community
         communityRepository.addUserToCommunity(user.getId(), savedCommunity.getId());
@@ -58,8 +66,8 @@ public class CommunityService {
     }
 
 
-    public ResponseText setWallpaper(MultipartFile file, long communityId) {
-        Community community = communityRepository.findById(communityId)
+    public ResponseText setWallpaper(MultipartFile file, String communityName) {
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         if (!file.isEmpty()) {
@@ -94,15 +102,15 @@ public class CommunityService {
     }
 
 
-    public CommunityDTO getCommunityById(long communityId) {
-        Community community = communityRepository.findById(communityId)
+    public CommunityDTO getCommunityById(String communityName) {
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         return communityMapper.entityToDto(community);
     }
 
 
-    public ResponseText setLogo(MultipartFile file, long communityId) {
-        Community community = communityRepository.findById(communityId)
+    public ResponseText setLogo(MultipartFile file, String communityName) {
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         if (!file.isEmpty()) {
@@ -130,10 +138,10 @@ public class CommunityService {
     }
 
 
-    public ResponseText makeUserBecomeMember(long communityId) {
+    public ResponseText makeUserBecomeMember(String communityName) {
         User user = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
-        Community community = communityRepository.findById(communityId)
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         //check if user is not already a member
@@ -145,19 +153,19 @@ public class CommunityService {
     }
 
 
-    public ResponseText deleteCommunity(long communityId) {
-        Community community = communityRepository.findById(communityId)
+    public ResponseText deleteCommunity(String communityName) {
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
-        postRepository.deleteAll( postRepository.findLaterPostAfterPostById( communityId) );
+        postRepository.deleteAll( postRepository.findLaterPostAfterPostByTitle( communityName) );
         communityRepository.deleteCommunity(community.getId());
         return new ResponseText(ResponseTextType.DELETED);
     }
 
 
-    public ResponseText makeUserBecomeAdmin(String usernameToBecomeAdmin, long communityId) {
+    public ResponseText makeUserBecomeAdmin(String usernameToBecomeAdmin, String communityName) {
         User user = userRepository.findByUsername( usernameToBecomeAdmin )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
-        Community community = communityRepository.findById( communityId )
+        Community community = communityRepository.findByTitle( communityName )
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         //checks if user is a member, if user is not already a moderator (if so, remove mod rights and upgrade to admin rights), if user is not already an administrator
@@ -173,10 +181,10 @@ public class CommunityService {
     }
 
 
-    public ResponseText makeUserBecomeMod(String usernameToBecomeMod, long communityId) {
+    public ResponseText makeUserBecomeMod(String usernameToBecomeMod, String communityName) {
         User user = userRepository.findByUsername(usernameToBecomeMod)
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
-        Community community = communityRepository.findById(communityId)
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         //checks if user is a member, if user is not already a moderator, if user is not already an administrator
@@ -192,17 +200,17 @@ public class CommunityService {
     }
 
 
-    public Set<UserDTO> getUsers(long communityId) {
-        Set<User> users = communityRepository.findMembersOfCommunityById(communityId);
+    public Set<UserDTO> getUsers(String communityName) {
+        Set<User> users = communityRepository.findMembersOfCommunityByTitle(communityName);
         return users.stream()
                 .map(user -> userMapper.entityToDto(user))
                 .collect(Collectors.toSet());
     }
 
 
-    public ResponseText changeModeratorRights(long communityId, ModeratorRightsDTO dto) {
+    public ResponseText changeModeratorRights(String communityName, ModeratorRightsDTO dto) {
 
-        Community community = communityRepository.findById( communityId )
+        Community community = communityRepository.findByTitle( communityName )
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         community.setModeratorCanChangeCommunityImage( dto.changeCommunityImage() );
@@ -219,9 +227,9 @@ public class CommunityService {
     }
 
 
-    public ModeratorRightsDTO getModeratorRights(long communityId) {
-        Community community = communityRepository.findById(communityId)
-                .orElseThrow(() -> new CommunityException(CommunityError.NOT_FOUND, communityId));
+    public ModeratorRightsDTO getModeratorRights(String communityName) {
+        Community community = communityRepository.findByTitle(communityName)
+                .orElseThrow(() -> new CommunityException(CommunityError.NOT_FOUND, communityName));
         return communityMapper.communityToModeratorRightsDto(community);
     }
 
@@ -250,11 +258,11 @@ public class CommunityService {
             communityRepository.deleteById(community.getId());
     }
 
-
-    public ResponseText unsubscribeUserFromCommunity(long communityId) {
-        User user = userRepository.findByUsername(jwtService.extractUsername( SecurityUtils.getUsername() ) )
+    @Transactional
+    public ResponseText unsubscribeUserFromCommunity(String communityName) {
+        User user = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
-        Community community = communityRepository.findById(communityId)
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         //check if user is member of community
         if (!userRepository.findCommunitiesUserIsMemberOf(user.getUsername()).contains(community))
@@ -265,8 +273,8 @@ public class CommunityService {
     }
 
 
-    public ResponseText banUserFromCommunity(long communityId, String usernameToBan) {
-        Community community = communityRepository.findById(communityId)
+    public ResponseText banUserFromCommunity(String communityName, String usernameToBan) {
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         User user = userRepository.findByUsername(usernameToBan)
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
@@ -275,7 +283,7 @@ public class CommunityService {
 
         unSubUser(
                 userRepository.findByUsername(usernameToBan).orElseThrow(),
-                communityRepository.findById(community.getId())
+                communityRepository.findByTitle(community.getTitle())
                         .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY))
         );
         return new ResponseText("Banned users successfully");
@@ -296,23 +304,23 @@ public class CommunityService {
     }
 
 
-    public UserHasRoleInCommunityResponse userHasRoleInCommunity(long communityId) {
+    public UserHasRoleInCommunityResponse userHasRoleInCommunity(String communityName) {
         // check if user is member
         Set<Community> communitiesMemberOf = userRepository.findCommunitiesUserIsMemberOf(SecurityUtils.getUsername());
         boolean userIsMember = communitiesMemberOf.stream()
-            .anyMatch(community -> communityId == community.getId());
+            .anyMatch(community -> Objects.equals(communityName, community.getTitle()));
         if (!userIsMember)
             return new UserHasRoleInCommunityResponse(UserHasRoleInCommunityResponseRoles.NOT_MEMBER);
         // check if user is admin
         Set<Community> communitiesAdminOf = userRepository.findCommunitiesUserIsAdministratorOf( SecurityUtils.getUsername() );
         boolean userIsAdmin = communitiesAdminOf.stream()
-                .anyMatch(community -> communityId == community.getId());
+                .anyMatch(community -> Objects.equals(communityName, community.getTitle()));
         if (userIsAdmin)
             return new UserHasRoleInCommunityResponse(UserHasRoleInCommunityResponseRoles.ADMIN);
         // check if user is mod
         Set<Community> communitiesModOf = userRepository.findCommunitiesUserIsModeratorOf( SecurityUtils.getUsername() );
         boolean userIsMod = communitiesModOf.stream()
-                .anyMatch(community -> communityId == community.getId());
+                .anyMatch(community -> Objects.equals(communityName, community.getTitle()));
         if (userIsMod)
             return new UserHasRoleInCommunityResponse(UserHasRoleInCommunityResponseRoles.MOD);
         // return user is regular member
@@ -330,14 +338,14 @@ public class CommunityService {
     }
 
 
-    public Set<MemberDTO> getMembers(long communityId) {
+    public Set<MemberDTO> getMembers(String communityName) {
         User foundUser = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
 
-        Set<User> admins = communityRepository.findAdminsOfCommunityById(communityId);
-        Set<User> mods = communityRepository.findModsOfCommunityById(communityId);
+        Set<User> admins = communityRepository.findAdminsOfCommunityByTitle(communityName);
+        Set<User> mods = communityRepository.findModsOfCommunityByTitle(communityName);
         Set<User> friends = userRepository.getFriendsOfUser(foundUser.getId());
-        Set<User> membersUser = communityRepository.findMembersOfCommunityById(communityId);
+        Set<User> membersUser = communityRepository.findMembersOfCommunityByTitle(communityName);
 
         Set<MemberDTO> members = friends.stream()
                 .map(friend -> communityMapper.userToMemberDto(

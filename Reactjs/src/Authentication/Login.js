@@ -4,14 +4,9 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import * as auth from "../Services/auth-header";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { printState, setUser, setUserToken, setUserUsername } from '../Actions/userActions';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUseByToken } from '../Services/UserService';
-import store from '../Slices';
-import { useHistory } from 'react-router-dom';
+import { getUserByToken } from '../Services/UserService';
 import { useNavigate } from 'react-router-dom';
-
-
 
 
 const Login = () => {
@@ -19,18 +14,12 @@ const Login = () => {
         password: "",
         username: ""
     })
-    const user = useSelector(state => state.user);
-
-    let dispatch = useDispatch()
 
     const handleInput = (e) => {
-        e.preventDefault();
-
         const {name, value} = e.target;
         setLoginData((prevData) => ({ ...prevData,
         [name]: value }))
     }
-
 
 
     const handleSubmit = async (e) => {
@@ -38,30 +27,18 @@ const Login = () => {
       
       const response = await auth.authenticate(loginData.username, loginData.password);
       if (response === 200) {
-        const user = await getUseByToken(localStorage.getItem("token"));
+        const user = await getUserByToken();
         navigate(`/profile/${user.username}`)
       }
 
     };
-  
-
-
-
-
 
     const navigate = useNavigate();
 
-    
   return (
-
-
-
-    
-
-
     <div>
-    <Form className='w-50 mx-auto mt-5'>
 
+    <Form className='w-50 mx-auto mt-5' onSubmit={handleSubmit}>
 
       <Form.Group className="mb-3" controlId="username">
         <Form.Control name="username" onChange={handleInput} type="text" placeholder="Username" />
@@ -71,14 +48,10 @@ const Login = () => {
         <Form.Control name="password" onChange={handleInput} type="password" placeholder="Password" />
       </Form.Group>
 
-
-
-      <Button onClick={handleSubmit} variant="primary" type="submit">
+      <Button variant="primary" type="submit">
         Log in
       </Button>
     </Form>
-
-
 
     </div>
   )

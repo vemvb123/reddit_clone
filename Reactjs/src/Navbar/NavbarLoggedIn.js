@@ -14,14 +14,20 @@ import logo from "../Assets/Reddit-Logo.wine.png"
 
 export default function NavbarLoggedIn() {
     
-    const [User, setUser] = useState("")
+    const [User, setUser] = useState(null)
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-              let token = localStorage.getItem('token');
-              const response = await userService.getUseByToken(token)
-              setUser(response)
+                let token = localStorage.getItem('token');
+                const user = await userService.getUserByToken(token)
+                if (user) {
+                    setUser(user)
+                }
+                else {
+                    localStorage.removeItem("token");
+                    window.location.href = "/login";
+                }
             } catch (error) {
               console.error('Error fetching posts:', error);
             }
@@ -30,67 +36,37 @@ export default function NavbarLoggedIn() {
 
     
     }, [])
-    
-
-
 
     let defaultImageUrl = "https://static.printler.com/cache/c/8/8/e/6/2/c88e62cb33a7b6e20b60af964d362a10883a43a1.jpg"
 
-
-  return (
-    <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
-
-
-
-      <Container>
+    if (!User) {
+        return null;
+    }
+    return (
+        <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
+        <Container>
         <Navbar.Brand href="/">
-
-        <img
-          src={logo}
-          height="100"
-          className="d-inline-block align-top"
-          alt="Reddit logo"
-        />
-
-
+            <img
+              src={logo}
+              height="100"
+              className="d-inline-block align-top"
+              alt="Reddit logo"
+            />
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
-      
-
-
-          <Nav className="me-auto">
-
-
-
-          
-
-            <NavDropdown title="Options" id="collapsible-nav-dropdown">
-              <NavDropdown.Item href={`/profile/${User.username}`}>View profile</NavDropdown.Item>
-              <NavDropdown.Item href="/">View feed</NavDropdown.Item>
-              <NavDropdown.Item href={`/profile/${User.username}/communities`}>View communities</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Logout</NavDropdown.Item>
-
-
-              <NavDropdown.Divider />
-
-              <NavDropdown.Item href="/create_community">Create community</NavDropdown.Item>
-            </NavDropdown>
-            <Messages User={User}/>
-
+            <Nav className="me-auto">
+                <NavDropdown title="Options" id="collapsible-nav-dropdown">
+                    <NavDropdown.Item href={`/profile/${User.username}`}>View profile</NavDropdown.Item>
+                    <NavDropdown.Item href="/">View feed</NavDropdown.Item>
+                    <NavDropdown.Item href={`/profile/${User.username}/communities`}>View communities</NavDropdown.Item>
+                    <NavDropdown.Item href="#action/3.3">Logout</NavDropdown.Item>
+                    <NavDropdown.Divider />
+                    <NavDropdown.Item href="/create_community">Create community</NavDropdown.Item>
+                </NavDropdown>
+                <Messages User={User}/>
           </Nav>
-
         </Navbar.Collapse>
-
-
-
-
-
-
-
-
-    
-
 
         <div
             style={{
@@ -106,7 +82,7 @@ export default function NavbarLoggedIn() {
             <RoundImage
                 imageUrl={
                     User.pathToProfileImage
-                    ? `http://localhost:8080/image/get_file_by_filename/${User.pathToProfileImage}`
+                    ? `http://localhost:8080/image/${User.pathToProfileImage}`
                     : defaultImageUrl
                 }
                 to={`/profile/${User.username}/set_profile_image`}
@@ -116,15 +92,7 @@ export default function NavbarLoggedIn() {
             <h3>{User.username}</h3>
         </div>
 
-
-
-
-
-
       </Container>
-
-
-
 
     </Navbar>
   )

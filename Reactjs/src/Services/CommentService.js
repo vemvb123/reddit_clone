@@ -1,4 +1,4 @@
-import { createAxiosInstance, request, isNotTokenNon } from './utils';
+import { createAxiosInstance, request, hasToken } from './utils';
 
 
 export async function getComment(commentId) {
@@ -10,12 +10,12 @@ export async function getComment(commentId) {
 
 export async function getCommentsOfUser(page, username) {
     const api = createAxiosInstance();
-    if (isNotTokenNon()) {
+    if (hasToken()) {
         var link = "http://localhost:8080/comment/not_logged_in/" + page + "/" + username
     } else {
         var link = "http://localhost:8080/comment/" + page + "/" + username
     }
-    return (await request(() => api.get(link))).data;
+    return (await request(() => api.get(link)));
 }
 
 
@@ -42,7 +42,7 @@ export async function getAllCommentsOfPost(postId) {
 
 export async function getIntervallOfComments(postId, fromPostId, parentCommentId) {
     const api = createAxiosInstance();
-    if (isNotTokenNon) {
+    if (hasToken) {
         var link = "http://localhost:8080/comment/" + postId + "/" + fromPostId + "/" + parentCommentId;
     } else {
         var link = "http://localhost:8080/comment/" + postId + "/" + fromPostId + "/" + parentCommentId;

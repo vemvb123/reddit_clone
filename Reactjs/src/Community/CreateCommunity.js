@@ -1,9 +1,4 @@
 import React from 'react'
-import Nav from 'react-bootstrap/Nav';
-import Form from 'react-bootstrap/Form';
-import FormControl from 'react-bootstrap/FormControl';
-import Button from 'react-bootstrap/Button';
-import NavDropdown from 'react-bootstrap/NavDropdown';
 import { useState } from 'react';
 import * as communityService from "../Services/CommunityService"
 
@@ -15,23 +10,22 @@ export default function CreateCommunity() {
       communityType: 'PUBLIC'
     });
   
-
-  
     const handleCommunityTypeChange = (communityType) => {
       setCommunityData(prevData => ({ ...prevData, communityType: communityType }));
-      console.log(communityData.communityType)
     };
   
-    const handleCreateCommunity = (e) => {
+    const handleCreateCommunity = async (e) => {
       e.preventDefault();
-      console.log('Creating community:', communityData);
-  
-      let token = localStorage.getItem("token");
-      let response = communityService.saveCommunity(communityData);
-      console.log(communityData)
-      console.log(response)
-      console.log(token)
-    };
+      try {
+          const response = await communityService.saveCommunity(communityData);
+          if (response.status === 200) {
+              const slug = response.data.title.replace(" ", "-")
+              window.location.href = "/community/" + slug
+          }
+    } catch (error) {
+        console.error("Error: ", error)
+      }
+};
 
     const handleCommunityTitleChange = (e) => {
       const inputText = e.target.value.slice(0, 21); // Limit to 21 characters

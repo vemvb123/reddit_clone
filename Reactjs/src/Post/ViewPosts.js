@@ -81,7 +81,7 @@ export default function ViewPosts(data) {
                             <RoundImage
                               imageUrl={
                                 post.pathToCommunityImage
-                                  ? `http://localhost:8080/image/get_file_by_filename/${post.pathToCommunityImage}`
+                                  ? `http://localhost:8080/image/${post.pathToCommunityImage}`
                                   : defaultImageUrl
                               }
                               to={`/community/${post.communityName}/set_logo`}
@@ -95,7 +95,7 @@ export default function ViewPosts(data) {
                             <RoundImage
                               imageUrl={
                                 post.pathToUserImage
-                                  ? `http://localhost:8080/image/get_file_by_filename/${post.pathToUserImage}`
+                                  ? `http://localhost:8080/image/${post.pathToUserImage}`
                                   : defaultImageUrl
                               }
                               to={`/community/${post.communityName}/set_logo`}
@@ -112,7 +112,7 @@ export default function ViewPosts(data) {
                         {post.pathToPostImage && (
                           <Card.Img
                             variant="top"
-                            src={`http://localhost:8080/image/get_file_by_filename/${post.pathToPostImage}`}
+                            src={`http://localhost:8080/image/${post.pathToPostImage}`}
                             alt="Post Image"
                           />
                         )}

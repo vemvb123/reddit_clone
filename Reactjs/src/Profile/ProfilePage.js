@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import RoundImage from '../Community/RoundImage';
 import * as userService from '../Services/UserService';
-import { Button, Nav, Container, Row, Col } from 'react-bootstrap';
-import Chat from '../Chat/Chat';
+import { Nav, Container, Row, Col } from 'react-bootstrap';
 import Wallpaper from '../Community/Wallpaper';
 import PostsOfUser from './PostsOfUser';
 import CommentsOfUser from './CommentsOfUser';
@@ -14,14 +13,11 @@ export default function ProfilePage() {
   let params = useParams();
   let username = params.username;
 
-
   const [friendRequestSent, setFriendRequestSent] = useState(false);
   const [profile, setProfile] = useState('');
   const [activeTab, setActiveTab] = useState('posts');
   const [User, setUser] = useState('');
   const [chatId, setChatId] = useState('second'); // Add chatId state
-
-
 
   let token = localStorage.getItem("token");
 
@@ -32,14 +28,13 @@ export default function ProfilePage() {
         const response = await userService.getUser(username);
         setProfile(response);
 
-        const userData = await userService.getUseByToken(token);
+        const userData = await userService.getUserByToken(token);
         console.log(userData)
         setUser(userData);
       } catch (error) {
         console.error('Error fetching posts:', error);
       }
     };
-
     fetchData();
   }, [token, username]);
 
@@ -75,7 +70,7 @@ export default function ProfilePage() {
   return (
     <div>
       <Wallpaper
-        imageUrl={`http://localhost:8080/image/get_file_by_filename/${profile.pathToWallpaperImage}`}
+        imageUrl={`http://localhost:8080/image/${profile.pathToWallpaperImage}`}
         wallpaperIsNull={profile.pathToWallpaperImage == null}
         existingLink={`/profile/${username}`}
       />
@@ -87,7 +82,7 @@ export default function ProfilePage() {
             <RoundImage
               imageUrl={
                 profile.pathToProfileImage
-                  ? `http://localhost:8080/image/get_file_by_filename/${profile.pathToProfileImage}`
+                  ? `http://localhost:8080/image/${profile.pathToProfileImage}`
                   : defaultImageUrl
               }
               to={`/profile/${username}/set_profile_image`}

@@ -42,13 +42,11 @@ export default function PostsOfUser(props) {
       <Container className=''>
 
       <Posts posts={posts}/>
-    
-    <Row className="justify-content-center mt-3">
-      <Button onClick={handleShowMoreClick}>Show more posts</Button>
-    </Row>
-
-
-    
-  </Container>
+      {posts?.length === 10 && (
+          <Row className="justify-content-center mt-3">
+              <Button onClick={handleShowMoreClick}>Show more posts</Button>
+          </Row>
+      )}
+      </Container>
     );
   }

@@ -41,7 +41,7 @@ public class User implements UserDetails {
     }
 
     @JsonIgnore
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @ToString.Exclude
     private Set<RoleEnum> roles = new HashSet<>();
 

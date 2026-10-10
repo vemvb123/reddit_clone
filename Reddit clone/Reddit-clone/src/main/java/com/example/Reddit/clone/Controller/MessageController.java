@@ -7,7 +7,6 @@ import com.example.Reddit.clone.DTO.MessageDTO;
 import com.example.Reddit.clone.DTO.ResponseText;
 import com.example.Reddit.clone.Services.MessageService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -18,17 +17,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/message")
 @EnableAutoConfiguration
-@RequiredArgsConstructor
 @AllArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class MessageController {
 
-    private MessageService messageService;
-    private CheckAgainstModeratorAndAdminRights checkAgainstModeratorAndAdminRights;
-    private OwnerCheck ownerCheck;
+    final private MessageService messageService;
+    final private CheckAgainstModeratorAndAdminRights checkAgainstModeratorAndAdminRights;
+    final private OwnerCheck ownerCheck;
 
 
-    @GetMapping("/user/{page}")
+    @GetMapping("/{page}")
     public List<MessageDTO> get10MessageToUser(
             @PathVariable Integer page
     ) {

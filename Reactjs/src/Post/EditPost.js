@@ -113,7 +113,7 @@ export default function EditPost() {
               <RoundImage
                 imageUrl={
                   post.pathToCommunityImage
-                    ? `http://localhost:8080/image/get_file_by_filename/${post.pathToCommunityImage}`
+                    ? `http://localhost:8080/image/${post.pathToCommunityImage}`
                     : defaultImageUrl
                 }
                 to={`/community/${post.communityName}`}
@@ -127,7 +127,7 @@ export default function EditPost() {
               <RoundImage
                 imageUrl={
                   post.pathToUserImage
-                    ? `http://localhost:8080/image/get_file_by_filename/${post.pathToUserImage}`
+                    ? `http://localhost:8080/image/${post.pathToUserImage}`
                     : defaultImageUrl
                 }
                 to={`/profile/${post.username}`}
@@ -164,7 +164,7 @@ export default function EditPost() {
             >
               <Card.Img
                 className="w-100"
-                src={`http://localhost:8080/image/get_file_by_filename/${post.pathToPostImage}`}
+                src={`http://localhost:8080/image/${post.pathToPostImage}`}
               />
               <div className="image-overlay">
                 <span>Change image</span>

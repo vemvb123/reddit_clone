@@ -13,7 +13,9 @@ export default function CommentsOfUser({ username: propUsername }) {
             try {
                 const token = localStorage.getItem('token');
                 const response = await commentService.getCommentsOfUser(token, page, propUsername)
-                setComments((prevComments) => [...prevComments, ...response]);
+                if (response.status === 200) {
+                    setComments((prevComments) => [...prevComments, ...response]);
+                }
                 console.log(response);
             } catch (error) {
                 console.error('Error fetching comments:', error);
@@ -75,7 +77,7 @@ export default function CommentsOfUser({ username: propUsername }) {
                                                 <RoundImage
                                                     imageUrl={
                                                         comment.pathToCommunityImage
-                                                            ? `http://localhost:8080/image/get_file_by_filename/${comment.pathToCommunityImage}`
+                                                            ? `http://localhost:8080/image/${comment.pathToCommunityImage}`
                                                             : defaultImageUrl
                                                     }
                                                     to={`/community/${comment.communityName}/set_logo`}
@@ -90,7 +92,7 @@ export default function CommentsOfUser({ username: propUsername }) {
                                                 <RoundImage
                                                     imageUrl={
                                                         comment.pathToUserImage
-                                                            ? `http://localhost:8080/image/get_file_by_filename/${comment.pathToUserImage}`
+                                                            ? `http://localhost:8080/image/${comment.pathToUserImage}`
                                                             : defaultImageUrl
                                                     }
                                                     to={`/community/${comment.communityName}/set_logo`}
@@ -105,7 +107,7 @@ export default function CommentsOfUser({ username: propUsername }) {
                                                 <RoundImage
                                                     imageUrl={
                                                         comment.usernameRepliedToPathToImage
-                                                            ? `http://localhost:8080/image/get_file_by_filename/${comment.usernameRepliedToPathToImage}`
+                                                            ? `http://localhost:8080/image/${comment.usernameRepliedToPathToImage}`
                                                             : defaultImageUrl
                                                     }
                                                     to={`/community/${comment.communityName}/set_logo`}
@@ -122,7 +124,7 @@ export default function CommentsOfUser({ username: propUsername }) {
                                         {comment.pathToImage && (
                                             <Card.Img
                                                 variant="top"
-                                                src={`http://localhost:8080/image/get_file_by_filename/${comment.pathToImage}`}
+                                                src={`http://localhost:8080/image/${comment.pathToImage}`}
                                                 alt="Post Image"
                                             />
                                         )}

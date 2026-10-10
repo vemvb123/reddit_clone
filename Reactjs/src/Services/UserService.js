@@ -1,4 +1,4 @@
-import { createAxiosInstance, request, isNotTokenNon } from './utils';
+import { createAxiosInstance, request, hasToken } from './utils';
 
 
 
@@ -18,7 +18,7 @@ export async function getUser(username)
 {
     const api = createAxiosInstance();
     var link = "http://localhost:8080/user/" + username
-    return (await request(() => api.get(link)).data);
+    return (await request(() => api.get(link))).data;
 }
 
 
@@ -33,11 +33,11 @@ export async function setWallpaper(file, username)
 }
 
 
-export async function getUseByToken()
+export async function getUserByToken()
 {
     const api = createAxiosInstance();
     var link = "http://localhost:8080/user/token"
-    return (await request(() => api.get(link)).data);
+    return (await request(() => api.get(link))).data;
 }
 
 
@@ -64,7 +64,7 @@ export async function getCommunitiesUserIsMemberOf(username)
 {
     const api = createAxiosInstance();
     var link = "http://localhost:8080/user/communities_of_user/" + username
-    return (await request(() => api.get(link)).data);
+    return (await request(() => api.get(link))).data;
 }
 
 
@@ -73,5 +73,5 @@ export async function createChat(token, toUserCreatingChatWith)
 {
     const api = createAxiosInstance();
     var link = "http://localhost:8080/api/chat/getChatOrCreateIfAlreadyExists/" + toUserCreatingChatWith
-    return (await request(() => api.post(link, null)).data);
+    return (await request(() => api.post(link, null))).data;
 }

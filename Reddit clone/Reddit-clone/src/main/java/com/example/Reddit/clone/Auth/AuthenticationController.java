@@ -1,5 +1,6 @@
 package com.example.Reddit.clone.Auth;
 
+import com.example.Reddit.clone.Exception.UsernameAlreadyExists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
             @RequestBody RegisterRequest request
-    ) {
+    ) throws UsernameAlreadyExists {
         log.info("Call to register user {}", request.toString());
         return ResponseEntity.ok(service.register(request));
     }

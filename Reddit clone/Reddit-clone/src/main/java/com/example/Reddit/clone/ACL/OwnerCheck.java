@@ -29,10 +29,10 @@ public class OwnerCheck {
     // first determines if the post is being edited, or made for the first time
     // if its made for the first time, it determines wether the user has access to the community
     // if the post is being edited, it determines if the user is the owner of the post
-    public boolean userCanMakeThisPost(PostDTO postDTO, long communityId) {
+    public boolean userCanMakeThisPost(PostDTO postDTO, String communityName) {
         User user = userRepository.findByUsername( SecurityUtils.getUsername() )
                 .orElseThrow(() -> new NotFoundException(NotFound.USER));
-        Community community = communityRepository.findById(communityId)
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
 
         if (postDTO.id() == null)
@@ -62,8 +62,8 @@ public class OwnerCheck {
     }
 
 
-    public boolean userCanRequestToJoinCommunity(long communityId) {
-        Community community = communityRepository.findById(communityId)
+    public boolean userCanRequestToJoinCommunity(String communityName) {
+        Community community = communityRepository.findByTitle(communityName)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMUNITY));
         if (userRepository.findCommunitiesUserIsMemberOf( SecurityUtils.getUsername() ).contains(community))
             return false;
@@ -86,8 +86,8 @@ public class OwnerCheck {
             return true;
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundException(NotFound.COMMENT));
-        long communityId = comment.getPost().getCommunity().getId();
-        return checkAgainstModeratorAndAdminRights.canDeleteOthersComments(communityId);
+        String communityName = comment.getPost().getCommunity().getTitle();
+        return checkAgainstModeratorAndAdminRights.canDeleteOthersComments(communityName);
     }
 
     public boolean userCanDeletePost(long postId) {
@@ -95,7 +95,7 @@ public class OwnerCheck {
             return true;
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException(NotFound.POST));
-        return checkAgainstModeratorAndAdminRights.canDeleteOthersPosts(post.getCommunity().getId());
+        return checkAgainstModeratorAndAdminRights.canDeleteOthersPosts(post.getCommunity().getTitle());
     }
 
 
