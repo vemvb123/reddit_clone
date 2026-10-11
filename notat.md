@@ -8,3 +8,5 @@ når man ikke er innlogget.
 
 Håndterer at response ikke er som forventet
 Sender ikke undefined response fra backend noen gang..
+
+viser feil til bruker på siden

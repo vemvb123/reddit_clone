@@ -2,39 +2,39 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { connect } from 'react-redux'
-import Register from './Authentication/Register';
-import Login from './Authentication/Login';
+import Register from './Page/Authentication/Register';
+import Login from './Page/Authentication/Login';
 import React from 'react';
-import FrontPage from './FrontPage/FrontPage'
-import Navbar from './Navbar/Navbar';
-import CreateCommunity from './Community/CreateCommunity';
-import ViewCommunity from './Community/ViewCommunity';
-import CreatePost from './Post/CreatePost';
-import ViewPost from './Post/ViewPost';
-import ViewCommunityPostsMemberOf from './Community/ViewCommunityPostsMemberOf';
-import SetWallpaper from './Community/SetWallpaper';
-import SetLogo from './Community/SetLogo';
-import ProfilePage from './Profile/ProfilePage';
-import SetProfileImage from './Profile/SetProfileImage';
-import SetPostImage from './Post/SetPostImage';
-import SetCommentImage from './Comment/SetCommentImage';
-import NavbarLoggedIn from './Navbar/NavbarLoggedIn';
-import NavbarLoggedout from './Navbar/NavbarLoggedout';
-import * as auth from "./Services/auth-header"
-import ViewCommunitiesOfUser from './Community/ViewCommunitiesOfUser';
-import EditPost from './Post/EditPost';
-import EditComment from './Comment/EditComment';
-import ChangePrivlegdeSettings from './Community/ChangePrivlegdeSettings';
-import CommunitySettings from './Community/CommunitySettings';
-import PostsOfUser from './Profile/PostsOfUser';
-import CommentsOfUser from './Profile/CommentsOfUser';
-import RequestsToJoinCommunity from './Community/RequestsToJoinCommunity';
-import Chat from './Chat/Chat';
-import store from './Slices';
-import SetWallpaperProfile from './Profile/SetWallpaperProfile';
-import MembersOfCommunity from './Community/MembersOfCommunity';
-import ViewModPrivleges from './Community/ViewModPrivleges';
-import ViewAllPublicCommunityPosts from './Community/ViewAllPublicCommunityPosts';
+import FrontPage from './Page/FrontPage/FrontPage'
+import Navbar from './Component/Navbar/Navbar';
+import CreateCommunity from './Page/Community/CreateCommunity';
+import ViewCommunity from './Page/Community/ViewCommunity';
+import CreatePost from './Page/Post/CreatePost';
+import ViewPost from './Component/Post/ViewPost';
+import ViewCommunityPostsMemberOf from './Page/Community/ViewCommunityPostsMemberOf';
+import SetWallpaper from './Page/Community/SetWallpaper';
+import SetLogo from './Page/Community/SetLogo';
+import ProfilePage from './Page/Profile/ProfilePage';
+import SetProfileImage from './Component/Profile/SetProfileImage';
+import SetPostImage from './Page/Post/SetPostImage';
+import SetCommentImage from './Page/Comment/SetCommentImage';
+import NavbarLoggedIn from './Component/Navbar/NavbarLoggedIn';
+import NavbarLoggedout from './Component/Navbar/NavbarLoggedout';
+import * as auth from "./Service/auth-header"
+import ViewCommunitiesOfUser from './Page/Community/ViewCommunitiesOfUser';
+import EditPost from './Page/Post/EditPost';
+import EditComment from './Page/Comment/EditComment';
+import ChangePrivlegdeSettings from './Page/Community/ChangePrivlegdeSettings';
+import CommunitySettings from './Page/Community/CommunitySettings';
+import PostsOfUser from './Component/Profile/PostsOfUser';
+import CommentsOfUser from './Component/Profile/CommentsOfUser';
+import RequestsToJoinCommunity from './Page/Community/RequestsToJoinCommunity';
+import Chat from './Page/Chat/Chat';
+import store from './Slice';
+import SetWallpaperProfile from './Component/Profile/SetWallpaperProfile';
+import MembersOfCommunity from './Page/Community/MembersOfCommunity';
+import ViewModPrivleges from './Page/Community/ViewModPrivleges';
+import ViewAllPublicCommunityPosts from './Page/Community/ViewAllPublicCommunityPosts';
 
 
 class App extends React.Component {
