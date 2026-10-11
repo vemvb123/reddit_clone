@@ -54,7 +54,7 @@ public class CommentService {
                 )).toList();
     }
 
-
+    //
     public List<CommentDTO> getCommentInterval(Long postId, int page) {
         Comment lastChild = commentRepository.getLastChildOfPost(postId, PageRequest.of(0,1));
         List<Comment> commentInterval = commentRepository.getCommentInterval(postId, PageRequest.of(page, 10));
