@@ -1,4 +1,4 @@
-import {createAxiosInstance, request, hasToken, handleRequest} from './utils';
+import {createAxiosInstance, hasToken, handleRequest} from './utils';
 
 
 const api = createAxiosInstance();
