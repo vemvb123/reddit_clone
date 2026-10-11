@@ -10,3 +10,8 @@ Håndterer at response ikke er som forventet
 Sender ikke undefined response fra backend noen gang..
 
 viser feil til bruker på siden
+
+
+vdn håndtere at man gjerne vil ha brukerens profilbilde?
+håndtere ting som å lage bruker, slette bruker, osv...
+
