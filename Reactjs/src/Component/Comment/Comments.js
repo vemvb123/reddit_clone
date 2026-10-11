@@ -11,7 +11,7 @@ export const Comments = (props) => {
             return <Comment 
                 id = {comment.id}
                 title = {comment.title}
-                description = {comment.description}
+                content = {comment.content}
                 username = {comment.username}
                 postId = {comment.postId}
                 parentCommentId = {comment.parentCommentId}

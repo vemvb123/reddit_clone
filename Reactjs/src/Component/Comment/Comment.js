@@ -66,15 +66,19 @@ export const Comment = (props) => {
         {/* Viser kommentaren */}
         <Card>
             <Card.Body>
-                <Card.Img src={`http://localhost:8080/image/${props.pathToImage}`}></Card.Img>
+
+                {props.pathToImage && (
+                    <Card.Img src={`http://localhost:8080/image/${props.pathToImage}`}></Card.Img>
+                )}
                 <Card.Title>{props.username}</Card.Title>
 
-                <RoundImage imageUrl={`http://localhost:8080/image/${props.pathToUserImage}`} to={`/profile/${props.username}`} sizeInPixels={"50px"} text={"See profile"}/>
-
+                {props.pathToUserImage&& (
+                    <RoundImage imageUrl={`http://localhost:8080/image/${props.pathToUserImage}`} to={`/profile/${props.username}`} sizeInPixels={"50px"} text={"See profile"}/>
+                )}
 
                 <Card.Title>{props.title}</Card.Title>
                 <Card.Text className='border p-2'>
-                    {props.description}
+                    {props.content}
                 </Card.Text>
                 <Card.Text>{props.createdAt}</Card.Text>
                 

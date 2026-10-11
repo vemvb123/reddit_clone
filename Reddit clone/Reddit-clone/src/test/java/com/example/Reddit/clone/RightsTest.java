@@ -147,7 +147,7 @@ public class RightsTest {
 
         var commentRequest = CommentDTO.builder()
                 .title(title)
-                .description(description)
+                .content(description)
                 .parentCommentId(parentId)
                 .postId(postId)
                 .build();

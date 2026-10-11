@@ -46,7 +46,7 @@ export const CreateComment = (props) => {
               />
             </Form.Group>
 
-            <Form.Group controlId="description" className="mb-3">
+            <Form.Group controlId="content" className="mb-3">
               <Form.Control
                 placeholder='Write a comment'
                 as="textarea"

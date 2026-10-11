@@ -33,10 +33,10 @@ export default function SetCommentImage() {
   return (
         <>
             <Form.Group className="mb-5">
-            <Form.Label>Upload file</Form.Label>
-            <Form.Control onChange={handleFileInput} type="file" className='w-75 mx-auto mb-2' />
-            <Button className='mt-3' onClick={handleUpload}>Upload file</Button>
-            {preview && <img src={preview} alt="File Preview" style={{ maxWidth: '100%' }} />}
+                <Form.Label>Upload file</Form.Label>
+                <Form.Control onChange={handleFileInput} type="file" className='w-75 mx-auto mb-2' />
+                <Button className='mt-3' onClick={handleUpload}>Upload file</Button>
+                {preview && <img src={preview} alt="File Preview" style={{ maxWidth: '100%' }} />}
             </Form.Group>
         </>
 

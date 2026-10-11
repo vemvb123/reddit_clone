@@ -24,7 +24,7 @@ public class CommentMapper {
             comment.setCreatedAt(LocalDateTime.now());
 
         comment.setPathToImage(dto.pathToImage());
-        comment.setDescription(dto.description());
+        comment.setDescription(dto.content());
         comment.setTitle(dto.title());
         comment.setPost(post);
         comment.setParent(parentComment);

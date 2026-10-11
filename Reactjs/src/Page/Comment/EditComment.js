@@ -2,20 +2,27 @@ import React, { useEffect, useState } from 'react'
 import * as commentService from "../../Service/CommentService"
 import { useParams } from 'react-router-dom'
 import { Button, Card, Container, Modal, Form } from 'react-bootstrap';
+import ErrorMessage from "../../Component/SiteMessage/ErrorMessage";
+import LoadingMessage from "../../Component/SiteMessage/LoadingMessage";
 
 
 export default function EditComment() {
     let params = useParams()
     const commentId = params.commentId
 
-    const [Comment, setComment] = useState("")
+    const [comment, setComment] = useState(null)
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [error, setError] = useState(null)
+    const [loading, setLoading] = useState(true)
 
     const getComment = async (e) => {
-        const result = await commentService.getComment(commentId)
+        const result = await commentService.getComment(commentId);
         if (!result.error) {
-            setComment(result)
+            setComment(result.data)
+        } else {
+            setError(result.error.message)
         }
+        setLoading(false)
     }
 
     useEffect(() => {
@@ -25,7 +32,7 @@ export default function EditComment() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        commentService.saveComment(Comment)
+        commentService.saveComment(comment)
       };
 
 
@@ -33,6 +40,12 @@ export default function EditComment() {
             commentService.deleteComment(commentId)
       };
 
+    if (error) {
+        return <ErrorMessage message={error}/>
+    }
+    if (loading) {
+        return <LoadingMessage/>
+    }
 
   return (
     <Container>
@@ -75,44 +88,41 @@ export default function EditComment() {
       <Form.Control
         type="text"
         placeholder="Enter the title"
-        value={Comment.title}
+        value={comment.title}
         onChange={(e) => setComment(prevData => ({ ...prevData, title: e.target.value }))}
       />
     </Form.Group>
 
 
 
-
-
-
       {/* Post Image */}
-      {Comment.pathToImage && (
-        <div 
+      {comment.pathToImage && (
+        <div
           className="position-relative"
-          onClick={() => window.location.href = `/${Comment.postId}/set_comment_image/${Comment.id}`}
+          onClick={() => window.location.href = `/${comment.postId}/set_comment_image/${comment.id}`}
         >
           <Card.Img
             className="w-100"
-            src={`http://localhost:8080/image/${Comment.pathToImage}`}
+            src={`http://localhost:8080/image/${comment.pathToImage}`}
           />
           <div className="image-overlay">
             <span>Change image</span>
           </div>
         </div>
       )}
-      <Button href={`/${Comment.postId}/set_comment_image/${Comment.id}`}>Set image</Button>
+      <Button href={`/${comment.postId}/set_comment_image/${comment.id}`}>Set image</Button>
 
 
 
       {/* Content */}
-      <Form.Group controlId="description">
+      <Form.Group controlId="content">
       <Form.Label>Description</Form.Label>
       <Form.Control
         as="textarea"
         rows={3}
         placeholder="Enter the description"
-        value={Comment.description}
-        onChange={(e) => setComment(prevData => ({ ...prevData, description: e.target.value }))}
+        value={comment.content}
+        onChange={(e) => setComment(prevData => ({ ...prevData, content: e.target.value }))}
       />
     </Form.Group>
 

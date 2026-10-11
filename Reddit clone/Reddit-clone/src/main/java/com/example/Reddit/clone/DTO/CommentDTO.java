@@ -9,7 +9,7 @@ public record CommentDTO(
 
     Long id,
     String title,
-    String description,
+    String content,
     Long userId,
     Long postId,
     Long parentCommentId,

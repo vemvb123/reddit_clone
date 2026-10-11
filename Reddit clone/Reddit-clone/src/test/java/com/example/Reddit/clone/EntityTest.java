@@ -562,7 +562,7 @@ public class EntityTest {
 
         var commentDTO = CommentDTO.builder()
                 .parentCommentId(null)
-                .description("description")
+                .content("description")
                 .title("title")
                 .postId(post.getId())
                 .isPrimeComment(true)
@@ -630,7 +630,7 @@ public class EntityTest {
 
         var commentDTO = CommentDTO.builder()
                 .parentCommentId(null)
-                .description("description")
+                .content("description")
                 .title("title")
                 .postId(post.getId())
                 .isPrimeComment(true)
@@ -653,7 +653,7 @@ public class EntityTest {
 
         var commentDTOchild = CommentDTO.builder()
                 .parentCommentId(messages.get(0).getId())
-                .description("description")
+                .content("description")
                 .title("title")
                 .postId(post.getId())
                 .isPrimeComment(true)

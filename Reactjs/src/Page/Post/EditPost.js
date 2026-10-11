@@ -162,11 +162,13 @@ export default function EditPost() {
               className="position-relative"
               onClick={() => window.location.href = `/${postId}/set_image`}
             >
-              <Card.Img
-                className="w-100"
-                src={`http://localhost:8080/image/${post.pathToPostImage}`}
-              />
-              <div className="image-overlay">
+                {post.pathToPostImage && (
+                   <Card.Img
+                        className="w-100"
+                        src={`http://localhost:8080/image/${post.pathToPostImage}`}
+                  />
+                )}
+             <div className="image-overlay">
                 <span>Change image</span>
               </div>
             </div>
