@@ -26,7 +26,11 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        auth.register(registerData.firstname, registerData.lastname, registerData.email, registerData.password, registerData.username)
+
+        const responseStatus = await auth.register(registerData.firstname, registerData.lastname, registerData.email, registerData.password, registerData.username)
+        if (responseStatus === 200) {
+            window.location.href = "profile/" + registerData.username
+        }
     }
 
   return (

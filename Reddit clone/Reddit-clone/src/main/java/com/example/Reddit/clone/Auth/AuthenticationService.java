@@ -40,7 +40,7 @@ public class AuthenticationService {
                 request.username(),
                 roles
         );
-        if (!userRepository.existsByUsername(user.getUsername()))
+        if (userRepository.existsByUsername(user.getUsername()))
             throw new UsernameAlreadyExists();
 
         User savedUser = userRepository.save(user);

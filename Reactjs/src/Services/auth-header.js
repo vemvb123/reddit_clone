@@ -1,23 +1,25 @@
 import axios from 'axios';
 
 
+
 export async function register(firstname, lastname, email, password, username) {
-  var link = "http://localhost:8080/auth/register"
+    try {
+        const response = await axios.post("http://localhost:8080/auth/register", {
+            firstname,
+            lastname,
+            email,
+            password,
+            username
+        });
 
-  await axios.post(link, {
-    firstname: firstname,
-    lastname: lastname,
-    email: email,
-    password: password,
-    username: username
+        setToken(response.data.token);
 
-  }).then((response) => {
-    setToken(response.data.token)
-  })
+        return response.status;
+    } catch (error) {
+        console.error("Registration failed:", error);
+        throw error;
+    }
 }
-
-
-
 
 export async function authenticate(username, password) {
   var link = "http://localhost:8080/auth/authenticate";
