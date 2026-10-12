@@ -1,10 +1,12 @@
-package com.example.Reddit.clone;
+package com.example.authentication;
 
-import com.example.Reddit.clone.Config.JwtService;
-import com.example.Reddit.clone.Entity.User;
-import com.example.Reddit.clone.Exception.NotFound;
-import com.example.Reddit.clone.Exception.NotFoundException;
-import com.example.Reddit.clone.Repository.UserRepository;
+import com.example.authentication.DTO.AuthenticationRequest;
+import com.example.authentication.DTO.AuthenticationResponse;
+import com.example.authentication.DTO.RegisterRequest;
+import com.example.authentication.Entity.User;
+import com.example.authentication.Exception.UserNotFound;
+import com.example.authentication.Repository.UserRepository;
+import com.example.authentication.Service.JwtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -80,7 +82,7 @@ class AuthenticationTest {
 
     private User getUser(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+                .orElseThrow(() -> new UserNotFound(username));
     }
 
     @Test

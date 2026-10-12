@@ -1,10 +1,10 @@
 package com.example.Reddit.clone.Exception;
+
 import io.jsonwebtoken.MalformedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -44,16 +44,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleNotFoundException(NotFoundException e) {
         return buildExceptionResponse(HttpStatus.NOT_FOUND, e);
-   }
-
-    @ExceptionHandler(UsernameAlreadyExists.class)
-    public ResponseEntity<ExceptionResponse> handleBadCredentialException(UsernameAlreadyExists e) {
-        return buildExceptionResponse(HttpStatus.CONFLICT, e);
-   }
-
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ExceptionResponse> handleBadCredentialException(BadCredentialsException e) {
-        return buildExceptionResponse(HttpStatus.FORBIDDEN, e, "Invalid username or password");
    }
 
    @ExceptionHandler({
