@@ -104,91 +104,33 @@ Users have realtime chat.
 
 # Setup
 
-1. Go into the application.properties file in the springboot project, and set the path where you want images to be saved:
-
-The the value to the path you want.
-```python
-images.path=/home/vemund/Pictures/reddit
+Go into the application.properties file under the Reddit-project under backend
 ```
-
-
-
-Make an SQL docker database:
-
-```python
-docker run --name mysql-reddit \
-  -e MYSQL_ROOT_PASSWORD=password \
-  -e MYSQL_DATABASE=reddit_clone \
-  -p 3305:3306 \
-  -d mysql:8.0
+backend/Reddit-clone/src/main/resources/application.properties
 ```
-
-Go to the react project under Reactjs/
-
-Run:
-
+Set the path where you want images to be saved. For example:
 ```python
-npm install
+images.path=/home/username/Pictures/reddit
 ```
-
 
 ## How to run
-In the springboot project, change the [application.properties](http://application.properties) to appropriate values for the mysql database.
 
-```python
-# JPA configuration
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-spring.datasource.url=jdbc:mysql://localhost:port/database_name
-spring.datasource.username=username
-spring.datasource.password=password
-spring.jpa.show-sql=true
-
-spring.jpa-properties.hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
-spring.main.allow-bean-definition-overriding=true
-spring.jpa.properties.hibernate.show_sql=false
-
-# Set the path to save images
-pathToSaveImages=C:/Users/path_to_save_images
-
-# file configuration
-spring.servlet.multipart.max-file-size=100MB
-spring.servlet.multipart.max-request-size=100MB
-
-logging.level.org.springframework.web: DEBUG
+In the root of the project, run
+```
+docker compose up
+```
+The website will run in the browser at
+```
+http://localhost:3000
 ```
 
-Make a database in mysql with the correct database_name.
-
-Also make sure to specify at what path you want images to be saved at.
-
-Run the file 
-
-```python
-Reddit clone\Reddit-clone\src\main\java\com\example\Reddit\clone\RedditCloneApplication.java
-```
-
-Then run the reactjs project with 
-
-```python
-npm install
-npm update
-npm start
-```
-
-Go to
-
-```python
-http://localhost:3000/
-```
-
-to see the webpage
 
 ## Database
 If some of the images are unclear, then click on them to get a better view.
 ![database](https://github.com/Vemund1999/reddit_clone/assets/88531005/55871bbe-5db8-466b-bb07-2aaec151d00c)
 
 
-
-## Potential improvments
-The project can be improved further by splitting the project into micro-services. Each micro-service can be in a docker-contrainer. There can be micro-services for users, communities & comments & posts. threaded commenting is currently handled using SQL. It would probably be easier to handle this with mongo-db. Mongo-db can have nested documents, which reminds more of nested comments.
-
+## Backend services
+There are two backend services.
+An authentication-backend service handles authentication,
+while another reddit-backend service handles most of the other logic for the website.
