@@ -1,7 +1,6 @@
 package com.example.Reddit.clone.Services;
 
 
-import com.example.Reddit.clone.Config.JwtService;
 import com.example.Reddit.clone.DTO.*;
 import com.example.Reddit.clone.Entity.Community;
 import com.example.Reddit.clone.Entity.User;
@@ -39,7 +38,6 @@ public class CommunityService {
     final private CommunityRepository communityRepository;
     final private UserRepository userRepository;
     final private PostRepository postRepository;
-    final private JwtService jwtService;
     final private CommunityMapper communityMapper;
     final private UserMapper userMapper;
 

@@ -1,7 +1,6 @@
 package com.example.Reddit.clone.ACL;
 
 
-import com.example.Reddit.clone.Config.JwtService;
 import com.example.Reddit.clone.Entity.Community;
 import com.example.Reddit.clone.Entity.User;
 import com.example.Reddit.clone.Exception.NotFound;
@@ -15,8 +14,6 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 public class CheckAgainstModeratorAndAdminRights {
-
-    private JwtService jwtService;
 
     private UserRepository userRepository;
     private CommunityRepository communityRepository;

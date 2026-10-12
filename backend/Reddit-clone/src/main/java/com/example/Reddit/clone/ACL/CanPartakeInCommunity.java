@@ -1,7 +1,6 @@
 package com.example.Reddit.clone.ACL;
 
 
-import com.example.Reddit.clone.Config.JwtService;
 import com.example.Reddit.clone.Entity.Community;
 import com.example.Reddit.clone.Entity.CommunityType;
 import com.example.Reddit.clone.Entity.Post;
@@ -23,9 +22,6 @@ public class CanPartakeInCommunity {
     private CommunityRepository communityRepository;
     private PostRepository postRepository;
     private UserRepository userRepository;
-
-    private JwtService jwtService;
-
 
     public boolean userCanCreate(String authorization, String communityName) {
         Community community = communityRepository.findByTitle(communityName).orElseThrow();

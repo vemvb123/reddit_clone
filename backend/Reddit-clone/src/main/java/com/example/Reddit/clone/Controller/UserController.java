@@ -1,7 +1,6 @@
 package com.example.Reddit.clone.Controller;
 
 
-import com.example.Reddit.clone.ACL.CheckIfMethodCalled;
 import com.example.Reddit.clone.DTO.CommunityDTO;
 import com.example.Reddit.clone.DTO.ResponseText;
 import com.example.Reddit.clone.DTO.UserDTO;
@@ -23,14 +22,7 @@ import java.util.List;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class UserController {
 
-    //@Autowired
-    //private OwnerCheck ownerCheck;
-
-    //@Autowired
-    //private CanPartakeInCommunity canPartakeInCommunity;
-    private CheckIfMethodCalled checkIfMethodCalled;
     private UserService userService;
-
 
     //Todo: Bare administrator kan gjøre dette ..
     @PreAuthorize(("@ownerCheck.usernameIsSameAsToken(#username)"))

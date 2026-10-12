@@ -1,6 +1,5 @@
 package com.example.Reddit.clone.ChatStuff;
 
-import com.example.Reddit.clone.Config.JwtService;
 import com.example.Reddit.clone.Entity.Chat;
 import com.example.Reddit.clone.Entity.ChatMessage;
 import com.example.Reddit.clone.Entity.User;
@@ -35,7 +34,6 @@ import java.util.Objects;
 public class ChatController {
 
     private ChatServiceImpl chatService;
-    private JwtService jwtService;
     private UserRepository userRepository;
     private ChatRepository chatRepository;
     private ChatMessageRepository chatMessageRepository;

@@ -23,7 +23,7 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
 
     @Modifying
     @Query(value = "INSERT INTO user_community (user_id, community_id) VALUES (:userId, :communityId)", nativeQuery = true)
-    public void addUserToCommunity(@Param("userId") Long userId, @Param("communityId") Long communityId);
+    void addUserToCommunity(@Param("userId") Long userId, @Param("communityId") Long communityId);
 
 
     Optional<Community> findByTitle(String title);
@@ -51,11 +51,11 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
 
     @Modifying
     @Query(value = "INSERT INTO user_community_admin (user_id, community_id) VALUES (:userId, :communityId)", nativeQuery = true)
-    public void addAdminToCommunity(@Param("userId") Long userId, @Param("communityId") Long communityId);
+    void addAdminToCommunity(@Param("userId") Long userId, @Param("communityId") Long communityId);
 
     @Modifying
     @Query(value = "INSERT INTO user_community_moderator (user_id, community_id) VALUES (:userId, :communityId)", nativeQuery = true)
-    public void addModToCommunity(@Param("userId") Long userId, @Param("communityId") Long communityId);
+    void addModToCommunity(@Param("userId") Long userId, @Param("communityId") Long communityId);
 
     @Query("SELECT c.members FROM Community c WHERE c.title LIKE :communityName")
     Set<User> findMembersOfCommunityByTitle(String communityName);
@@ -65,15 +65,15 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
 
     @Modifying
     @Query(value = "DELETE FROM user_community_moderator WHERE user_id = :userId AND community_id = :communityId", nativeQuery = true)
-    public void removeModeratorPowers(@Param("userId") Long userId, @Param("communityId") Long communityId);
+    void removeModeratorPowers(@Param("userId") Long userId, @Param("communityId") Long communityId);
 
     @Modifying
     @Query(value = "DELETE FROM user_community_admin WHERE user_id = :userId AND community_id = :communityId", nativeQuery = true)
-    public void removeAdminPowers(@Param("userId") Long userId, @Param("communityId") Long communityId);
+    void removeAdminPowers(@Param("userId") Long userId, @Param("communityId") Long communityId);
 
     @Modifying
     @Query(value = "DELETE FROM user_community WHERE user_id = :userId AND community_id = :communityId", nativeQuery = true)
-    public void unsubscribeUserFromCommunity(@Param("userId") Long userId, @Param("communityId") Long communityId);
+    void unsubscribeUserFromCommunity(@Param("userId") Long userId, @Param("communityId") Long communityId);
 
     @Query("SELECT c.administrators FROM Community c WHERE c.title LIKE :communityName")
     Set<User> findAdminsOfCommunityByTitle(String communityName);

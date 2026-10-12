@@ -42,38 +42,30 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p WHERE " +
             "p.community.title = :communityTitle " +
             "ORDER BY p.createdAt DESC")
-    public List<Post> find20LaterPostAfterPost(@Param("communityTitle") String communityTitle, Pageable pageable);
+    List<Post> find20LaterPostAfterPost(@Param("communityTitle") String communityTitle, Pageable pageable);
 
 
     @Query("SELECT p FROM Post p WHERE " +
             "p.community.title = :communityTitle " +
             "ORDER BY p.createdAt DESC")
-    public List<Post> findLaterPostAfterPostByTitle(@Param("communityTitle") String communityTitle);
+    List<Post> findLaterPostAfterPostByTitle(@Param("communityTitle") String communityTitle);
 
 
     @Query("SELECT p FROM Post p WHERE " +
             "p.community.id = :communityId " +
             "ORDER BY p.createdAt DESC")
-    public List<Post> findLaterPostAfterPostById(@Param("communityId") long communityId);
+    List<Post> findLaterPostAfterPostById(@Param("communityId") long communityId);
 
 
 
     @Query("SELECT p FROM Post p WHERE p.user.username LIKE :username")
-    public List<Post> getPostsOfUserOrderByCreatedAt(@Param("username") String username, PageRequest of);
+    List<Post> getPostsOfUserOrderByCreatedAt(@Param("username") String username, PageRequest of);
 
     boolean existsByTitle(String title);
 
 
-
     @Query("SELECT p FROM Post p WHERE p.community.communityType = 'PUBLIC' ORDER BY p.createdAt DESC")
     List<Post> getLatestsPostsOfPublicCommunities(PageRequest of);
-
-
-
-        /*
-        Hent ut communities der bruker er medlem - Dette er en liste
-
-         */
 
 
 }

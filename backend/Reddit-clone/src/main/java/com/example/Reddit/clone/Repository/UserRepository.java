@@ -38,10 +38,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u.friends FROM User u WHERE u.id = :userId")
     Set<User> getFriendsOfUser(@Param("userId") Long userId);
 
-
-
-
-
     @Modifying
     @Query("DELETE FROM Message m WHERE m.fromUser.id = :fromUserId AND m.toUser.id = :toUserId")
     void deleteFriendRequestsFromUserToUser(@Param("fromUserId") Long fromUserid, @Param("toUserId") Long toUserid);
