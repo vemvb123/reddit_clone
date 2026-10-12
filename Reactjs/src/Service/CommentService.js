@@ -3,7 +3,7 @@ import {createAxiosInstance, hasToken, handleRequest} from './utils';
 
 const api = createAxiosInstance();
 
-
+//
 export const getComment = (commentId) =>
     handleRequest(() => api.get(`/comment/${commentId}`));
 
