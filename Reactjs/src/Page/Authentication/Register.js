@@ -5,6 +5,8 @@ import Form from 'react-bootstrap/Form';
 import * as auth from "../../Service/auth-header";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {useNavigate} from "react-router-dom";
+import {getUser} from "../../Service/UserService";
+import LoadingMessage from "../../Component/SiteMessage/LoadingMessage";
 
 
 
@@ -19,6 +21,8 @@ const Register = () => {
         username: ""
     })
 
+    const [loading, setLoading] = useState(null)
+
     const navigate = useNavigate();
 
     const handleInput = (e) => {
@@ -29,13 +33,20 @@ const Register = () => {
         }))
     }
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        setLoading(true)
         const responseStatus = await auth.register(registerData.firstname, registerData.lastname, registerData.email, registerData.password, registerData.username)
         if (responseStatus === 200) {
+            await new Promise(resolve => setTimeout(resolve, 5000));
             navigate(`/profile/${registerData.username}`)
         }
+    }
+
+
+    if (loading) {
+        return <LoadingMessage/>
     }
 
   return (

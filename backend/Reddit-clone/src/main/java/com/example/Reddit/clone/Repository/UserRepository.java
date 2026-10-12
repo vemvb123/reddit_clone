@@ -19,15 +19,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findById(Long id);
 
-    Optional<User> findByEmail(String email);
-
     @Query("SELECT u.communities FROM User u WHERE u.username = :username")
     Set<Community> findCommunitiesByUsername(@Param("username") String username);
 
     @Query("SELECT u.communities FROM User u WHERE u.username LIKE :username")
     Set<Community> findCommunitiesUserIsMemberOf(@Param("username") String username);
-
-
 
     @Query("SELECT u.moderatorOnCommunities FROM User u WHERE u.username LIKE :username")
     Set<Community> findCommunitiesUserIsModeratorOf(@Param("username") String username);
@@ -35,11 +31,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u.administratorOnCommunities FROM User u WHERE u.username LIKE :username")
     Set<Community> findCommunitiesUserIsAdministratorOf(@Param("username") String username);
 
-
     @Modifying
     @Query(value = "INSERT INTO friends (user_id, friend_id) VALUES (:userId, :friendId)", nativeQuery = true)
     void addUserAsFriendToThisUser(Long userId, Long friendId);
-
 
     @Query("SELECT u.friends FROM User u WHERE u.id = :userId")
     Set<User> getFriendsOfUser(@Param("userId") Long userId);

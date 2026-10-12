@@ -1,6 +1,5 @@
 package com.example.Reddit.clone.Services;
 
-import com.example.Reddit.clone.Config.JwtService;
 import com.example.Reddit.clone.DTO.CommunityDTO;
 import com.example.Reddit.clone.DTO.ResponseText;
 import com.example.Reddit.clone.DTO.ResponseTextType;
@@ -41,8 +40,6 @@ public class UserService {
 
     final private UserRepository userRepository;
     final private MessageRepository messageRepository;
-
-    final private JwtService jwtService;
 
     final private UserMapper userMapper;
     final private CommunityMapper communityMapper;

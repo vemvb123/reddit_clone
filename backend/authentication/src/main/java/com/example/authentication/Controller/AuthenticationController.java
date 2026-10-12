@@ -1,9 +1,10 @@
 package com.example.authentication.Controller;
 
-import com.example.authentication.Service.AuthenticationService;
 import com.example.authentication.DTO.AuthenticationRequest;
 import com.example.authentication.DTO.AuthenticationResponse;
 import com.example.authentication.DTO.RegisterRequest;
+import com.example.authentication.Exception.UsernameAlreadyExists;
+import com.example.authentication.Service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,6 @@ public class AuthenticationController {
     }
 
 
-
     @CrossOrigin(origins = origin)
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
@@ -43,15 +43,12 @@ public class AuthenticationController {
 
     }
 
-
     @CrossOrigin(origins = origin)
     @GetMapping("/validate")
     public ResponseEntity<String> validate(@RequestHeader("Authorization") String authorization)
     {
         return ResponseEntity.ok().body("ok");
     }
-
-
 
     @GetMapping("/user")
     public ResponseEntity<String> user(@RequestHeader("Authorization") String authorization) {

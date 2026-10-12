@@ -11,7 +11,6 @@ public class UserMapper {
         return new UserDTO(
                 user.getUsername(),
                 user.getPathToProfileImage(),
-                user.getPassword(),
                 user.getPathToWallpaperImage()
         );
     }

@@ -3,6 +3,7 @@ package com.example.authentication.DTO;
 import com.example.authentication.Entity.RoleEnum;
 
 import java.util.HashSet;
+import java.util.Set;
 
 public record AuthenticationResponse(
     String firstname,

@@ -4,7 +4,7 @@ import axios from 'axios';
 
 export async function register(firstname, lastname, email, password, username) {
     try {
-        const response = await axios.post("http://localhost:8080/auth/register", {
+        const response = await axios.post("http://localhost:8081/auth/register", {
             firstname,
             lastname,
             email,
@@ -22,7 +22,7 @@ export async function register(firstname, lastname, email, password, username) {
 }
 
 export async function authenticate(username, password) {
-  var link = "http://localhost:8080/auth/authenticate";
+  var link = "http://localhost:8081/auth/authenticate";
   let responseStatus;
 
   await axios.post(link, {
@@ -56,7 +56,7 @@ export function setToken(token) {
 
 export async function checkValidToken(token)
 {
-  var link = "http://localhost:8080/auth/validate"
+  var link = "http://localhost:8081/auth/validate"
   let responseStatus;
 
   const authHeader = {

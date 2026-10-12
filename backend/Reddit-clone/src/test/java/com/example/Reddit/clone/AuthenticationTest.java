@@ -1,8 +1,5 @@
 package com.example.Reddit.clone;
 
-import com.example.Reddit.clone.Auth.AuthenticationRequest;
-import com.example.Reddit.clone.Auth.AuthenticationResponse;
-import com.example.Reddit.clone.Auth.RegisterRequest;
 import com.example.Reddit.clone.Config.JwtService;
 import com.example.Reddit.clone.Entity.User;
 import com.example.Reddit.clone.Exception.NotFound;

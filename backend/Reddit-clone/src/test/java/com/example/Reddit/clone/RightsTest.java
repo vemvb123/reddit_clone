@@ -1,9 +1,6 @@
 package com.example.Reddit.clone;
 
 
-import com.example.Reddit.clone.Auth.AuthenticationRequest;
-import com.example.Reddit.clone.Auth.AuthenticationResponse;
-import com.example.Reddit.clone.Auth.RegisterRequest;
 import com.example.Reddit.clone.Config.JwtService;
 import com.example.Reddit.clone.DTO.CommentDTO;
 import com.example.Reddit.clone.DTO.CommunityDTO;

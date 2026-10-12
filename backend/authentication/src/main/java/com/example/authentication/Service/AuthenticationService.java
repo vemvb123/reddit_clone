@@ -2,10 +2,13 @@ package com.example.authentication.Service;
 
 import com.example.authentication.DTO.AuthenticationRequest;
 import com.example.authentication.DTO.AuthenticationResponse;
+import com.example.authentication.DTO.UserCreatedEvent;
 import com.example.authentication.Entity.RoleEnum;
 import com.example.authentication.Entity.User;
+import com.example.authentication.Exception.UserNotFound;
 import com.example.authentication.Exception.UsernameAlreadyExists;
 import com.example.authentication.DTO.RegisterRequest;
+import com.example.authentication.Publisher.UserEventPublisher;
 import com.example.authentication.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +29,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final UserEventPublisher userEventPublisher;
 
     public AuthenticationResponse register(RegisterRequest request) throws UsernameAlreadyExists {
         Set<RoleEnum> roles = new HashSet<>();
@@ -39,10 +43,13 @@ public class AuthenticationService {
                 request.username(),
                 roles
         );
-        if (userRepository.existsByUsername(user.getUsername()))
-            throw new UsernameAlreadyExists();
+        if (userRepository.existsByUsername(request.username()))
+            throw new UsernameAlreadyExists(request.username());
 
         User savedUser = userRepository.save(user);
+        UserCreatedEvent event = new UserCreatedEvent(savedUser.getUsername());
+        userEventPublisher.publishUserCreated(event);
+
         log.info("Saved user {}", savedUser);
         var jwtToken = jwtService.generateToken(savedUser);
         return new AuthenticationResponse( jwtToken );
@@ -50,7 +57,6 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        System.out.println(request);
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -60,7 +66,7 @@ public class AuthenticationService {
         );
 
         var user  = userRepository.findByUsername(request.username())
-                .orElseThrow(() -> new NotFoundException(NotFound.USER));
+                .orElseThrow(() -> new UserNotFound(request.username()));
         var jwtToken = jwtService.generateToken(user);
 
         return new AuthenticationResponse(
