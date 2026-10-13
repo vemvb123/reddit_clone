@@ -4,12 +4,14 @@ import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap styles
 import { Container, Row, Button } from 'react-bootstrap';
 
 import Wallpaper from '../../Component/Community/Wallpaper';
+import RoundImage from '../../Component/Community/RoundImage';
 import * as communityService from "../../Service/CommunityService"
 import * as postService from "../../Service/PostService"
 
 import Posts from '../../Component/Post/Posts';
 import ErrorMessage from "../../Component/SiteMessage/ErrorMessage";
 import LoadingMessage from "../../Component/SiteMessage/LoadingMessage";
+import { defaultCommunityImage } from '../../Service/utils';
 
 
 export default function ViewCommunity() {
@@ -75,7 +77,6 @@ export default function ViewCommunity() {
             background-color: transparent !important;
         }
     `;
-
 
     if (loading) {
         <LoadingMessage/>
@@ -150,8 +151,17 @@ export default function ViewCommunity() {
             </div>
 
 
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '5px', marginTop: '20px', marginBottom: '20px' }}>
-                {/* ... (existing code) */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px', marginTop: '20px', marginBottom: '20px' }}>
+                <RoundImage
+                    imageUrl={
+                        community?.communityImage
+                            ? `http://localhost:8080/image/${community.communityImage}`
+                            : defaultCommunityImage(community?.title)
+                    }
+                    to={`/community/${communityName}/set_logo`}
+                    sizeInPixels={'120px'}
+                />
+                <h1>{community?.title}</h1>
             </div>
 
             <Container className=''>

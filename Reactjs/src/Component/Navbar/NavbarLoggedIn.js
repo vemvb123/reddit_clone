@@ -4,11 +4,12 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import * as userService from "../../Service/UserService"
-import RoundImage from '../Community/RoundImage';
 
 import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap styles
 import Messages from './Messages';
 import logo from "../../Assets/Reddit-Logo.wine.png"
+import "../../App.css"
+import { defaultUserImage } from '../../Service/utils';
 
 
 
@@ -30,9 +31,6 @@ export default function NavbarLoggedIn() {
           fetchData();
     }, [])
 
-
-    let defaultImageUrl = "https://static.printler.com/cache/c/8/8/e/6/2/c88e62cb33a7b6e20b60af964d362a10883a43a1.jpg"
-
     if (!User) {
         return null;
     }
@@ -50,14 +48,6 @@ export default function NavbarLoggedIn() {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
-                <NavDropdown title="Options" id="collapsible-nav-dropdown">
-                    <NavDropdown.Item href={`/profile/${User.username}`}>View profile</NavDropdown.Item>
-                    <NavDropdown.Item href="/">View feed</NavDropdown.Item>
-                    <NavDropdown.Item href={`/profile/${User.username}/communities`}>View communities</NavDropdown.Item>
-                    <NavDropdown.Item href="#action/3.3">Logout</NavDropdown.Item>
-                    <NavDropdown.Divider />
-                    <NavDropdown.Item href="/create_community">Create community</NavDropdown.Item>
-                </NavDropdown>
                 <Messages User={User}/>
           </Nav>
         </Navbar.Collapse>
@@ -73,15 +63,29 @@ export default function NavbarLoggedIn() {
                 marginBottom: '20px', // Adjust bottom margin as needed
             }}    
         >
-            <RoundImage
-                imageUrl={
-                    User.pathToProfileImage
-                    ? `http://localhost:8080/image/${User.pathToProfileImage}`
-                    : defaultImageUrl
+            <NavDropdown
+                align="end"
+                id="profile-nav-dropdown"
+                title={
+                    <img
+                        src={
+                            User.pathToProfileImage
+                            ? `http://localhost:8080/image/${User.pathToProfileImage}`
+                            : defaultUserImage(User.username)
+                        }
+                        alt="Profile"
+                        className="profile-navbar-image"
+                    />
                 }
-                to={`/profile/${User.username}/set_profile_image`}
-                sizeInPixels={"75px"}
-            />
+            >
+                <NavDropdown.Item href={`/profile/${User.username}`}>View profile</NavDropdown.Item>
+                <NavDropdown.Item href="/">View feed</NavDropdown.Item>
+                <NavDropdown.Item href={`/profile/${User.username}/communities`}>View communities</NavDropdown.Item>
+                <NavDropdown.Item href={`/profile/${User.username}/set_profile_image`}>Change profile image</NavDropdown.Item>
+                <NavDropdown.Item href="#action/3.3">Logout</NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item href="/create_community">Create community</NavDropdown.Item>
+            </NavDropdown>
 
             <h3>{User.username}</h3>
         </div>

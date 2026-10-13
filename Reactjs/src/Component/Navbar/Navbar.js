@@ -1,5 +1,6 @@
 import React from 'react'
 import { useState } from 'react';
+import { defaultUserImage } from '../../Service/utils';
 
 
 
@@ -41,7 +42,7 @@ export default function Navbar() {
           {/* Profile image as a dropdown */}
           <div className="nav-item dropdown" style={{ cursor: 'pointer' }}>
             <img
-              src="https://cdn3.iconfinder.com/data/icons/social-messaging-productivity-6/128/profile-circle2-512.png"
+              src={defaultUserImage("username")}
               alt="Profile"
               className="rounded-circle dropdown-toggle"
               data-bs-toggle="dropdown"

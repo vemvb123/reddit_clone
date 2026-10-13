@@ -2,9 +2,9 @@ import React from 'react';
 import { Card, Row } from 'react-bootstrap';
 import RoundImage from '../Community/RoundImage';
 import { Link } from 'react-router-dom';
+import { defaultCommunityImage, defaultUserImage } from '../../Service/utils';
 
 export default function Posts({ posts }) {
-  const defaultImageUrl = 'https://www.alleycat.org/wp-content/uploads/2019/03/FELV-cat.jpg';
   const imageSize = '30px';
 
   const truncateWords = (str, numWords) => {
@@ -62,7 +62,7 @@ export default function Posts({ posts }) {
                         imageUrl={
                           post.pathToCommunityImage
                             ? `http://localhost:8080/image/${post.pathToCommunityImage}`
-                            : defaultImageUrl
+                            : defaultCommunityImage(post.communityName)
                         }
                         to={`/community/${post.communityName}`}
                         text={"See community"}
@@ -76,7 +76,7 @@ export default function Posts({ posts }) {
                         imageUrl={
                           post.pathToUserImage
                             ? `http://localhost:8080/image/${post.pathToUserImage}`
-                            : defaultImageUrl
+                            : defaultUserImage(post.username)
                         }
                         to={`/profile/${post.username}`}
                         text={"See profile"}

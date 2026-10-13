@@ -9,8 +9,8 @@ export const getComment = (commentId) =>
 
 export const getCommentsOfUser = (page, username) => {
     const link = hasToken()
-        ? `/comment/not_logged_in/${page}/${username}`
-        : `/comment/${page}/${username}`;
+      ? `/comment/latests/${page}/${username}`
+      : `/comment/latets_not_logged_in/${page}/${username}`;
 
     return handleRequest(() => api.get(link));
 };

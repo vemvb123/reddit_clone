@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import * as userService from '../../Service/UserService';
-import { useParams } from 'react-router-dom';
-import RoundImage from '../../Component/Community/RoundImage';
+import { Link, useParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Card, Container } from 'react-bootstrap';
+import '../../App.css';
+import { defaultCommunityImage } from '../../Service/utils';
 
 export default function ViewCommunitiesOfUser({ username: propsUsername }) {
   const { username: paramsUsername } = useParams();
@@ -28,24 +29,23 @@ export default function ViewCommunitiesOfUser({ username: propsUsername }) {
     console.log(communities);
   }, [username]);
 
-  let defaultImageUrl =
-    'https://static.printler.com/cache/c/8/8/e/6/2/c88e62cb33a7b6e20b60af964d362a10883a43a1.jpg';
-
   return (
     <Container className='mt-5'>
       {communities.map((community) => (
-        <Card key={community.title} className='mb-5 p-2'>
-          <RoundImage
-            imageUrl={
-              community.communityImage
-                ? `http://localhost:8080/image/${community.communityImage}`
-                : defaultImageUrl
-            }
-            to={`/community/${community.title}`}
-            sizeInPixels={'80px'}
-          ></RoundImage>
-          <Card.Title>{community.title}</Card.Title>
-        </Card>
+        <Link key={community.title} to={`/community/${community.title}`} className='text-decoration-none'>
+          <Card className='community-list-card mb-5 p-2 d-flex flex-row align-items-center gap-3'>
+            <img
+              src={
+                community.communityImage
+                  ? `http://localhost:8080/image/${community.communityImage}`
+                  : defaultCommunityImage(community.title)
+              }
+              alt={community.title}
+              className='community-list-image'
+            />
+            <Card.Title className='mb-0'>{community.title}</Card.Title>
+          </Card>
+        </Link>
       ))}
     </Container>
   );

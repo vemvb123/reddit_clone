@@ -9,21 +9,21 @@ import CommentsOfUser from '../../Component/Profile/CommentsOfUser';
 import ViewCommunitiesOfUser from '../Community/ViewCommunitiesOfUser';
 import ErrorMessage from "../../Component/SiteMessage/ErrorMessage";
 import LoadingMessage from "../../Component/SiteMessage/LoadingMessage";
+import { defaultUserImage } from '../../Service/utils';
 
 export default function ProfilePage() {
 
   let params = useParams();
   let username = params.username;
 
+  const [chatId, setChatId] = useState()
   const [friendRequestSent, setFriendRequestSent] = useState(false);
   const [profile, setProfile] = useState('');
   const [activeTab, setActiveTab] = useState('posts');
-  const [User, setUser] = useState('');
-  const [chatId, setChatId] = useState('second'); // Add chatId state
+  const [user, setUser] = useState('');
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  let token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,6 +34,7 @@ export default function ProfilePage() {
         const userResponse = await userService.getUserByToken();
         userResponse.error ? setError(userResponse.error.message) : setUser(userResponse.data);
 
+
         setLoading(false)
 
       } catch (error) {
@@ -41,20 +42,20 @@ export default function ProfilePage() {
       }
     };
     fetchData();
-  }, [token, username]);
+  }, [username]);
 
   const sendFriendRequest = async () => {
     if (!friendRequestSent) {
-      await userService.sendFriendRequest(token, username);
+      await userService.sendFriendRequest(username);
       setFriendRequestSent(true);
     }
   };
 
   const createChat = async () => {
     try {
-      let response = await userService.createChat(token, username);
+      let response = await userService.createChat(username);
       console.log('Chat created:', response);
-      setChatId(response);
+      setChatId(response.data);
       return response;
     } catch (error) {
       console.error('Error creating chat:', error);
@@ -68,9 +69,6 @@ export default function ProfilePage() {
     // Introduce a delay of 1 second (1000 milliseconds)
       window.location.href = `/chat/${response}/${username}`;
   };
-
-  const defaultImageUrl =
-    'https://i.guim.co.uk/img/media/dd703cd39013271a45bc199fae6aa1ddad72faaf/0_0_2000_1200/master/2000.jpg?width=1200&height=900&quality=85&auto=format&fit=crop&s=2192262d7832a184dbb583c238563695'; // Replace with your default image URL
 
   if (loading) {
     return <LoadingMessage/>
@@ -95,7 +93,7 @@ export default function ProfilePage() {
               imageUrl={
                 profile.pathToProfileImage
                   ? `http://localhost:8080/image/${profile.pathToProfileImage}`
-                  : defaultImageUrl
+                  : defaultUserImage(profile.username)
               }
               to={`/profile/${username}/set_profile_image`}
               sizeInPixels={'200px'}
@@ -110,13 +108,13 @@ export default function ProfilePage() {
         <Row className="text-center mt-3">
           <Col>
             <Nav variant="tabs" defaultActiveKey="/profile" className="justify-content-center">
-            {token !== 'non' && User?.username !== profile.username && (
-  <Nav.Item>
-    <Nav.Link onClick={sendFriendRequest} disabled={friendRequestSent}>
-      {friendRequestSent ? 'Friend request sent' : 'Send friend request'}
-    </Nav.Link>
-  </Nav.Item>
-)}
+              {user?.username !== profile.username && (
+                <Nav.Item>
+                  <Nav.Link onClick={sendFriendRequest} disabled={friendRequestSent}>
+                    {friendRequestSent ? 'Friend request sent' : 'Send friend request'}
+                  </Nav.Link>
+                </Nav.Item>
+              )}
               <Nav.Item>
                 <Nav.Link onClick={() => setActiveTab('posts')}>See posts</Nav.Link>
               </Nav.Item>
@@ -126,10 +124,12 @@ export default function ProfilePage() {
               <Nav.Item>
                 <Nav.Link onClick={() => setActiveTab('communities')}>See communities</Nav.Link>
               </Nav.Item>
-              <Nav.Item>
-                <Nav.Link onClick={handleChatClick}>Chat</Nav.Link>
-              </Nav.Item>
-            </Nav>
+              {profile.username !== user.username && (
+                 <Nav.Item>
+                  <Nav.Link onClick={handleChatClick}>Chat</Nav.Link>
+                </Nav.Item>
+              )}
+           </Nav>
           </Col>
         </Row>
       </Container>

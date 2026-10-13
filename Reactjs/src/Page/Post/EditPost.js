@@ -7,6 +7,7 @@ import { Button, Card, Collapse, Container, Modal, Form } from 'react-bootstrap'
 import * as commentService from '../../Service/CommentService';
 import * as postService from '../../Service/PostService';
 import RoundImage from '../../Component/Community/RoundImage';
+import { defaultCommunityImage, defaultUserImage } from '../../Service/utils';
 
 export default function EditPost() {
 
@@ -38,17 +39,6 @@ export default function EditPost() {
 
   
 
-  
-    let defaultImageUrl = 'https://www.alleycat.org/wp-content/uploads/2019/03/FELV-cat.jpg';
-  
-  
-  
-  
-
-  
-  
-  
-  
   
     const [showDeleteModal, setShowDeleteModal] = useState(false);
   
@@ -114,7 +104,7 @@ export default function EditPost() {
                 imageUrl={
                   post.pathToCommunityImage
                     ? `http://localhost:8080/image/${post.pathToCommunityImage}`
-                    : defaultImageUrl
+                    : defaultCommunityImage(post.communityName)
                 }
                 to={`/community/${post.communityName}`}
                 sizeInPixels={'50px'}
@@ -128,7 +118,7 @@ export default function EditPost() {
                 imageUrl={
                   post.pathToUserImage
                     ? `http://localhost:8080/image/${post.pathToUserImage}`
-                    : defaultImageUrl
+                    : defaultUserImage(post.username)
                 }
                 to={`/profile/${post.username}`}
                 sizeInPixels={'50px'}

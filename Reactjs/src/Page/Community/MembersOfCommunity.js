@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import * as communityService from '../../Service/CommunityService';
 import { Container, Card } from 'react-bootstrap';
 import RoundImage from '../../Component/Community/RoundImage';
+import { defaultUserImage } from '../../Service/utils';
 
 export default function MembersOfCommunity() {
   let params = useParams();
@@ -44,7 +45,7 @@ export default function MembersOfCommunity() {
       {members.map((member) => (
         <Card key={member.username} style={{ border: `2px solid ${getBorderColor(member)}` }} className='mb-5'>
           <RoundImage
-            imageUrl={`http://localhost:8080/image/${member.pathToProfileImage}`}
+            imageUrl={member.pathToProfileImage ? `http://localhost:8080/image/${member.pathToProfileImage}` : defaultUserImage(member.username)}
             to={`/profile/${member.username}`}
             sizeInPixels={'80px'}
           />

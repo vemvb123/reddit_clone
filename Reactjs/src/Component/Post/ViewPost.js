@@ -6,6 +6,7 @@ import { Button, Card, Collapse, Container, Modal } from 'react-bootstrap';
 import * as commentService from '../../Service/CommentService';
 import * as postService from '../../Service/PostService';
 import RoundImage from '../Community/RoundImage';
+import { defaultCommunityImage, defaultUserImage } from '../../Service/utils';
 
 export default function ViewPost() {
 
@@ -50,10 +51,6 @@ export default function ViewPost() {
     }
   }
 
-  let defaultImageUrl = 'https://www.alleycat.org/wp-content/uploads/2019/03/FELV-cat.jpg';
-
-
-
   return (
     <Container>
       <style>
@@ -97,7 +94,7 @@ export default function ViewPost() {
                 imageUrl={
                   post.pathToCommunityImage
                     ? `http://localhost:8080/image/${post.pathToCommunityImage}`
-                    : defaultImageUrl
+                    : defaultCommunityImage(post.communityName)
                 }
                 text={"See community"}
 
@@ -114,7 +111,7 @@ export default function ViewPost() {
                 imageUrl={
                   post.pathToUserImage
                     ? `http://localhost:8080/image/${post.pathToUserImage}`
-                    : defaultImageUrl
+                    : defaultUserImage(post.username)
                 }
                 text={"See profile"}
 

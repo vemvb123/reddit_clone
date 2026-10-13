@@ -3,6 +3,7 @@ import * as commentService from '../../Service/CommentService';
 import { Card, Container, Row, Button } from 'react-bootstrap';
 import RoundImage from "../Community/RoundImage";
 import { Link, useParams } from 'react-router-dom';
+import { defaultCommunityImage, defaultUserImage } from '../../Service/utils';
 
 export default function CommentsOfUser({ username: propUsername }) {
     const [comments, setComments] = useState([]);
@@ -22,7 +23,6 @@ export default function CommentsOfUser({ username: propUsername }) {
         setPage((prevPage) => prevPage + 1);
     };
 
-    let defaultImageUrl = 'https://www.alleycat.org/wp-content/uploads/2019/03/FELV-cat.jpg';
     const imageSize = '30px';
 
     return (
@@ -71,7 +71,7 @@ export default function CommentsOfUser({ username: propUsername }) {
                                                     imageUrl={
                                                         comment.pathToCommunityImage
                                                             ? `http://localhost:8080/image/${comment.pathToCommunityImage}`
-                                                            : defaultImageUrl
+                                                            : defaultCommunityImage(comment.communityName)
                                                     }
                                                     to={`/community/${comment.communityName}/set_logo`}
                                                     sizeInPixels={imageSize}
@@ -86,7 +86,7 @@ export default function CommentsOfUser({ username: propUsername }) {
                                                     imageUrl={
                                                         comment.pathToUserImage
                                                             ? `http://localhost:8080/image/${comment.pathToUserImage}`
-                                                            : defaultImageUrl
+                                                            : defaultUserImage(comment.username)
                                                     }
                                                     to={`/community/${comment.communityName}/set_logo`}
                                                     sizeInPixels={imageSize}
@@ -101,7 +101,7 @@ export default function CommentsOfUser({ username: propUsername }) {
                                                     imageUrl={
                                                         comment.usernameRepliedToPathToImage
                                                             ? `http://localhost:8080/image/${comment.usernameRepliedToPathToImage}`
-                                                            : defaultImageUrl
+                                                            : defaultUserImage(comment.usernameRepliedTo)
                                                     }
                                                     to={`/community/${comment.communityName}/set_logo`}
                                                     sizeInPixels={imageSize}
@@ -132,10 +132,12 @@ export default function CommentsOfUser({ username: propUsername }) {
                         </div>
                     ))}
                 </Row>
-                <Row className="justify-content-center mt-3">
-                    <Button onClick={handleShowMoreClick}>Show more comments</Button>
-                </Row>
-            </Container>
+                {comments?.length === 10 && (
+                     <Row className="justify-content-center mt-3">
+                        <Button onClick={handleShowMoreClick}>Show more comments</Button>
+                    </Row>
+                )}
+           </Container>
         </>
     );
 }

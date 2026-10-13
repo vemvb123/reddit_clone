@@ -32,5 +32,5 @@ export const acceptFriendRequest = (fromUsername) =>
 export const getCommunitiesUserIsMemberOf = (username) =>
     handleRequest(() => api.get(`/user/communities_of_user/${username}`));
 
-export const createChat = (token, toUserCreatingChatWith) =>
+export const createChat = (toUserCreatingChatWith) =>
     handleRequest(() => api.post(`/api/chat/getChatOrCreateIfAlreadyExists/${toUserCreatingChatWith}`, null));

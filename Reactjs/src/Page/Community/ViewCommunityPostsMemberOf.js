@@ -3,6 +3,7 @@ import * as postService from '../../Service/PostService';
 import { Card, Container, Row, Button } from 'react-bootstrap';
 import RoundImage from '../../Component/Community/RoundImage';
 import { Link } from 'react-router-dom';
+import { defaultCommunityImage, defaultUserImage } from '../../Service/utils';
 
 export default function ViewCommunityPostsMemberOf() {
   const [posts, setPosts] = useState([]);
@@ -26,7 +27,6 @@ export default function ViewCommunityPostsMemberOf() {
     setPage((prevPage) => prevPage + 1);
   };
 
-  let defaultImageUrl = 'https://www.alleycat.org/wp-content/uploads/2019/03/FELV-cat.jpg';
   const imageSize = '30px';
 
   return (
@@ -74,7 +74,7 @@ export default function ViewCommunityPostsMemberOf() {
                           imageUrl={
                             post.pathToCommunityImage
                               ? `http://localhost:8080/image/${post.pathToCommunityImage}`
-                              : defaultImageUrl
+                              : defaultCommunityImage(post.communityName)
                           }
                           to={`/community/${post.communityName}/set_logo`}
                           sizeInPixels={imageSize}
@@ -88,7 +88,7 @@ export default function ViewCommunityPostsMemberOf() {
                           imageUrl={
                             post.pathToUserImage
                               ? `http://localhost:8080/image/${post.pathToUserImage}`
-                              : defaultImageUrl
+                              : defaultUserImage(post.username)
                           }
                           to={`/community/${post.communityName}/set_logo`}
                           sizeInPixels={imageSize}

@@ -34,6 +34,14 @@ export function hasToken() {
     return localStorage.getItem("token") !== null
 }
 
+export function defaultUserImage(seed = "user") {
+    return `https://api.dicebear.com/10.x/initials/svg?seed=${encodeURIComponent(seed)}&backgroundColor=e0e7ff,c7d2fe,ddd6fe`;
+}
+
+export function defaultCommunityImage(seed = "community") {
+    return `https://api.dicebear.com/10.x/shapes/svg?seed=${encodeURIComponent(seed)}&backgroundColor=f1f5f9,e2e8f0,dbeafe`;
+}
+
 
 export async function handleRequest(requestFn) {
     try {

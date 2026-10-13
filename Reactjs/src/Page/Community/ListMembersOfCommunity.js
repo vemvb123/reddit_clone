@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {Card, Container} from 'react-bootstrap';
 import React, { useEffect, useState } from 'react'
 import * as communityService from "../../Service/CommunityService"
+import { defaultUserImage } from '../../Service/utils';
 
 
 export default function ListMembersOfCommunity({communityName}) {
@@ -18,8 +19,6 @@ export default function ListMembersOfCommunity({communityName}) {
         fetchData()
     }, [])
 
-    let defaultImageUrl = "https://static.printler.com/cache/c/8/8/e/6/2/c88e62cb33a7b6e20b60af964d362a10883a43a1.jpg"
-
     return (
         <Container>
 
@@ -29,7 +28,7 @@ export default function ListMembersOfCommunity({communityName}) {
                     imageUrl={
                         user.pathToProfileImage
                         ? `http://localhost:8080/image/${user.pathToProfileImage}`
-                        : defaultImageUrl
+                        : defaultUserImage(user.username)
                     } to={`/profile/${user.username}`} sizeInPixels={"80px"}></RoundImage>
                 <Card.Title>{user.username}</Card.Title>
         </Card> 
