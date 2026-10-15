@@ -61,7 +61,9 @@ public class SecurityConfig {
 
                         "/message/get_10_messages_for_user/{page}",
 
-                        "/websocket/**"
+                        "/websocket/**",
+                        "/actuator/health",
+                        "/actuator/prometheus"
 
                         )
                 .permitAll(

@@ -1,0 +1,18 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: api-gateway
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["api-gateway:8080"]
+
+  - job_name: authentication
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["authentication-backend:8081"]
+
+  - job_name: reddit-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["reddit-backend:8080"]

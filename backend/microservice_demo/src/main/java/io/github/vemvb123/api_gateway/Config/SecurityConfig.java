@@ -19,14 +19,17 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
 
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/public/**").permitAll()
+                        .pathMatchers(
+                                "/public/**",
+                                "/auth/**"
+                                ).permitAll()
 
 
                         .pathMatchers(
                             "/actuator/health",
                             "/actuator/prometheus"
                         ).permitAll()
-                        .anyExchange().authenticated()
+                        .anyExchange().permitAll()
                 )
 
                 .oauth2ResourceServer(oauth2 ->

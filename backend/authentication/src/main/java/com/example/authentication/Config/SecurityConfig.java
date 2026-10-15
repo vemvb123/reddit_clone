@@ -32,7 +32,9 @@ public class SecurityConfig {
 
                 .requestMatchers(
                         "/auth/**",
-                        "/websocket/**"
+                        "/websocket/**",
+                        "/actuator/health",
+                        "/actuator/prometheus"
                         )
                 .permitAll()
                 .requestMatchers(
