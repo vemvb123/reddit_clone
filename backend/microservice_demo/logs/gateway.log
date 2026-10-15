@@ -1,0 +1,78 @@
+2026-08-08T18:21:38.939+02:00  INFO 35280 --- [api_gateway] [main] i.g.v.api_gateway.ApiGatewayApplication  : Starting ApiGatewayApplication using Java 26.0.1 with PID 35280 (C:\Users\Vemund Vestgøte\Documents\kode\Microservice DEMO\api_gateway\api_gateway\target\classes started by Vemund Vestgøte in C:\Users\Vemund Vestgøte\Documents\kode\Microservice DEMO\api_gateway\api_gateway)
+2026-08-08T18:21:38.942+02:00  INFO 35280 --- [api_gateway] [main] i.g.v.api_gateway.ApiGatewayApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-08-08T18:21:41.650+02:00  INFO 35280 --- [api_gateway] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-08-08T18:21:41.653+02:00  INFO 35280 --- [api_gateway] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-08-08T18:21:41.673+02:00  INFO 35280 --- [api_gateway] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 9 ms. Found 0 Redis repository interfaces.
+2026-08-08T18:21:41.960+02:00  INFO 35280 --- [api_gateway] [main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=2ff3f58c-e8a4-3142-a486-05d4b0b4cc68
+2026-08-08T18:21:43.763+02:00  WARN 35280 --- [api_gateway] [main] o.h.v.i.m.a.CascadingMetaDataBuilder     : HV000271: Using `@Valid` on a container (java.util.List) is deprecated. You should apply the annotation on the type argument(s). Affected element: routes
+2026-08-08T18:21:43.898+02:00  INFO 35280 --- [api_gateway] [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [After]
+2026-08-08T18:21:43.898+02:00  INFO 35280 --- [api_gateway] [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Before]
+2026-08-08T18:21:43.898+02:00  INFO 35280 --- [api_gateway] [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Between]
+2026-08-08T18:21:43.898+02:00  INFO 35280 --- [api_gateway] [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Cookie]
+2026-08-08T18:21:43.898+02:00  INFO 35280 --- [api_gateway] [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Header]
+2026-08-08T18:21:43.898+02:00  INFO 35280 --- [api_gateway] [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Host]
+2026-08-08T18:21:43.898+02:00  INFO 35280 --- [api_gateway] [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Method]
+2026-08-08T18:21:43.898+02:00  INFO 35280 --- [api_gateway] [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Path]
+2026-08-08T18:21:43.898+02:00  INFO 35280 --- [api_gateway] [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Query]
+2026-08-08T18:21:43.898+02:00  INFO 35280 --- [api_gateway] [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [ReadBody]
+2026-08-08T18:21:43.898+02:00  INFO 35280 --- [api_gateway] [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [RemoteAddr]
+2026-08-08T18:21:43.899+02:00  INFO 35280 --- [api_gateway] [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Version]
+2026-08-08T18:21:43.899+02:00  INFO 35280 --- [api_gateway] [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2026-08-08T18:21:43.899+02:00  INFO 35280 --- [api_gateway] [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Weight]
+2026-08-08T18:21:43.899+02:00  INFO 35280 --- [api_gateway] [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2026-08-08T18:21:44.235+02:00  INFO 35280 --- [api_gateway] [main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 4 endpoints beneath base path '/actuator'
+2026-08-08T18:21:44.574+02:00  INFO 35280 --- [api_gateway] [main] o.s.boot.reactor.netty.NettyWebServer    : Netty started on port 8080 (http)
+2026-08-08T18:21:44.603+02:00  INFO 35280 --- [api_gateway] [main] i.g.v.api_gateway.ApiGatewayApplication  : Started ApiGatewayApplication in 6.616 seconds (process running for 9.689)
+2026-08-08T18:21:45.263+02:00  WARN 35280 --- [api_gateway] [boundedElastic-1] b.d.r.h.DataRedisReactiveHealthIndicator : Redis health check failed
+
+org.springframework.data.redis.RedisConnectionFailureException: Unable to connect to Redis
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.translateException(LettuceConnectionFactory.java:1873) ~[spring-data-redis-4.1.0.jar:4.1.0]
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1804) ~[spring-data-redis-4.1.0.jar:4.1.0]
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getNativeConnection(LettuceConnectionFactory.java:1601) ~[spring-data-redis-4.1.0.jar:4.1.0]
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.lambda$getConnection$0(LettuceConnectionFactory.java:1581) ~[spring-data-redis-4.1.0.jar:4.1.0]
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.doInLock(LettuceConnectionFactory.java:1542) ~[spring-data-redis-4.1.0.jar:4.1.0]
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getConnection(LettuceConnectionFactory.java:1578) ~[spring-data-redis-4.1.0.jar:4.1.0]
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getSharedReactiveConnection(LettuceConnectionFactory.java:1283) ~[spring-data-redis-4.1.0.jar:4.1.0]
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getReactiveConnection(LettuceConnectionFactory.java:1153) ~[spring-data-redis-4.1.0.jar:4.1.0]
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getReactiveConnection(LettuceConnectionFactory.java:122) ~[spring-data-redis-4.1.0.jar:4.1.0]
+	at reactor.core.publisher.MonoSupplier.call(MonoSupplier.java:63) ~[reactor-core-3.8.6.jar:3.8.6]
+	at reactor.core.publisher.FluxSubscribeOnCallable$CallableSubscribeOnSubscription.run(FluxSubscribeOnCallable.java:228) ~[reactor-core-3.8.6.jar:3.8.6]
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:72) ~[reactor-core-3.8.6.jar:3.8.6]
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28) ~[reactor-core-3.8.6.jar:3.8.6]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:330) ~[na:na]
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:309) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090) ~[na:na]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614) ~[na:na]
+	at java.base/java.lang.Thread.run(Thread.java:1516) ~[na:na]
+Caused by: io.lettuce.core.RedisConnectionException: Unable to connect to localhost/<unresolved>:6379
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:63) ~[lettuce-core-7.5.2.RELEASE.jar:7.5.2.RELEASE/5728917]
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:41) ~[lettuce-core-7.5.2.RELEASE.jar:7.5.2.RELEASE/5728917]
+	at io.lettuce.core.AbstractRedisClient.getConnection(AbstractRedisClient.java:315) ~[lettuce-core-7.5.2.RELEASE.jar:7.5.2.RELEASE/5728917]
+	at io.lettuce.core.RedisClient.connect(RedisClient.java:220) ~[lettuce-core-7.5.2.RELEASE.jar:7.5.2.RELEASE/5728917]
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.lambda$getConnection$1(StandaloneConnectionProvider.java:113) ~[spring-data-redis-4.1.0.jar:4.1.0]
+	at java.base/java.util.Optional.orElseGet(Optional.java:368) ~[na:na]
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.getConnection(StandaloneConnectionProvider.java:113) ~[spring-data-redis-4.1.0.jar:4.1.0]
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1802) ~[spring-data-redis-4.1.0.jar:4.1.0]
+	... 16 common frames omitted
+Caused by: io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: getsockopt: localhost/127.0.0.1:6379
+Caused by: java.net.ConnectException: Connection refused: getsockopt
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method) ~[na:na]
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:642) ~[na:na]
+	at java.base/sun.nio.ch.SocketChannelImpl.finishConnect(SocketChannelImpl.java:1043) ~[na:na]
+	at io.netty.channel.socket.nio.NioSocketChannel.doFinishConnect(NioSocketChannel.java:330) ~[netty-transport-4.2.15.Final.jar:4.2.15.Final]
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:384) ~[netty-transport-4.2.15.Final.jar:4.2.15.Final]
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.handle(AbstractNioChannel.java:432) ~[netty-transport-4.2.15.Final.jar:4.2.15.Final]
+	at io.netty.channel.nio.NioIoHandler$DefaultNioRegistration.handle(NioIoHandler.java:388) ~[netty-transport-4.2.15.Final.jar:4.2.15.Final]
+	at io.netty.channel.nio.NioIoHandler.processSelectedKey(NioIoHandler.java:596) ~[netty-transport-4.2.15.Final.jar:4.2.15.Final]
+	at io.netty.channel.nio.NioIoHandler.processSelectedKeysPlain(NioIoHandler.java:541) ~[netty-transport-4.2.15.Final.jar:4.2.15.Final]
+	at io.netty.channel.nio.NioIoHandler.processSelectedKeys(NioIoHandler.java:514) ~[netty-transport-4.2.15.Final.jar:4.2.15.Final]
+	at io.netty.channel.nio.NioIoHandler.run(NioIoHandler.java:484) ~[netty-transport-4.2.15.Final.jar:4.2.15.Final]
+	at io.netty.channel.SingleThreadIoEventLoop.runIo(SingleThreadIoEventLoop.java:225) ~[netty-transport-4.2.15.Final.jar:4.2.15.Final]
+	at io.netty.channel.SingleThreadIoEventLoop.run(SingleThreadIoEventLoop.java:196) ~[netty-transport-4.2.15.Final.jar:4.2.15.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:1195) ~[netty-common-4.2.15.Final.jar:4.2.15.Final]
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) ~[netty-common-4.2.15.Final.jar:4.2.15.Final]
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) ~[netty-common-4.2.15.Final.jar:4.2.15.Final]
+	at java.base/java.lang.Thread.run(Thread.java:1516) ~[na:na]
+
+2026-08-08T18:22:04.456+02:00  INFO 35280 --- [api_gateway] [SpringApplicationShutdownHook] o.s.boot.reactor.netty.GracefulShutdown  : Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-08T18:22:04.459+02:00  INFO 35280 --- [api_gateway] [netty-shutdown] o.s.boot.reactor.netty.GracefulShutdown  : Graceful shutdown complete
