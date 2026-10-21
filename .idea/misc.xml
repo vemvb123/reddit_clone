@@ -8,6 +8,7 @@
         <option value="$PROJECT_DIR$/backend/Reddit-clone/pom.xml" />
         <option value="$PROJECT_DIR$/backend/authentication/pom.xml" />
         <option value="$PROJECT_DIR$/backend/chat_service/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/microservice_demo/pom.xml" />
       </list>
     </option>
   </component>
