@@ -25,6 +25,20 @@ services:
     volumes:
       - mysql_authentication_data:/var/lib/mysql
 
+  mysql-chat:
+    image: mysql:8.0
+    container_name: chat-mysql
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: authentication
+    ports:
+      - "3303:3306"
+    volumes:
+      - mysql_chat_data:/var/lib/mysql
+
+
   kafka:
     image: apache/kafka:3.7.0
     container_name: kafka
@@ -79,6 +93,23 @@ services:
     ports:
       - "8081:8081"
 
+  chat-backend:
+    build:
+      context: ./backend/chat_service
+    container_name: chat-backend
+    restart: unless-stopped
+    depends_on:
+      - mysql-chat
+      - kafka
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-chat:3306/chat?allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8081:8081"
+
+
   frontend:
     build:
       context: ./Reactjs
@@ -97,3 +128,4 @@ volumes:
   mysql_reddit_data:
   mysql_authentication_data:
   reddit_images:
+  mysql_chat_data:
